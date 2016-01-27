@@ -1,0 +1,21 @@
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+
+  group="com.plexobject.dp"
+  version='1.0-SNAPSHOT'
+
+  apply plugin: 'java'
+  apply plugin: 'eclipse'
+  apply plugin: 'idea'
+}
+
+subprojects {
+}
+
+project(':dp-sample') {
+    dependencies {
+        compile project(':dp-framework')
+    }
+}

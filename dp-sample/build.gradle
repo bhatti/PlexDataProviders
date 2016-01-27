@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.guava:guava:17.0'
+    compile 'org.xerial:sqlite-jdbc:3.7.2'
+    compile project(':dp-framework')
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'com.googlecode.jmockit:jmockit:1.7'
+}
+

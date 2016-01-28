@@ -1,4 +1,4 @@
-package com.plexobject.dp;
+package com.plexobject.dp.domain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,10 +7,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.plexobject.domain.Preconditions;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataFieldRowSet {
@@ -27,8 +27,8 @@ public class DataFieldRowSet {
     }
 
     public DataFieldRowSet(MetaFields metaFields, Collection<DataFieldRow> rows) {
-        Preconditions.checkNotNull(metaFields, "metaFields cannot be null");
-        Preconditions.checkNotNull(rows, "rows cannot be null");
+        Objects.requireNonNull(metaFields, "metaFields cannot be null");
+        Objects.requireNonNull(rows, "rows cannot be null");
         this.metaFields = metaFields;
         for (MetaField metaField : metaFields.getMetaFields()) {
             metaFieldsByName.put(metaField.getName(), metaField);
@@ -59,7 +59,7 @@ public class DataFieldRowSet {
     }
 
     public synchronized void addRow(DataFieldRow row) {
-        Preconditions.checkNotNull(row, "row cannot be null");
+        Objects.requireNonNull(row, "row cannot be null");
         rows.add(row);
     }
 
@@ -96,55 +96,55 @@ public class DataFieldRowSet {
     }
 
     public String getValueAsText(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsText(metaField);
     }
 
     public long getValueAsLong(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsLong(metaField);
     }
 
     public double getValueAsDecimal(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsDecimal(metaField);
     }
 
     public byte[] getValueAsBinary(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsBinary(metaField);
     }
 
     public Date getValueAsDate(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsDate(metaField);
     }
 
     public long[] getValueAsLongArray(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsLongArray(metaField);
     }
 
     public double[] getValueAsDecimalArray(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsDecimalArray(metaField);
     }
 
     public Date[] getValueAsDateArray(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsDateArray(metaField);
     }
 
     public String[] getValueAsTextArray(MetaField metaField, int row) {
-        Preconditions.checkNotNull(metaField, "metaField cannot be null");
+        Objects.requireNonNull(metaField, "metaField cannot be null");
         validateRow(row);
         return rows.get(row).getValueAsTextArray(metaField);
     }

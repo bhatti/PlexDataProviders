@@ -1,4 +1,4 @@
-package com.plexobject.dp;
+package com.plexobject.dp.domain;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +15,7 @@ public class MetaFields {
     public MetaFields() {
     }
 
-    public MetaFields(MetaField[] metaFields) {
+    public MetaFields(MetaField... metaFields) {
         this(Arrays.asList(metaFields));
     }
 

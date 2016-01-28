@@ -1,4 +1,4 @@
-package com.plexobject.dp;
+package com.plexobject.dp.domain;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +17,7 @@ public class MetaFieldFactory {
                             + ", new type " + type);
         }
         field = new MetaField(name, type);
+        fieldsCache.put(name, field);
         return field;
     }
 }

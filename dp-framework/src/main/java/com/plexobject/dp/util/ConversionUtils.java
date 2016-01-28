@@ -1,4 +1,4 @@
-package com.plexobject.dp;
+package com.plexobject.dp.util;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -11,9 +11,7 @@ public class ConversionUtils {
         } else if (value != null) {
             return value.toString();
         }
-        throw new DataProviderException("unexpected type found "
-                + (value != null ? value.getClass().getSimpleName() : "null")
-                + ", value " + value);
+        throw new IllegalArgumentException("unexpected null value found ");
     }
 
     public static long getAsLong(Object value) {
@@ -22,7 +20,7 @@ public class ConversionUtils {
         } else if (value instanceof String) {
             return Long.valueOf((String) value);
         }
-        throw new DataProviderException("unexpected type found "
+        throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")
                 + ", value " + value);
     }
@@ -33,7 +31,7 @@ public class ConversionUtils {
         } else if (value instanceof String) {
             return Double.valueOf((String) value);
         }
-        throw new DataProviderException("unexpected type found "
+        throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")
                 + ", value " + value);
     }
@@ -44,7 +42,7 @@ public class ConversionUtils {
         } else if (value instanceof String) {
             return ((String) value).getBytes();
         }
-        throw new DataProviderException("unexpected type found "
+        throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")
                 + ", value " + value);
     }
@@ -57,7 +55,7 @@ public class ConversionUtils {
         } else if (value instanceof String) {
             return new Date(Long.valueOf((String) value));
         }
-        throw new DataProviderException("unexpected type found "
+        throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")
                 + ", value " + value);
     }
@@ -71,18 +69,18 @@ public class ConversionUtils {
                 values[i++] = ConversionUtils.getAsLong(obj);
             }
             return values;
-        } else if (value instanceof Array) {
-            Array array = (Array) value;
-            long[] values = new long[Array.getLength(array)];
-            for (int i = 0; i < values.length; i++) {
-                values[i++] = ConversionUtils.getAsLong(Array.get(array, i));
-            }
-            return values;
-        } else if (value instanceof double[]) {
+        } else if (value instanceof long[]) {
             long[] array = (long[]) value;
             return array;
+        } else if (value instanceof Long[]) {
+            Long[] array = (Long[]) value;
+            long[] values = new long[Array.getLength(array)];
+            for (int i = 0; i < values.length; i++) {
+                values[i] = array[i];
+            }
+            return values;
         }
-        throw new DataProviderException("unexpected type found "
+        throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")
                 + ", value " + value);
     }
@@ -96,18 +94,18 @@ public class ConversionUtils {
                 values[i++] = ConversionUtils.getAsDecimal(obj);
             }
             return values;
-        } else if (value instanceof Array) {
-            Array array = (Array) value;
-            double[] values = new double[Array.getLength(array)];
-            for (int i = 0; i < values.length; i++) {
-                values[i++] = ConversionUtils.getAsDecimal(Array.get(array, i));
-            }
-            return values;
         } else if (value instanceof double[]) {
             double[] array = (double[]) value;
             return array;
+        } else if (value instanceof Double[]) {
+            Double[] array = (Double[]) value;
+            double[] values = new double[Array.getLength(array)];
+            for (int i = 0; i < values.length; i++) {
+                values[i] = array[i];
+            }
+            return values;
         }
-        throw new DataProviderException("unexpected type found "
+        throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")
                 + ", value " + value);
     }
@@ -121,18 +119,11 @@ public class ConversionUtils {
                 values[i++] = ConversionUtils.getAsDate(obj);
             }
             return values;
-        } else if (value instanceof Array) {
-            Array array = (Array) value;
-            Date[] values = new Date[Array.getLength(array)];
-            for (int i = 0; i < values.length; i++) {
-                values[i++] = ConversionUtils.getAsDate(Array.get(array, i));
-            }
-            return values;
         } else if (value instanceof Date[]) {
             Date[] array = (Date[]) value;
             return array;
         }
-        throw new DataProviderException("unexpected type found "
+        throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")
                 + ", value " + value);
     }
@@ -146,18 +137,11 @@ public class ConversionUtils {
                 values[i++] = ConversionUtils.getAsText(obj);
             }
             return values;
-        } else if (value instanceof Array) {
-            Array array = (Array) value;
-            String[] values = new String[Array.getLength(array)];
-            for (int i = 0; i < values.length; i++) {
-                values[i++] = ConversionUtils.getAsText(Array.get(array, i));
-            }
-            return values;
         } else if (value instanceof String[]) {
             String[] array = (String[]) value;
             return array;
         }
-        throw new DataProviderException("unexpected type found "
+        throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")
                 + ", value " + value);
     }

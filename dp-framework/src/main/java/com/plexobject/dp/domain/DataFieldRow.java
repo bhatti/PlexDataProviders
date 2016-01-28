@@ -1,4 +1,4 @@
-package com.plexobject.dp;
+package com.plexobject.dp.domain;
 
 import java.util.Date;
 import java.util.Map;
@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.plexobject.dp.util.ConversionUtils;
 
 /**
  * This class defines collection of data fields that would be returned or
@@ -55,7 +56,7 @@ public class DataFieldRow {
         if (value instanceof RuntimeException) {
             throw (RuntimeException) value;
         } else if (value instanceof Exception) {
-            throw new DataProviderException("Error found retrieving " + field,
+            throw new RuntimeException("Error found retrieving " + field,
                     (Exception) value);
         }
         return value;

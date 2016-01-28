@@ -1,4 +1,4 @@
-package com.plexobject.dp;
+package com.plexobject.dp.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
@@ -23,10 +23,7 @@ public class MetaField implements Comparable<MetaField> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
+        return name.hashCode();
     }
 
     @Override
@@ -38,17 +35,12 @@ public class MetaField implements Comparable<MetaField> {
         if (getClass() != obj.getClass())
             return false;
         MetaField other = (MetaField) obj;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        return true;
+        return name.equals(other.name);
     }
 
     @Override
     public String toString() {
-        return name; // "[" + name + "/" + type + "]";
+        return "[" + name + "/" + type + "]";
     }
 
     @Override

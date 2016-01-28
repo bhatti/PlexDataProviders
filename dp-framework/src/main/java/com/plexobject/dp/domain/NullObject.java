@@ -1,4 +1,4 @@
-package com.plexobject.dp;
+package com.plexobject.dp.domain;
 
 public final class NullObject {
     public static final NullObject instance = new NullObject();

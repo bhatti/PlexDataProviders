@@ -1,4 +1,7 @@
-package com.plexobject.dp;
+package com.plexobject.dp.provider;
+
+import com.plexobject.dp.domain.DataConfiguration;
+import com.plexobject.dp.domain.DataFieldRowSet;
 
 /**
  * This interface defines method for producing collection of data fields given

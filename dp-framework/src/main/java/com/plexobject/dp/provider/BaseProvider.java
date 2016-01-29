@@ -8,6 +8,8 @@ public abstract class BaseProvider implements DataProvider {
     private final MetaFields optionalRequestFields;
     private final MetaFields responseFields;
     private TaskGranularity taskGranularity = TaskGranularity.COARSE;
+    private String name;
+    private int rank;
 
     public BaseProvider(MetaFields mandatoryRequestFields,
             MetaFields optionalRequestFields, MetaFields responseFields) {
@@ -32,6 +34,31 @@ public abstract class BaseProvider implements DataProvider {
     }
 
     @Override
+    public TaskGranularity getTaskGranularity() {
+        return taskGranularity;
+    }
+
+    public void setTaskGranularity(TaskGranularity taskGranularity) {
+        this.taskGranularity = taskGranularity;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
     public int compareTo(DataProvider other) {
         for (MetaField requestField : mandatoryRequestFields.getMetaFields()) {
             if (other.getResponseFields().contains(requestField)) {
@@ -52,12 +79,8 @@ public abstract class BaseProvider implements DataProvider {
     }
 
     @Override
-    public TaskGranularity getTaskGranularity() {
-        return taskGranularity;
+    public String toString() {
+        return name + "(" + getMandatoryRequestFields() + "/"
+                + getOptionalRequestFields() + ") => " + getResponseFields();
     }
-
-    public void setTaskGranularity(TaskGranularity taskGranularity) {
-        this.taskGranularity = taskGranularity;
-    }
-
 }

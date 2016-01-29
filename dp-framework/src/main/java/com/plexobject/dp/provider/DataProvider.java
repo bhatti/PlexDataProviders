@@ -10,6 +10,20 @@ import com.plexobject.dp.domain.MetaFields;
  */
 public interface DataProvider extends DataProducer, Comparable<DataProvider> {
     /**
+     * This method returns name of the provider
+     * 
+     * @return
+     */
+    String getName();
+
+    /**
+     * This method returns rank of provider when searching same data field
+     * 
+     * @return
+     */
+    int getRank();
+
+    /**
      * This method returns required request fields
      * 
      * @return

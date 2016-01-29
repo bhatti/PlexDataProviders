@@ -157,14 +157,16 @@ public class DataProvidersImpl implements DataProviders {
             MetaFields requestFields) {
         DataProvider bestProvider = null;
         int minCount = Integer.MAX_VALUE;
+        int maxRank = Integer.MIN_VALUE;
         for (DataProvider provider : providers) {
             int count = provider.getMandatoryRequestFields().getMissingCount(
                     requestFields);
-            if (count == 0) {
-                return provider;
-            }
             if (count < minCount) {
                 minCount = count;
+                maxRank = provider.getRank();
+                bestProvider = provider;
+            } else if (count == minCount && provider.getRank() > maxRank) {
+                maxRank = provider.getRank();
                 bestProvider = provider;
             }
         }

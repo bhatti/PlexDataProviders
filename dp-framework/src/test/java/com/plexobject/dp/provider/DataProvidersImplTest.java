@@ -28,7 +28,7 @@ import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.MetaFields;
 
 public class DataProvidersImplTest {
-    public static class TimeoutProvider extends BaseProvider {
+    static class TimeoutProvider extends BaseProvider {
         private long sleepMillis;
 
         public TimeoutProvider(long sleepMillis, String name) {
@@ -53,7 +53,7 @@ public class DataProvidersImplTest {
         }
     }
 
-    public static class FailingProvider extends BaseProvider {
+    static class FailingProvider extends BaseProvider {
         private final RuntimeException error;
 
         public FailingProvider(String name, RuntimeException error) {
@@ -74,9 +74,10 @@ public class DataProvidersImplTest {
         }
     }
 
-    public static class OptionalProvider extends BaseProvider {
-        public OptionalProvider(String[] requestFields,
-                String[] optionalFields, String... responseFields) {
+    // this provider consumes and produces scalar input
+    static class ScalarProvider extends BaseProvider {
+        public ScalarProvider(String[] requestFields, String[] optionalFields,
+                String... responseFields) {
             super(metaFrom(requestFields), metaFrom(optionalFields),
                     metaFrom(responseFields));
         }
@@ -92,14 +93,22 @@ public class DataProvidersImplTest {
                 }
                 for (MetaField metaField : getOptionalRequestFields()
                         .getMetaFields()) {
-                    requestRowSet.getValueAsText(metaField, i);
+                    if (requestRowSet.hasFieldValue(metaField, i)) {
+                        requestRowSet.getValueAsText(metaField, i);
+                    }
                 }
+            }
+            int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
+                    .create("maxOutputRows", MetaFieldType.INTEGER), 0) ? (int) requestRowSet
+                    .getValueAsLong(MetaFieldFactory.create("maxOutputRows",
+                            MetaFieldType.INTEGER), 0) : requestRowSet.size();
+            for (int i = 0; i < maxOutputRows; i++) {
                 Collection<MetaField> responseFields = new ArrayList<>(
                         (responseRowSet.getMetaFields().getMetaFields()));
                 for (MetaField metaField : responseFields) {
                     if (getResponseFields().contains(metaField)) {
                         responseRowSet.addDataField(metaField,
-                                metaField.getName() + "-value", i);
+                                metaField.getName() + "-value-" + i, i);
                     }
                 }
             }
@@ -107,52 +116,16 @@ public class DataProvidersImplTest {
 
         @Override
         public String toString() {
-            return "TestProvider(" + getMandatoryRequestFields() + "/"
+            return "ScalarProvider(" + getMandatoryRequestFields() + "/"
                     + getOptionalRequestFields() + ") => "
                     + getResponseFields();
         }
 
     }
 
-    public static class TestProvider extends BaseProvider {
-        public TestProvider(String[] requestFields, String[] optionalFields,
+    static class ArrayProvider extends BaseProvider {
+        public ArrayProvider(String[] requestFields, String[] optionalFields,
                 String... responseFields) {
-            super(metaFrom(requestFields), metaFrom(optionalFields),
-                    metaFrom(responseFields));
-        }
-
-        @Override
-        public void produce(final DataFieldRowSet requestRowSet,
-                final DataFieldRowSet responseRowSet,
-                final DataConfiguration config) throws DataProviderException {
-            for (int i = 0; i < requestRowSet.size(); i++) {
-                for (MetaField metaField : getMandatoryRequestFields()
-                        .getMetaFields()) {
-                    requestRowSet.getValueAsText(metaField, i);
-                }
-                Collection<MetaField> responseFields = new ArrayList<>(
-                        (responseRowSet.getMetaFields().getMetaFields()));
-                for (MetaField metaField : responseFields) {
-                    if (getResponseFields().contains(metaField)) {
-                        responseRowSet.addDataField(metaField,
-                                metaField.getName() + "-value", i);
-                    }
-                }
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "TestProvider(" + getMandatoryRequestFields() + "/"
-                    + getOptionalRequestFields() + ") => "
-                    + getResponseFields();
-        }
-
-    }
-
-    public static class TestArrayProvider extends BaseProvider {
-        public TestArrayProvider(String[] requestFields,
-                String[] optionalFields, String... responseFields) {
             super(metaArrayFrom(requestFields), metaArrayFrom(optionalFields),
                     metaArrayFrom(responseFields));
         }
@@ -166,6 +139,12 @@ public class DataProvidersImplTest {
                         .getMetaFields()) {
                     requestRowSet.getValueAsTextArray(metaField, i);
                 }
+            }
+            int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
+                    .create("maxOutputRows", MetaFieldType.INTEGER), 0) ? (int) requestRowSet
+                    .getValueAsLong(MetaFieldFactory.create("maxOutputRows",
+                            MetaFieldType.INTEGER), 0) : requestRowSet.size();
+            for (int i = 0; i < maxOutputRows; i++) {
                 Collection<MetaField> responseFields = new ArrayList<>(
                         (responseRowSet.getMetaFields().getMetaFields()));
                 for (MetaField metaField : responseFields) {
@@ -183,13 +162,6 @@ public class DataProvidersImplTest {
             }
         }
 
-        @Override
-        public String toString() {
-            return "TestProvider(" + getMandatoryRequestFields() + "/"
-                    + getOptionalRequestFields() + ") => "
-                    + getResponseFields();
-        }
-
     }
 
     private final DataProvidersImpl dataProviders = new DataProvidersImpl();
@@ -200,25 +172,26 @@ public class DataProvidersImplTest {
         BasicConfigurator.configure();
         LogManager.getRootLogger().setLevel(Level.INFO);
         MetaFieldFactory.reset();
-        dataProviders.register(new TestProvider(new String[] { "X" },
+        dataProviders.register(new ScalarProvider(new String[] { "X" },
                 new String[] {}, "B", "F"));
-        dataProviders.register(new TestProvider(new String[] { "A" },
+        dataProviders.register(new ScalarProvider(new String[] { "A" },
                 new String[] {}, "B", "C", "D"));
-        dataProviders.register(new TestProvider(new String[] { "B", "D" },
+        dataProviders.register(new ScalarProvider(new String[] { "B", "D" },
                 new String[] {}, "E", "F", "G"));
-        dataProviders.register(new TestProvider(new String[] { "B", "F" },
+        dataProviders.register(new ScalarProvider(new String[] { "B", "F" },
                 new String[] {}, "H", "I", "J"));
-        dataProviders.register(new TestProvider(new String[] { "L", "M" },
+        dataProviders.register(new ScalarProvider(new String[] { "L", "M" },
                 new String[] {}, "N", "O", "P"));
-        dataProviders.register(new TestProvider(new String[] { "B", "F", "L" },
-                new String[] {}, "Q", "R", "S"));
-        dataProviders.register(new TestProvider(new String[] { "H", "N" },
+        dataProviders
+                .register(new ScalarProvider(new String[] { "B", "F", "L" },
+                        new String[] {}, "Q", "R", "S"));
+        dataProviders.register(new ScalarProvider(new String[] { "H", "N" },
                 new String[] {}, "V", "W", "X"));
-        dataProviders.register(new TestProvider(new String[] { "L", "H" },
+        dataProviders.register(new ScalarProvider(new String[] { "L", "H" },
                 new String[] {}, "V", "W"));
-        dataProviders.register(new TestProvider(new String[] { "F" },
+        dataProviders.register(new ScalarProvider(new String[] { "F" },
                 new String[] {}, "G"));
-        dataProviders.register(new TestProvider(new String[] { "V", "W" },
+        dataProviders.register(new ScalarProvider(new String[] { "V", "W" },
                 new String[] {}, "Z"));
     }
 
@@ -262,29 +235,9 @@ public class DataProvidersImplTest {
 
     @Test
     public void testProduceOptional() {
-        dataProviders.register(new OptionalProvider(new String[] { "input1" },
+        dataProviders.register(new ScalarProvider(new String[] { "input1" },
                 new String[] {}, "output1a", "output1b", "optional1"));
-        dataProviders.register(new OptionalProvider(
-                new String[] { "output1b" }, new String[] { "optional1" },
-                "output2a", "output2b"));
-
-        DataFieldRowSet request = rowsetFrom(true, "input1");
-        DataFieldRowSet response = rowsetFrom(false, "output2a");
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
-        assertEquals(1, response.size());
-        assertEquals("output2a-value",
-                response.getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
-        assertEquals("optional1-value", response.getValueAsText(
-                MetaFieldFactory.lookup("optional1"), 0));
-    }
-
-    @Test
-    public void testProduceOptionalNotAvailable() {
-        dataProviders.register(new OptionalProvider(new String[] { "input1" },
-                new String[] {}, "output1a", "output1b"));
-        dataProviders.register(new TestProvider(new String[] { "output1b" },
+        dataProviders.register(new ScalarProvider(new String[] { "output1b" },
                 new String[] { "optional1" }, "output2a", "output2b"));
 
         DataFieldRowSet request = rowsetFrom(true, "input1");
@@ -293,7 +246,26 @@ public class DataProvidersImplTest {
                 response, config);
         assertEquals(0, errors.size());
         assertEquals(1, response.size());
-        assertEquals("output2a-value",
+        assertEquals("output2a-value-0",
+                response.getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
+        assertEquals("optional1-value-0", response.getValueAsText(
+                MetaFieldFactory.lookup("optional1"), 0));
+    }
+
+    @Test
+    public void testProduceOptionalNotAvailable() {
+        dataProviders.register(new ScalarProvider(new String[] { "input1" },
+                new String[] {}, "output1a", "output1b"));
+        dataProviders.register(new ScalarProvider(new String[] { "output1b" },
+                new String[] { "optional1" }, "output2a", "output2b"));
+
+        DataFieldRowSet request = rowsetFrom(true, "input1");
+        DataFieldRowSet response = rowsetFrom(false, "output2a");
+        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
+                response, config);
+        assertEquals(0, errors.size());
+        assertEquals(1, response.size());
+        assertEquals("output2a-value-0",
                 response.getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
         assertFalse(response.hasFieldValue(
                 MetaFieldFactory.lookup("optional1"), 0));
@@ -308,11 +280,11 @@ public class DataProvidersImplTest {
                 response, config);
         assertEquals(0, errors.size());
         assertEquals(1, response.size());
-        assertEquals("E-value",
+        assertEquals("E-value-0",
                 response.getValueAsText(MetaFieldFactory.lookup("E"), 0));
-        assertEquals("F-value",
+        assertEquals("F-value-0",
                 response.getValueAsText(MetaFieldFactory.lookup("F"), 0));
-        assertEquals("H-value",
+        assertEquals("H-value-0",
                 response.getValueAsText(MetaFieldFactory.lookup("H"), 0));
         long elapsed = System.currentTimeMillis() - started;
         assertTrue(elapsed < 100);
@@ -320,16 +292,14 @@ public class DataProvidersImplTest {
 
     @Test
     public void testProduceArray() {
-        dataProviders.register(new TestArrayProvider(new String[] { "uid" },
+        dataProviders.register(new ArrayProvider(new String[] { "uid" },
                 new String[] {}, "uname", "acctids"));
-        dataProviders.register(new TestArrayProvider(
-                new String[] { "acctids" }, new String[] {}, "actname",
-                "accttype"));
-        dataProviders.register(new TestArrayProvider(new String[] { "search" },
+        dataProviders.register(new ArrayProvider(new String[] { "acctids" },
+                new String[] {}, "actname", "accttype"));
+        dataProviders.register(new ArrayProvider(new String[] { "search" },
                 new String[] {}, "symbol", "company", "instrumentId"));
-        dataProviders.register(new TestArrayProvider(new String[] {
-                "instrumentId", "symbol" }, new String[] {}, "positionCount",
-                "orderCount"));
+        dataProviders.register(new ArrayProvider(new String[] { "instrumentId",
+                "symbol" }, new String[] {}, "positionCount", "orderCount"));
 
         long started = System.currentTimeMillis();
         DataFieldRowSet request = rowsetArrayFrom(true, "uid", "search");
@@ -361,6 +331,41 @@ public class DataProvidersImplTest {
     }
 
     @Test
+    public void testProduceMixedDataTypes() {
+        dataProviders.register(new ScalarProvider(new String[] { "q" },
+                new String[] {}, "instrumentId"));
+        dataProviders.register(new ScalarProvider(
+                new String[] { "instrumentId" }, new String[] {},
+                "companyName", "symbol"));
+        dataProviders.register(new ScalarProvider(new String[] { "symbol" },
+                new String[] {}, "bid", "ask", "volume"));
+        dataProviders.register(new ScalarProvider(
+                new String[] { "bid", "bid" }, new String[] {}, "mark"));
+
+        long started = System.currentTimeMillis();
+        DataFieldRowSet request = rowsetFrom(true, "q");
+        request.addDataField(
+                MetaFieldFactory.create("maxOutputRows", MetaFieldType.INTEGER),
+                10, 0);
+        DataFieldRowSet response = rowsetFrom(false, "symbol", "bid", "mark");
+
+        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
+                response, config);
+        assertEquals(0, errors.size());
+        assertEquals(10, response.size());
+        for (int i = 0; i < 10; i++) {
+            assertEquals("symbol-value-" + i, response.getValueAsText(
+                    MetaFieldFactory.lookup("symbol"), i));
+            assertEquals("bid-value-" + i,
+                    response.getValueAsText(MetaFieldFactory.lookup("bid"), i));
+            assertEquals("mark-value-" + i,
+                    response.getValueAsText(MetaFieldFactory.lookup("mark"), i));
+        }
+        long elapsed = System.currentTimeMillis() - started;
+        assertTrue(elapsed < 100);
+    }
+
+    @Test
     public void testSimpleGetDataProviders() {
         // P1: X -> B, F
         // P2: A -> B, C, D
@@ -377,7 +382,7 @@ public class DataProvidersImplTest {
 
     @Test
     public void testSingleProvider() {
-        TestProvider provider1 = new TestProvider(new String[] { "a" },
+        ScalarProvider provider1 = new ScalarProvider(new String[] { "a" },
                 new String[] {}, "b");
         provider1.setTaskGranularity(TaskGranularity.FINE);
         dataProviders.register(provider1);
@@ -390,17 +395,17 @@ public class DataProvidersImplTest {
         assertEquals(0, errors.size());
 
         assertEquals(1, response.size());
-        assertEquals("b-value",
+        assertEquals("b-value-0",
                 response.getValueAsText(MetaFieldFactory.lookup("b"), 0));
     }
 
     @Test
     public void testUnregister() {
-        DataProvider provider1 = new TestProvider(new String[] { "search" },
+        DataProvider provider1 = new ScalarProvider(new String[] { "search" },
                 new String[] {}, "symbols");
-        DataProvider provider2 = new TestProvider(new String[] { "symbols" },
+        DataProvider provider2 = new ScalarProvider(new String[] { "symbols" },
                 new String[] {}, "quotes");
-        DataProvider provider3 = new TestProvider(new String[] { "symbols" },
+        DataProvider provider3 = new ScalarProvider(new String[] { "symbols" },
                 new String[] {}, "research");
         //
         dataProviders.unregister(provider1);
@@ -417,9 +422,9 @@ public class DataProvidersImplTest {
                 response, config);
         assertEquals(0, errors.size());
         assertEquals(1, response.size());
-        assertEquals("quotes-value",
+        assertEquals("quotes-value-0",
                 response.getValueAsText(MetaFieldFactory.lookup("quotes"), 0));
-        assertEquals("research-value",
+        assertEquals("research-value-0",
                 response.getValueAsText(MetaFieldFactory.lookup("research"), 0));
 
         request = rowsetFrom(true, "search");
@@ -439,9 +444,9 @@ public class DataProvidersImplTest {
         TimeoutProvider provider = new TimeoutProvider(200, "timeout");
         provider.setTaskGranularity(TaskGranularity.FINE);
         dataProviders.register(provider);
-        dataProviders.register(new TestProvider(new String[] { "a" },
+        dataProviders.register(new ScalarProvider(new String[] { "a" },
                 new String[] {}, "b"));
-        dataProviders.register(new TestProvider(new String[] { "b" },
+        dataProviders.register(new ScalarProvider(new String[] { "b" },
                 new String[] {}, "d", "e"));
 
         DataFieldRowSet request = rowsetFrom(true, "timeout", "a");
@@ -456,9 +461,9 @@ public class DataProvidersImplTest {
         TimeoutProvider provider = new TimeoutProvider(200, "timeout");
         provider.setTaskGranularity(TaskGranularity.COARSE);
         dataProviders.register(provider);
-        dataProviders.register(new TestProvider(new String[] { "a" },
+        dataProviders.register(new ScalarProvider(new String[] { "a" },
                 new String[] {}, "b"));
-        dataProviders.register(new TestProvider(new String[] { "b" },
+        dataProviders.register(new ScalarProvider(new String[] { "b" },
                 new String[] {}, "d", "e"));
 
         DataFieldRowSet request = rowsetFrom(true, "timeout", "a");
@@ -478,9 +483,9 @@ public class DataProvidersImplTest {
                 new RuntimeException("failed"));
         provider.setTaskGranularity(TaskGranularity.COARSE);
         dataProviders.register(provider);
-        dataProviders.register(new TestProvider(new String[] { "query" },
+        dataProviders.register(new ScalarProvider(new String[] { "query" },
                 new String[] {}, "lookupResults"));
-        dataProviders.register(new TestProvider(
+        dataProviders.register(new ScalarProvider(
                 new String[] { "lookupResults" }, new String[] {},
                 "detailsData"));
 
@@ -499,9 +504,9 @@ public class DataProvidersImplTest {
                 new RuntimeException("failed"));
         provider.setTaskGranularity(TaskGranularity.COARSE);
         dataProviders.register(provider);
-        dataProviders.register(new TestProvider(new String[] { "query" },
+        dataProviders.register(new ScalarProvider(new String[] { "query" },
                 new String[] {}, "lookupResults"));
-        dataProviders.register(new TestProvider(
+        dataProviders.register(new ScalarProvider(
                 new String[] { "lookupResults" }, new String[] {},
                 "detailsData"));
 

@@ -60,7 +60,7 @@ public class ConversionUtils {
                 + ", value " + value);
     }
 
-    public static long[] getAsLongArray(Object value) {
+    public static long[] getAsLongVector(Object value) {
         if (value instanceof Collection) {
             Collection<?> collection = (Collection<?>) (value);
             long[] values = new long[collection.size()];
@@ -85,7 +85,7 @@ public class ConversionUtils {
                 + ", value " + value);
     }
 
-    public static double[] getAsDecimalArray(Object value) {
+    public static double[] getAsDecimalVector(Object value) {
         if (value instanceof Collection) {
             Collection<?> collection = (Collection<?>) (value);
             double[] values = new double[collection.size()];
@@ -110,7 +110,7 @@ public class ConversionUtils {
                 + ", value " + value);
     }
 
-    public static Date[] getAsDateArray(Object value) {
+    public static Date[] getAsDateVector(Object value) {
         if (value instanceof Collection) {
             Collection<?> collection = (Collection<?>) (value);
             Date[] values = new Date[collection.size()];
@@ -128,7 +128,7 @@ public class ConversionUtils {
                 + ", value " + value);
     }
 
-    public static String[] getAsTextArray(Object value) {
+    public static String[] getAsTextVector(Object value) {
         if (value instanceof Collection) {
             Collection<?> collection = (Collection<?>) (value);
             String[] values = new String[collection.size()];
@@ -139,6 +139,24 @@ public class ConversionUtils {
             return values;
         } else if (value instanceof String[]) {
             String[] array = (String[]) value;
+            return array;
+        }
+        throw new IllegalArgumentException("unexpected type found "
+                + (value != null ? value.getClass().getSimpleName() : "null")
+                + ", value " + value);
+    }
+
+    public static Object[] getAsObjectVector(Object value) {
+        if (value instanceof Collection) {
+            Collection<?> collection = (Collection<?>) (value);
+            Object[] values = new Object[collection.size()];
+            int i = 0;
+            for (Object obj : collection) {
+                values[i++] = ConversionUtils.getAsText(obj);
+            }
+            return values;
+        } else if (value instanceof String[]) {
+            Object[] array = (Object[]) value;
             return array;
         }
         throw new IllegalArgumentException("unexpected type found "

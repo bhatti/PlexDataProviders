@@ -12,12 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class DataFieldRowSetTest {
-    private MetaFields metaFields;
+    private Metadata metaFields;
 
     @Before
     public void setup() {
         MetaFieldFactory.reset();
-        metaFields = MetaFields.fromRaw("text", "TEXT", "name", "TEXT");
+        metaFields = Metadata.fromRaw("text", "SCALAR_TEXT", "name", "SCALAR_TEXT");
     }
 
     @Test
@@ -42,7 +42,7 @@ public class DataFieldRowSetTest {
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields,
                 Arrays.asList(row));
         assertEquals(1, rowset.size());
-        assertEquals(metaFields, rowset.getMetaFields());
+        assertEquals(metaFields, rowset.getMetadata());
     }
 
     @Test
@@ -95,7 +95,7 @@ public class DataFieldRowSetTest {
     @Test
     public void testGetValueAsLong() {
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.INTEGER));
+                MetaFieldType.SCALAR_INTEGER));
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         rowset.addDataField(MetaFieldFactory.lookup("object"), 100L, 0);
         assertEquals(100L,
@@ -105,7 +105,7 @@ public class DataFieldRowSetTest {
     @Test
     public void testGetValueAsDecimal() {
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.DECIMAL));
+                MetaFieldType.SCALAR_DECIMAL));
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         rowset.addDataField(MetaFieldFactory.lookup("object"), 1.1, 0);
         assertEquals(1.1,
@@ -117,7 +117,7 @@ public class DataFieldRowSetTest {
     public void testGetValueAsBinary() {
         String hello = "hello";
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.TEXT));
+                MetaFieldType.SCALAR_TEXT));
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         rowset.addDataField(MetaFieldFactory.lookup("object"),
                 hello.getBytes(), 0);
@@ -131,7 +131,7 @@ public class DataFieldRowSetTest {
     public void testGetValueAsDate() {
         Date date = new Date();
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.DATE));
+                MetaFieldType.SCALAR_DATE));
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         rowset.addDataField(MetaFieldFactory.lookup("object"), date, 0);
         assertEquals(date,
@@ -139,50 +139,50 @@ public class DataFieldRowSetTest {
     }
 
     @Test
-    public void testGetValueAsLongArray() {
+    public void testGetValueAsLongVector() {
         long[] values = { 1, 2, 3 };
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.ARRAY_INTEGER));
+                MetaFieldType.VECTOR_INTEGER));
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         rowset.addDataField(MetaFieldFactory.lookup("object"), values, 0);
         assertEquals(
                 Arrays.toString(values),
-                Arrays.toString(rowset.getValueAsLongArray(
+                Arrays.toString(rowset.getValueAsLongVector(
                         MetaFieldFactory.lookup("object"), 0)));
     }
 
     @Test
-    public void testGetValueAsDecimalArray() {
+    public void testGetValueAsDecimalVector() {
         double[] values = { 1.1, 2.1, 3.1 };
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.ARRAY_DECIMAL));
+                MetaFieldType.VECTOR_DECIMAL));
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         rowset.addDataField(MetaFieldFactory.lookup("object"), values, 0);
         assertEquals(
                 Arrays.toString(values),
-                Arrays.toString(rowset.getValueAsDecimalArray(
+                Arrays.toString(rowset.getValueAsDecimalVector(
                         MetaFieldFactory.lookup("object"), 0)));
     }
 
     @Test
-    public void testGetValueAsDateArray() {
+    public void testGetValueAsDateVector() {
         Date[] values = { new Date(0), new Date(1) };
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.ARRAY_DATE));
+                MetaFieldType.VECTOR_DATE));
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         rowset.addDataField(MetaFieldFactory.lookup("object"), values, 0);
-        assertArrayEquals(values, rowset.getValueAsDateArray(
+        assertArrayEquals(values, rowset.getValueAsDateVector(
                 MetaFieldFactory.lookup("object"), 0));
     }
 
     @Test
-    public void testGetValueAsTextArray() {
+    public void testGetValueAsTextVector() {
         String[] values = { "one", "two" };
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.ARRAY_DATE));
+                MetaFieldType.VECTOR_DATE));
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         rowset.addDataField(MetaFieldFactory.lookup("object"), values, 0);
-        assertArrayEquals(values, rowset.getValueAsTextArray(
+        assertArrayEquals(values, rowset.getValueAsTextVector(
                 MetaFieldFactory.lookup("object"), 0));
     }
 

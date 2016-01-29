@@ -1,68 +1,21 @@
-package com.plexobject.dp.provider;
+package com.plexobject.dp.provider.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
-
-import com.plexobject.dp.domain.DataConfiguration;
-import com.plexobject.dp.domain.DataFieldRowSet;
 import com.plexobject.dp.domain.MetaField;
-import com.plexobject.dp.domain.MetaFields;
+import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.provider.DataProvider;
+import com.plexobject.dp.provider.DataProviderException;
+import com.plexobject.dp.provider.DataProviderLocator;
 
-/**
- * This class implements Data Providers interface
- * 
- * @author shahzad bhatti
- *
- */
-public class DataProvidersImpl implements DataProviders {
-    private static final Logger logger = Logger
-            .getLogger(DataProvidersImpl.class);
-
+public class DataProviderLocatorImpl implements DataProviderLocator {
     private ConcurrentHashMap<MetaField, Set<DataProvider>> providersByOutputMetaField = new ConcurrentHashMap<>();
-    private ExecutorService defaultExecutor;
-
-    public ExecutorService getDefaultExecutor() {
-        return defaultExecutor;
-    }
-
-    public void setDefaultExecutor(ExecutorService defaultExecutor) {
-        this.defaultExecutor = defaultExecutor;
-    }
-
-    @Override
-    public Map<DataProvider, Throwable> produce(DataFieldRowSet requestFields,
-            DataFieldRowSet responseFields, DataConfiguration config) {
-        // Get all data providers needed
-        Collection<DataProvider> providers = getDataProviders(
-                requestFields.getMetaFields(), responseFields.getMetaFields());
-        if (logger.isDebugEnabled()) {
-            logger.debug("Executing requestFields " + requestFields
-                    + ", responseFields " + responseFields + " with "
-                    + providers);
-        }
-        //
-        // creating parallel thread executor
-        final ExecutorService executor = defaultExecutor != null ? defaultExecutor
-                : Executors.newFixedThreadPool(getThreadPoolSize(providers));
-        try {
-            return new ProvidersExecutor(requestFields, responseFields, config,
-                    providers, executor).execute();
-        } finally {
-            if (executor != defaultExecutor) {
-                executor.shutdown();
-            }
-        }
-    }
 
     @Override
     public void register(DataProvider provider) {
@@ -109,18 +62,19 @@ public class DataProvidersImpl implements DataProviders {
      * @param responseFields
      * @return collection of data providers
      */
-    Collection<DataProvider> getDataProviders(MetaFields requestFields,
-            MetaFields responseFields) {
+    @Override
+    public Collection<DataProvider> locate(Metadata requestFields,
+            Metadata responseFields) {
         final List<DataProvider> providers = new ArrayList<>();
-        populateDataProviders(new MetaFields(requestFields.getMetaFields()),
-                new MetaFields(responseFields.getMetaFields()), providers);
+        populateDataProviders(new Metadata(requestFields.getMetaFields()),
+                new Metadata(responseFields.getMetaFields()), providers);
         Collections.sort(providers); // sort by dependency
         return providers;
     }
 
-    private void populateDataProviders(MetaFields requestFields,
-            MetaFields responseFields, List<DataProvider> existingProviders) {
-        responseFields.removeMetaFields(requestFields);
+    private void populateDataProviders(Metadata requestFields,
+            Metadata responseFields, List<DataProvider> existingProviders) {
+        responseFields.removeMetadata(requestFields);
         for (MetaField responseField : responseFields.getMetaFields()) {
             Set<DataProvider> providers = providersByOutputMetaField
                     .get(responseField);
@@ -137,12 +91,12 @@ public class DataProvidersImpl implements DataProviders {
 
             // find the missing fields from the mandatory request parameters and
             // we will try to find providers for those
-            MetaFields missingFields = requestFields
-                    .getMissingMetaFields(provider.getMandatoryRequestFields());
+            Metadata missingFields = requestFields.getMissingMetadata(provider
+                    .getMandatoryRequestFields());
 
             // add output fields to requests so that we can use it for other
             // providers
-            requestFields.addMetaFields(provider.getResponseFields());
+            requestFields.addMetadata(provider.getResponseFields());
             //
             if (missingFields.size() > 0) {
                 populateDataProviders(requestFields, missingFields,
@@ -154,7 +108,7 @@ public class DataProvidersImpl implements DataProviders {
     // This method finds data provider that matches or almost matches the
     // request parameters that we have
     private DataProvider getBestDataProvider(Set<DataProvider> providers,
-            MetaFields requestFields) {
+            Metadata requestFields) {
         DataProvider bestProvider = null;
         int minCount = Integer.MAX_VALUE;
         int maxRank = Integer.MIN_VALUE;
@@ -171,15 +125,5 @@ public class DataProvidersImpl implements DataProviders {
             }
         }
         return bestProvider;
-    }
-
-    private static int getThreadPoolSize(Collection<DataProvider> providers) {
-        int count = 0;
-        for (DataProvider provider : providers) {
-            if (provider.getTaskGranularity() == TaskGranularity.COARSE) {
-                count++;
-            }
-        }
-        return Math.min(count, 3) + 1;
     }
 }

@@ -1,6 +1,6 @@
 package com.plexobject.dp.provider;
 
-import com.plexobject.dp.domain.MetaFields;
+import com.plexobject.dp.domain.Metadata;
 
 /**
  * This interface defines a method for producing data fields given input
@@ -28,21 +28,21 @@ public interface DataProvider extends DataProducer, Comparable<DataProvider> {
      * 
      * @return
      */
-    MetaFields getMandatoryRequestFields();
+    Metadata getMandatoryRequestFields();
 
     /**
      * This method returns optional request fields
      * 
      * @return
      */
-    MetaFields getOptionalRequestFields();
+    Metadata getOptionalRequestFields();
 
     /**
      * This method returns response fields information
      * 
      * @return
      */
-    MetaFields getResponseFields();
+    Metadata getResponseFields();
 
     /**
      * This method returns granularity of task so that a separate thread can be

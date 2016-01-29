@@ -9,17 +9,17 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class MetaFields {
+public class Metadata {
     private final Set<MetaField> metaFields = new HashSet<>();
 
-    public MetaFields() {
+    public Metadata() {
     }
 
-    public MetaFields(MetaField... metaFields) {
+    public Metadata(MetaField... metaFields) {
         this(Arrays.asList(metaFields));
     }
 
-    public MetaFields(Collection<MetaField> metaFields) {
+    public Metadata(Collection<MetaField> metaFields) {
         for (MetaField metaField : metaFields) {
             addMetaField(metaField);
         }
@@ -31,14 +31,14 @@ public class MetaFields {
         }
     }
 
-    public synchronized void addMetaFields(MetaFields metaFields) {
-        for (MetaField metaField : metaFields.getMetaFields()) {
+    public synchronized void addMetadata(Metadata metadata) {
+        for (MetaField metaField : metadata.getMetaFields()) {
             addMetaField(metaField);
         }
     }
 
-    public synchronized void removeMetaFields(MetaFields metaFields) {
-        for (MetaField metaField : metaFields.getMetaFields()) {
+    public synchronized void removeMetadata(Metadata metadata) {
+        for (MetaField metaField : metadata.getMetaFields()) {
             removeMetaField(metaField);
         }
     }
@@ -47,15 +47,15 @@ public class MetaFields {
         metaFields.remove(metaField);
     }
 
-    public synchronized boolean containsAll(MetaFields other) {
+    public synchronized boolean containsAll(Metadata other) {
         return getMissingCount(other) == 0;
     }
 
     public synchronized boolean contains(MetaField other) {
-        return getMissingCount(MetaFields.from(other)) == 0;
+        return getMissingCount(Metadata.from(other)) == 0;
     }
 
-    public synchronized int getMissingCount(MetaFields other) {
+    public synchronized int getMissingCount(Metadata other) {
         int count = 0;
         for (MetaField field : other.metaFields) {
             if (!metaFields.contains(field)) {
@@ -65,14 +65,14 @@ public class MetaFields {
         return count;
     }
 
-    public synchronized MetaFields getMissingMetaFields(MetaFields other) {
+    public synchronized Metadata getMissingMetadata(Metadata other) {
         Set<MetaField> missingMetaFields = new HashSet<MetaField>();
         for (MetaField field : other.metaFields) {
             if (!metaFields.contains(field)) {
                 missingMetaFields.add(field);
             }
         }
-        return new MetaFields(missingMetaFields);
+        return new Metadata(missingMetaFields);
     }
 
     public synchronized Collection<MetaField> getMetaFields() {
@@ -83,16 +83,16 @@ public class MetaFields {
         return metaFields.size();
     }
 
-    public static MetaFields from(MetaField... args) {
-        final MetaFields metaFields = new MetaFields();
+    public static Metadata from(MetaField... args) {
+        final Metadata metaFields = new Metadata();
         for (MetaField arg : args) {
             metaFields.addMetaField(arg);
         }
         return metaFields;
     }
 
-    public static MetaFields fromRaw(Object... args) {
-        final MetaFields metaFields = new MetaFields();
+    public static Metadata fromRaw(Object... args) {
+        final Metadata metaFields = new Metadata();
         for (int i = 0; i < args.length; i += 2) {
             MetaField field = MetaFieldFactory.create((String) args[i],
                     MetaFieldType.valueOf(args[i + 1].toString()));
@@ -119,7 +119,7 @@ public class MetaFields {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        MetaFields other = (MetaFields) obj;
+        Metadata other = (Metadata) obj;
         if (metaFields.size() != other.metaFields.size()) {
             return false;
         }

@@ -1,4 +1,4 @@
-package com.plexobject.dp.provider;
+package com.plexobject.dp.provider.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -25,14 +25,20 @@ import com.plexobject.dp.domain.DataFieldRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.MetaFieldType;
-import com.plexobject.dp.domain.MetaFields;
+import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.provider.BaseProvider;
+import com.plexobject.dp.provider.DataProvider;
+import com.plexobject.dp.provider.DataProviderException;
+import com.plexobject.dp.provider.DataProviderLocator;
+import com.plexobject.dp.provider.TaskGranularity;
 
 public class DataProvidersImplTest {
     static class TimeoutProvider extends BaseProvider {
         private long sleepMillis;
 
         public TimeoutProvider(long sleepMillis, String name) {
-            super(metaFrom(name), metaFrom("none"), metaFrom(name + "-result"));
+            super(name, metaFrom(name), metaFrom("none"), metaFrom(name
+                    + "-result"));
             this.sleepMillis = sleepMillis;
         }
 
@@ -57,7 +63,8 @@ public class DataProvidersImplTest {
         private final RuntimeException error;
 
         public FailingProvider(String name, RuntimeException error) {
-            super(metaFrom(name), metaFrom("none"), metaFrom(name + "-result"));
+            super(name, metaFrom(name), metaFrom("none"), metaFrom(name
+                    + "-result"));
             this.error = error;
         }
 
@@ -76,9 +83,9 @@ public class DataProvidersImplTest {
 
     // this provider consumes and produces scalar input
     static class ScalarProvider extends BaseProvider {
-        public ScalarProvider(String[] requestFields, String[] optionalFields,
-                String... responseFields) {
-            super(metaFrom(requestFields), metaFrom(optionalFields),
+        public ScalarProvider(String name, String[] requestFields,
+                String[] optionalFields, String... responseFields) {
+            super(name, metaFrom(requestFields), metaFrom(optionalFields),
                     metaFrom(responseFields));
         }
 
@@ -99,12 +106,13 @@ public class DataProvidersImplTest {
                 }
             }
             int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
-                    .create("maxOutputRows", MetaFieldType.INTEGER), 0) ? (int) requestRowSet
+                    .create("maxOutputRows", MetaFieldType.SCALAR_INTEGER), 0) ? (int) requestRowSet
                     .getValueAsLong(MetaFieldFactory.create("maxOutputRows",
-                            MetaFieldType.INTEGER), 0) : requestRowSet.size();
+                            MetaFieldType.SCALAR_INTEGER), 0) : requestRowSet
+                    .size();
             for (int i = 0; i < maxOutputRows; i++) {
                 Collection<MetaField> responseFields = new ArrayList<>(
-                        (responseRowSet.getMetaFields().getMetaFields()));
+                        (responseRowSet.getMetadata().getMetaFields()));
                 for (MetaField metaField : responseFields) {
                     if (getResponseFields().contains(metaField)) {
                         responseRowSet.addDataField(metaField,
@@ -123,10 +131,11 @@ public class DataProvidersImplTest {
 
     }
 
-    static class ArrayProvider extends BaseProvider {
-        public ArrayProvider(String[] requestFields, String[] optionalFields,
-                String... responseFields) {
-            super(metaArrayFrom(requestFields), metaArrayFrom(optionalFields),
+    static class VectorProvider extends BaseProvider {
+        public VectorProvider(String name, String[] requestFields,
+                String[] optionalFields, String... responseFields) {
+            super(name, metaArrayFrom(requestFields),
+                    metaArrayFrom(optionalFields),
                     metaArrayFrom(responseFields));
         }
 
@@ -137,16 +146,17 @@ public class DataProvidersImplTest {
             for (int i = 0; i < requestRowSet.size(); i++) {
                 for (MetaField metaField : getMandatoryRequestFields()
                         .getMetaFields()) {
-                    requestRowSet.getValueAsTextArray(metaField, i);
+                    requestRowSet.getValueAsTextVector(metaField, i);
                 }
             }
             int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
-                    .create("maxOutputRows", MetaFieldType.INTEGER), 0) ? (int) requestRowSet
+                    .create("maxOutputRows", MetaFieldType.SCALAR_INTEGER), 0) ? (int) requestRowSet
                     .getValueAsLong(MetaFieldFactory.create("maxOutputRows",
-                            MetaFieldType.INTEGER), 0) : requestRowSet.size();
+                            MetaFieldType.SCALAR_INTEGER), 0) : requestRowSet
+                    .size();
             for (int i = 0; i < maxOutputRows; i++) {
                 Collection<MetaField> responseFields = new ArrayList<>(
-                        (responseRowSet.getMetaFields().getMetaFields()));
+                        (responseRowSet.getMetadata().getMetaFields()));
                 for (MetaField metaField : responseFields) {
                     if (getResponseFields().contains(metaField)) {
                         responseRowSet
@@ -164,7 +174,9 @@ public class DataProvidersImplTest {
 
     }
 
-    private final DataProvidersImpl dataProviders = new DataProvidersImpl();
+    private final DataProviderLocator dataProviderLocator = new DataProviderLocatorImpl();
+    private final DataProvidersImpl dataProviders = new DataProvidersImpl(
+            dataProviderLocator);
     private final DataConfiguration config = new DataConfiguration();
 
     @Before
@@ -172,27 +184,26 @@ public class DataProvidersImplTest {
         BasicConfigurator.configure();
         LogManager.getRootLogger().setLevel(Level.INFO);
         MetaFieldFactory.reset();
-        dataProviders.register(new ScalarProvider(new String[] { "X" },
-                new String[] {}, "B", "F"));
-        dataProviders.register(new ScalarProvider(new String[] { "A" },
-                new String[] {}, "B", "C", "D"));
-        dataProviders.register(new ScalarProvider(new String[] { "B", "D" },
-                new String[] {}, "E", "F", "G"));
-        dataProviders.register(new ScalarProvider(new String[] { "B", "F" },
-                new String[] {}, "H", "I", "J"));
-        dataProviders.register(new ScalarProvider(new String[] { "L", "M" },
-                new String[] {}, "N", "O", "P"));
-        dataProviders
-                .register(new ScalarProvider(new String[] { "B", "F", "L" },
-                        new String[] {}, "Q", "R", "S"));
-        dataProviders.register(new ScalarProvider(new String[] { "H", "N" },
-                new String[] {}, "V", "W", "X"));
-        dataProviders.register(new ScalarProvider(new String[] { "L", "H" },
-                new String[] {}, "V", "W"));
-        dataProviders.register(new ScalarProvider(new String[] { "F" },
-                new String[] {}, "G"));
-        dataProviders.register(new ScalarProvider(new String[] { "V", "W" },
-                new String[] {}, "Z"));
+        dataProviderLocator.register(new ScalarProvider("first",
+                new String[] { "X" }, new String[] {}, "B", "F"));
+        dataProviderLocator.register(new ScalarProvider("second",
+                new String[] { "A" }, new String[] {}, "B", "C", "D"));
+        dataProviderLocator.register(new ScalarProvider("third", new String[] {
+                "B", "D" }, new String[] {}, "E", "F", "G"));
+        dataProviderLocator.register(new ScalarProvider("fourth", new String[] {
+                "B", "F" }, new String[] {}, "H", "I", "J"));
+        dataProviderLocator.register(new ScalarProvider("fifth", new String[] {
+                "L", "M" }, new String[] {}, "N", "O", "P"));
+        dataProviderLocator.register(new ScalarProvider("sixth", new String[] {
+                "B", "F", "L" }, new String[] {}, "Q", "R", "S"));
+        dataProviderLocator.register(new ScalarProvider("seven", new String[] {
+                "H", "N" }, new String[] {}, "V", "W", "X"));
+        dataProviderLocator.register(new ScalarProvider("eight", new String[] {
+                "L", "H" }, new String[] {}, "V", "W"));
+        dataProviderLocator.register(new ScalarProvider("nine",
+                new String[] { "F" }, new String[] {}, "G"));
+        dataProviderLocator.register(new ScalarProvider("ten", new String[] {
+                "V", "W" }, new String[] {}, "Z"));
     }
 
     @Test
@@ -200,25 +211,23 @@ public class DataProvidersImplTest {
         String[] datapoints = { "B", "C", "D", "E", "F", "G", "H", "I", "J",
                 "O", "P", "Q", "R", "S", "V", "W", "X", "Z" };
         for (String dp : datapoints) {
-            Collection<DataProvider> providers = dataProviders
-                    .getDataProviders(metaFrom("A", "K", "L", "M"),
-                            metaFrom(dp));
+            Collection<DataProvider> providers = dataProviderLocator.locate(
+                    metaFrom("A", "K", "L", "M"), metaFrom(dp));
             assertTrue(providers.size() > 0);
         }
     }
 
     @Test(expected = DataProviderException.class)
     public void testGetUnknownDataProviders() {
-        dataProviders.getDataProviders(metaFrom("A", "K", "L", "M"),
-                metaFrom("Y"));
+        dataProviderLocator.locate(metaFrom("A", "K", "L", "M"), metaFrom("Y"));
     }
 
     @Test
     public void testGetMissingMetaFields() {
-        MetaFields first = metaFrom("A", "B", "C");
-        MetaFields second = metaFrom("A", "B", "C");
-        MetaFields third = metaFrom("A", "B", "C", "D");
-        MetaFields fourth = metaFrom("X", "Y");
+        Metadata first = metaFrom("A", "B", "C");
+        Metadata second = metaFrom("A", "B", "C");
+        Metadata third = metaFrom("A", "B", "C", "D");
+        Metadata fourth = metaFrom("X", "Y");
 
         assert first.containsAll(second);
         assert first.contains(second.getMetaFields().iterator().next());
@@ -227,18 +236,20 @@ public class DataProvidersImplTest {
         assert first.getMissingCount(fourth) == 2;
         assert second.getMissingCount(third) == 1;
 
-        assertEquals(0, first.getMissingMetaFields(second).size());
-        assertEquals(1, first.getMissingMetaFields(third).size());
-        assertEquals(2, first.getMissingMetaFields(fourth).size());
-        assertEquals(1, second.getMissingMetaFields(third).size());
+        assertEquals(0, first.getMissingMetadata(second).size());
+        assertEquals(1, first.getMissingMetadata(third).size());
+        assertEquals(2, first.getMissingMetadata(fourth).size());
+        assertEquals(1, second.getMissingMetadata(third).size());
     }
 
     @Test
     public void testProduceOptional() {
-        dataProviders.register(new ScalarProvider(new String[] { "input1" },
-                new String[] {}, "output1a", "output1b", "optional1"));
-        dataProviders.register(new ScalarProvider(new String[] { "output1b" },
-                new String[] { "optional1" }, "output2a", "output2b"));
+        dataProviderLocator.register(new ScalarProvider("one",
+                new String[] { "input1" }, new String[] {}, "output1a",
+                "output1b", "optional1"));
+        dataProviderLocator.register(new ScalarProvider("two",
+                new String[] { "output1b" }, new String[] { "optional1" },
+                "output2a", "output2b"));
 
         DataFieldRowSet request = rowsetFrom(true, "input1");
         DataFieldRowSet response = rowsetFrom(false, "output2a");
@@ -254,10 +265,12 @@ public class DataProvidersImplTest {
 
     @Test
     public void testProduceOptionalNotAvailable() {
-        dataProviders.register(new ScalarProvider(new String[] { "input1" },
-                new String[] {}, "output1a", "output1b"));
-        dataProviders.register(new ScalarProvider(new String[] { "output1b" },
-                new String[] { "optional1" }, "output2a", "output2b"));
+        dataProviderLocator.register(new ScalarProvider("one",
+                new String[] { "input1" }, new String[] {}, "output1a",
+                "output1b"));
+        dataProviderLocator.register(new ScalarProvider("two",
+                new String[] { "output1b" }, new String[] { "optional1" },
+                "output2a", "output2b"));
 
         DataFieldRowSet request = rowsetFrom(true, "input1");
         DataFieldRowSet response = rowsetFrom(false, "output2a");
@@ -291,15 +304,18 @@ public class DataProvidersImplTest {
     }
 
     @Test
-    public void testProduceArray() {
-        dataProviders.register(new ArrayProvider(new String[] { "uid" },
-                new String[] {}, "uname", "acctids"));
-        dataProviders.register(new ArrayProvider(new String[] { "acctids" },
-                new String[] {}, "actname", "accttype"));
-        dataProviders.register(new ArrayProvider(new String[] { "search" },
-                new String[] {}, "symbol", "company", "instrumentId"));
-        dataProviders.register(new ArrayProvider(new String[] { "instrumentId",
-                "symbol" }, new String[] {}, "positionCount", "orderCount"));
+    public void testProduceVector() {
+        dataProviderLocator.register(new VectorProvider("one",
+                new String[] { "uid" }, new String[] {}, "uname", "acctids"));
+        dataProviderLocator.register(new VectorProvider("two",
+                new String[] { "acctids" }, new String[] {}, "actname",
+                "accttype"));
+        dataProviderLocator.register(new VectorProvider("three",
+                new String[] { "search" }, new String[] {}, "symbol",
+                "company", "instrumentId"));
+        dataProviderLocator.register(new VectorProvider("fourth", new String[] {
+                "instrumentId", "symbol" }, new String[] {}, "positionCount",
+                "orderCount"));
 
         long started = System.currentTimeMillis();
         DataFieldRowSet request = rowsetArrayFrom(true, "uid", "search");
@@ -310,21 +326,21 @@ public class DataProvidersImplTest {
                 response, config);
         assertEquals(0, errors.size());
         assertEquals(1, response.size());
-        assertEquals("uname-array-value1", response.getValueAsTextArray(
+        assertEquals("uname-array-value1", response.getValueAsTextVector(
                 MetaFieldFactory.lookup("uname"), 0)[0]);
-        assertEquals("uname-array-value2", response.getValueAsTextArray(
+        assertEquals("uname-array-value2", response.getValueAsTextVector(
                 MetaFieldFactory.lookup("uname"), 0)[1]);
-        assertEquals("symbol-array-value1", response.getValueAsTextArray(
+        assertEquals("symbol-array-value1", response.getValueAsTextVector(
                 MetaFieldFactory.lookup("symbol"), 0)[0]);
-        assertEquals("symbol-array-value2", response.getValueAsTextArray(
+        assertEquals("symbol-array-value2", response.getValueAsTextVector(
                 MetaFieldFactory.lookup("symbol"), 0)[1]);
         assertEquals(
                 "positionCount-array-value1",
-                response.getValueAsTextArray(
+                response.getValueAsTextVector(
                         MetaFieldFactory.lookup("positionCount"), 0)[0]);
         assertEquals(
                 "positionCount-array-value2",
-                response.getValueAsTextArray(
+                response.getValueAsTextVector(
                         MetaFieldFactory.lookup("positionCount"), 0)[1]);
         long elapsed = System.currentTimeMillis() - started;
         assertTrue(elapsed < 100);
@@ -332,21 +348,21 @@ public class DataProvidersImplTest {
 
     @Test
     public void testProduceMixedDataTypes() {
-        dataProviders.register(new ScalarProvider(new String[] { "q" },
-                new String[] {}, "instrumentId"));
-        dataProviders.register(new ScalarProvider(
+        dataProviderLocator.register(new ScalarProvider("one",
+                new String[] { "q" }, new String[] {}, "instrumentId"));
+        dataProviderLocator.register(new ScalarProvider("two",
                 new String[] { "instrumentId" }, new String[] {},
                 "companyName", "symbol"));
-        dataProviders.register(new ScalarProvider(new String[] { "symbol" },
-                new String[] {}, "bid", "ask", "volume"));
-        dataProviders.register(new ScalarProvider(
-                new String[] { "bid", "bid" }, new String[] {}, "mark"));
+        dataProviderLocator.register(new ScalarProvider("three",
+                new String[] { "symbol" }, new String[] {}, "bid", "ask",
+                "volume"));
+        dataProviderLocator.register(new ScalarProvider("fourth", new String[] {
+                "bid", "bid" }, new String[] {}, "mark"));
 
         long started = System.currentTimeMillis();
         DataFieldRowSet request = rowsetFrom(true, "q");
-        request.addDataField(
-                MetaFieldFactory.create("maxOutputRows", MetaFieldType.INTEGER),
-                10, 0);
+        request.addDataField(MetaFieldFactory.create("maxOutputRows",
+                MetaFieldType.SCALAR_INTEGER), 10, 0);
         DataFieldRowSet response = rowsetFrom(false, "symbol", "bid", "mark");
 
         Map<DataProvider, Throwable> errors = dataProviders.produce(request,
@@ -375,17 +391,17 @@ public class DataProvidersImplTest {
         // E, which can be get metaFrom P3, but it requires B, D
         // B can be get metaFrom P1 and P2, but we will need X or A
         //
-        Collection<DataProvider> providers = dataProviders.getDataProviders(
+        Collection<DataProvider> providers = dataProviderLocator.locate(
                 metaFrom("A"), metaFrom("E", "F", "H"));
         assertEquals(3, providers.size());
     }
 
     @Test
     public void testSingleProvider() {
-        ScalarProvider provider1 = new ScalarProvider(new String[] { "a" },
-                new String[] {}, "b");
+        ScalarProvider provider1 = new ScalarProvider("one",
+                new String[] { "a" }, new String[] {}, "b");
         provider1.setTaskGranularity(TaskGranularity.FINE);
-        dataProviders.register(provider1);
+        dataProviderLocator.register(provider1);
 
         DataFieldRowSet request = rowsetFrom(true, "a");
         DataFieldRowSet response = rowsetFrom(false, "b");
@@ -401,18 +417,18 @@ public class DataProvidersImplTest {
 
     @Test
     public void testUnregister() {
-        DataProvider provider1 = new ScalarProvider(new String[] { "search" },
-                new String[] {}, "symbols");
-        DataProvider provider2 = new ScalarProvider(new String[] { "symbols" },
-                new String[] {}, "quotes");
-        DataProvider provider3 = new ScalarProvider(new String[] { "symbols" },
-                new String[] {}, "research");
+        DataProvider provider1 = new ScalarProvider("one",
+                new String[] { "search" }, new String[] {}, "symbols");
+        DataProvider provider2 = new ScalarProvider("two",
+                new String[] { "symbols" }, new String[] {}, "quotes");
+        DataProvider provider3 = new ScalarProvider("three",
+                new String[] { "symbols" }, new String[] {}, "research");
         //
-        dataProviders.unregister(provider1);
+        dataProviderLocator.unregister(provider1);
 
-        dataProviders.register(provider1);
-        dataProviders.register(provider2);
-        dataProviders.register(provider3);
+        dataProviderLocator.register(provider1);
+        dataProviderLocator.register(provider2);
+        dataProviderLocator.register(provider3);
 
         DataFieldRowSet request = rowsetFrom(true, "search");
         DataFieldRowSet response = rowsetFrom(false, "quotes", "research");
@@ -430,8 +446,8 @@ public class DataProvidersImplTest {
         request = rowsetFrom(true, "search");
         response = rowsetFrom(false, "quotes", "research");
         try {
-            dataProviders.unregister(provider2);
-            dataProviders.unregister(provider3);
+            dataProviderLocator.unregister(provider2);
+            dataProviderLocator.unregister(provider3);
             dataProviders.produce(request, response, config);
             fail("Should have failed");
         } catch (DataProviderException e) {
@@ -443,11 +459,11 @@ public class DataProvidersImplTest {
     public void testTimeoutFine() {
         TimeoutProvider provider = new TimeoutProvider(200, "timeout");
         provider.setTaskGranularity(TaskGranularity.FINE);
-        dataProviders.register(provider);
-        dataProviders.register(new ScalarProvider(new String[] { "a" },
-                new String[] {}, "b"));
-        dataProviders.register(new ScalarProvider(new String[] { "b" },
-                new String[] {}, "d", "e"));
+        dataProviderLocator.register(provider);
+        dataProviderLocator.register(new ScalarProvider("one",
+                new String[] { "a" }, new String[] {}, "b"));
+        dataProviderLocator.register(new ScalarProvider("two",
+                new String[] { "b" }, new String[] {}, "d", "e"));
 
         DataFieldRowSet request = rowsetFrom(true, "timeout", "a");
         DataFieldRowSet response = rowsetFrom(false, "d", "e", "timeout-result");
@@ -460,11 +476,11 @@ public class DataProvidersImplTest {
     public void testTimeoutCoarse() {
         TimeoutProvider provider = new TimeoutProvider(200, "timeout");
         provider.setTaskGranularity(TaskGranularity.COARSE);
-        dataProviders.register(provider);
-        dataProviders.register(new ScalarProvider(new String[] { "a" },
-                new String[] {}, "b"));
-        dataProviders.register(new ScalarProvider(new String[] { "b" },
-                new String[] {}, "d", "e"));
+        dataProviderLocator.register(provider);
+        dataProviderLocator.register(new ScalarProvider("one",
+                new String[] { "a" }, new String[] {}, "b"));
+        dataProviderLocator.register(new ScalarProvider("two",
+                new String[] { "b" }, new String[] {}, "d", "e"));
 
         DataFieldRowSet request = rowsetFrom(true, "timeout", "a");
         DataFieldRowSet response = rowsetFrom(false, "d", "e", "timeout-result");
@@ -482,10 +498,10 @@ public class DataProvidersImplTest {
         FailingProvider provider = new FailingProvider("error",
                 new RuntimeException("failed"));
         provider.setTaskGranularity(TaskGranularity.COARSE);
-        dataProviders.register(provider);
-        dataProviders.register(new ScalarProvider(new String[] { "query" },
-                new String[] {}, "lookupResults"));
-        dataProviders.register(new ScalarProvider(
+        dataProviderLocator.register(provider);
+        dataProviderLocator.register(new ScalarProvider("one",
+                new String[] { "query" }, new String[] {}, "lookupResults"));
+        dataProviderLocator.register(new ScalarProvider("two",
                 new String[] { "lookupResults" }, new String[] {},
                 "detailsData"));
 
@@ -503,10 +519,10 @@ public class DataProvidersImplTest {
         FailingProvider provider = new FailingProvider("error",
                 new RuntimeException("failed"));
         provider.setTaskGranularity(TaskGranularity.COARSE);
-        dataProviders.register(provider);
-        dataProviders.register(new ScalarProvider(new String[] { "query" },
-                new String[] {}, "lookupResults"));
-        dataProviders.register(new ScalarProvider(
+        dataProviderLocator.register(provider);
+        dataProviderLocator.register(new ScalarProvider("one",
+                new String[] { "query" }, new String[] {}, "lookupResults"));
+        dataProviderLocator.register(new ScalarProvider("two",
                 new String[] { "lookupResults" }, new String[] {},
                 "detailsData"));
 
@@ -519,31 +535,32 @@ public class DataProvidersImplTest {
         assertEquals(1, errors.size());
     }
 
-    static MetaFields metaFrom(String... args) {
-        MetaFields metaFields = new MetaFields();
+    static Metadata metaFrom(String... args) {
+        Metadata metaFields = new Metadata();
         for (String arg : args) {
             metaFields.addMetaField(MetaFieldFactory.create(arg,
-                    MetaFieldType.TEXT));
+                    MetaFieldType.SCALAR_TEXT));
         }
         return metaFields;
     }
 
-    static MetaFields metaArrayFrom(String... args) {
-        MetaFields metaFields = new MetaFields();
+    static Metadata metaArrayFrom(String... args) {
+        Metadata metaFields = new Metadata();
         for (String arg : args) {
             metaFields.addMetaField(MetaFieldFactory.create(arg,
-                    MetaFieldType.ARRAY_TEXT));
+                    MetaFieldType.VECTOR_TEXT));
         }
         return metaFields;
     }
 
     static DataFieldRowSet rowsetFrom(boolean addData, String... args) {
-        MetaFields metaFields = metaFrom(args);
+        Metadata metaFields = metaFrom(args);
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         if (addData) {
             DataFieldRow row = new DataFieldRow();
             for (String arg : args) {
-                row.addField(MetaFieldFactory.create(arg, MetaFieldType.TEXT),
+                row.addField(
+                        MetaFieldFactory.create(arg, MetaFieldType.SCALAR_TEXT),
                         arg + "-input");
             }
             rowset.addRow(row);
@@ -552,12 +569,12 @@ public class DataProvidersImplTest {
     }
 
     static DataFieldRowSet rowsetArrayFrom(boolean addData, String... args) {
-        MetaFields metaFields = metaArrayFrom(args);
+        Metadata metaFields = metaArrayFrom(args);
         DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
         if (addData) {
             for (int i = 0; i < args.length; i++) {
                 rowset.addDataField(MetaFieldFactory.create(args[i],
-                        MetaFieldType.ARRAY_TEXT), Collections
+                        MetaFieldType.VECTOR_TEXT), Collections
                         .singleton(args[i]), 0);
             }
         }

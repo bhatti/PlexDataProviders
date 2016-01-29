@@ -93,24 +93,24 @@ public class DataFieldRow {
         return ConversionUtils.getAsDate(value);
     }
 
-    public long[] getValueAsLongArray(MetaField field) {
+    public long[] getValueAsLongVector(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsLongArray(value);
+        return ConversionUtils.getAsLongVector(value);
     }
 
-    public double[] getValueAsDecimalArray(MetaField field) {
+    public double[] getValueAsDecimalVector(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsDecimalArray(value);
+        return ConversionUtils.getAsDecimalVector(value);
     }
 
-    public Date[] getValueAsDateArray(MetaField field) {
+    public Date[] getValueAsDateVector(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsDateArray(value);
+        return ConversionUtils.getAsDateVector(value);
     }
 
-    public String[] getValueAsTextArray(MetaField field) {
+    public String[] getValueAsTextVector(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsTextArray(value);
+        return ConversionUtils.getAsTextVector(value);
     }
 
     /**

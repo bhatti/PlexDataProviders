@@ -1,4 +1,4 @@
-package com.plexobject.dp.provider;
+package com.plexobject.dp.provider.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +13,10 @@ import org.apache.log4j.Logger;
 import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataFieldRowSet;
 import com.plexobject.dp.domain.MetaField;
-import com.plexobject.dp.domain.MetaFields;
+import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.provider.DataProvider;
+import com.plexobject.dp.provider.DataProviderException;
+import com.plexobject.dp.provider.TaskGranularity;
 
 public class ProvidersExecutor {
     private static final Logger logger = Logger
@@ -24,7 +27,7 @@ public class ProvidersExecutor {
     private final Collection<DataProvider> providers;
     private final ExecutorService executor;
     private final DataFieldRowSet optionalRequestFields = new DataFieldRowSet(
-            new MetaFields());
+            new Metadata());
     private final Map<DataProvider, Throwable> providerErrors = new HashMap<>();
 
     ProvidersExecutor(final DataFieldRowSet requestFields,
@@ -86,7 +89,7 @@ public class ProvidersExecutor {
         final Collection<DataProvider> executedProviders = new ArrayList<>();
         final Map<DataProvider, Future<?>> futures = new HashMap<>();
         for (final DataProvider provider : providers) {
-            if (requestFields.getMetaFields().getMissingCount(
+            if (requestFields.getMetadata().getMissingCount(
                     provider.getMandatoryRequestFields()) == 0) {
                 executedProviders.add(provider);
                 // execute in background thread if provider will take long time
@@ -133,9 +136,9 @@ public class ProvidersExecutor {
         for (int i = 0; i < responseFields.size(); i++) {
             for (MetaField responseField : provider.getResponseFields()
                     .getMetaFields()) {
-                if ((responseFields.getMetaFields().contains(responseField) && responseFields
+                if ((responseFields.getMetadata().contains(responseField) && responseFields
                         .hasFieldValue(responseField, i))
-                        || (optionalRequestFields.getMetaFields().contains(
+                        || (optionalRequestFields.getMetadata().contains(
                                 responseField) && responseFields.hasFieldValue(
                                 responseField, i))) {
                     Object value = responseFields.getFieldValue(responseField,
@@ -151,15 +154,15 @@ public class ProvidersExecutor {
         for (final DataProvider provider : providers) {
             for (MetaField metaField : provider.getMandatoryRequestFields()
                     .getMetaFields()) {
-                if (!responseFields.getMetaFields().contains(metaField)) {
-                    responseFields.getMetaFields().addMetaField(metaField);
+                if (!responseFields.getMetadata().contains(metaField)) {
+                    responseFields.getMetadata().addMetaField(metaField);
                 }
             }
             for (MetaField metaField : provider.getOptionalRequestFields()
                     .getMetaFields()) {
-                optionalRequestFields.getMetaFields().addMetaField(metaField);
-                if (!responseFields.getMetaFields().contains(metaField)) {
-                    responseFields.getMetaFields().addMetaField(metaField);
+                optionalRequestFields.getMetadata().addMetaField(metaField);
+                if (!responseFields.getMetadata().contains(metaField)) {
+                    responseFields.getMetadata().addMetaField(metaField);
                 }
             }
         }

@@ -18,8 +18,8 @@ public class DataFieldRowTest {
     @Before
     public void setup() {
         MetaFieldFactory.reset();
-        text = MetaFieldFactory.create("text", MetaFieldType.TEXT);
-        integer = MetaFieldFactory.create("integer", MetaFieldType.INTEGER);
+        text = MetaFieldFactory.create("text", MetaFieldType.SCALAR_TEXT);
+        integer = MetaFieldFactory.create("integer", MetaFieldType.SCALAR_INTEGER);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class DataFieldRowTest {
     @Test
     public void testGetValueAsLong() {
         DataFieldRow row = new DataFieldRow();
-        MetaField field = new MetaField("object", MetaFieldType.INTEGER);
+        MetaField field = new MetaField("object", MetaFieldType.SCALAR_INTEGER);
         row.addField(field, 1);
         assertEquals(1L, row.getValueAsLong(field));
     }
@@ -136,7 +136,7 @@ public class DataFieldRowTest {
     @Test
     public void testGetValueAsDecimal() {
         DataFieldRow row = new DataFieldRow();
-        MetaField field = new MetaField("object", MetaFieldType.DECIMAL);
+        MetaField field = new MetaField("object", MetaFieldType.SCALAR_DECIMAL);
         row.addField(field, 1.1);
         assertEquals(1.1, row.getValueAsDecimal(field), 0.0001);
     }
@@ -154,46 +154,46 @@ public class DataFieldRowTest {
     public void testGetValueAsDate() {
         Date date = new Date();
         DataFieldRow row = new DataFieldRow();
-        MetaField field = new MetaField("object", MetaFieldType.DATE);
+        MetaField field = new MetaField("object", MetaFieldType.SCALAR_DATE);
         row.addField(field, date);
         assertEquals(date, row.getValueAsDate(field));
     }
 
     @Test
-    public void testGetValueAsLongArray() {
+    public void testGetValueAsLongVector() {
         long[] numbers = { 1, 2, 3 };
         DataFieldRow row = new DataFieldRow();
-        MetaField field = new MetaField("object", MetaFieldType.ARRAY_INTEGER);
+        MetaField field = new MetaField("object", MetaFieldType.VECTOR_INTEGER);
         row.addField(field, numbers);
-        assertEquals(numbers, row.getValueAsLongArray(field));
+        assertEquals(numbers, row.getValueAsLongVector(field));
     }
 
     @Test
-    public void testGetValueAsDecimalArray() {
+    public void testGetValueAsDecimalVector() {
         double[] numbers = { 1.1, 2.1, 3.1 };
         DataFieldRow row = new DataFieldRow();
-        MetaField field = new MetaField("object", MetaFieldType.ARRAY_DECIMAL);
+        MetaField field = new MetaField("object", MetaFieldType.VECTOR_DECIMAL);
         row.addField(field, numbers);
         assertEquals(Arrays.toString(numbers),
-                Arrays.toString(row.getValueAsDecimalArray(field)));
+                Arrays.toString(row.getValueAsDecimalVector(field)));
     }
 
     @Test
-    public void testGetValueAsDateArray() {
+    public void testGetValueAsDateVector() {
         Date[] dates = { new Date(0), new Date(1) };
         DataFieldRow row = new DataFieldRow();
-        MetaField field = new MetaField("object", MetaFieldType.ARRAY_DATE);
+        MetaField field = new MetaField("object", MetaFieldType.VECTOR_DATE);
         row.addField(field, dates);
-        assertArrayEquals(dates, row.getValueAsDateArray(field));
+        assertArrayEquals(dates, row.getValueAsDateVector(field));
     }
 
     @Test
-    public void testGetValueAsTextArray() {
+    public void testGetValueAsTextVector() {
         String[] values = { "value1", "value2" };
         DataFieldRow row = new DataFieldRow();
-        MetaField field = new MetaField("object", MetaFieldType.ARRAY_TEXT);
+        MetaField field = new MetaField("object", MetaFieldType.VECTOR_TEXT);
         row.addField(field, values);
-        assertArrayEquals(values, row.getValueAsTextArray(field));
+        assertArrayEquals(values, row.getValueAsTextVector(field));
     }
 
     @Test

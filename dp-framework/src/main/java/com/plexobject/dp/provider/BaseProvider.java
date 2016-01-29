@@ -1,39 +1,36 @@
 package com.plexobject.dp.provider;
 
 import com.plexobject.dp.domain.MetaField;
-import com.plexobject.dp.domain.MetaFields;
+import com.plexobject.dp.domain.Metadata;
 
 public abstract class BaseProvider implements DataProvider {
-    private final MetaFields mandatoryRequestFields;
-    private final MetaFields optionalRequestFields;
-    private final MetaFields responseFields;
+    private final String name;
+    private final Metadata mandatoryRequestFields;
+    private final Metadata optionalRequestFields;
+    private final Metadata responseFields;
     private TaskGranularity taskGranularity = TaskGranularity.COARSE;
-    private String name;
     private int rank;
 
-    public BaseProvider(MetaFields mandatoryRequestFields,
-            MetaFields optionalRequestFields, MetaFields responseFields) {
+    public BaseProvider(String name, Metadata mandatoryRequestFields,
+            Metadata optionalRequestFields, Metadata responseFields) {
+        this.name = name;
         this.mandatoryRequestFields = mandatoryRequestFields;
         this.optionalRequestFields = optionalRequestFields;
         this.responseFields = responseFields;
     }
 
-    @Override
-    public final MetaFields getMandatoryRequestFields() {
+    public Metadata getMandatoryRequestFields() {
         return mandatoryRequestFields;
     }
 
-    @Override
-    public final MetaFields getOptionalRequestFields() {
+    public Metadata getOptionalRequestFields() {
         return optionalRequestFields;
     }
 
-    @Override
-    public final MetaFields getResponseFields() {
+    public Metadata getResponseFields() {
         return responseFields;
     }
 
-    @Override
     public TaskGranularity getTaskGranularity() {
         return taskGranularity;
     }
@@ -52,10 +49,6 @@ public abstract class BaseProvider implements DataProvider {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
@@ -78,9 +71,4 @@ public abstract class BaseProvider implements DataProvider {
         return 0;
     }
 
-    @Override
-    public String toString() {
-        return name + "(" + getMandatoryRequestFields() + "/"
-                + getOptionalRequestFields() + ") => " + getResponseFields();
-    }
 }

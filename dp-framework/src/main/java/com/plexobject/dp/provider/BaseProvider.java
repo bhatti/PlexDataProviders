@@ -7,6 +7,7 @@ public abstract class BaseProvider implements DataProvider {
     private final MetaFields mandatoryRequestFields;
     private final MetaFields optionalRequestFields;
     private final MetaFields responseFields;
+    private TaskGranularity taskGranularity = TaskGranularity.COARSE;
 
     public BaseProvider(MetaFields mandatoryRequestFields,
             MetaFields optionalRequestFields, MetaFields responseFields) {
@@ -31,11 +32,6 @@ public abstract class BaseProvider implements DataProvider {
     }
 
     @Override
-    public TaskGranularity getTaskGranularity() {
-        return TaskGranularity.COARSE;
-    }
-
-    @Override
     public int compareTo(DataProvider other) {
         for (MetaField requestField : mandatoryRequestFields.getMetaFields()) {
             if (other.getResponseFields().contains(requestField)) {
@@ -53,6 +49,15 @@ public abstract class BaseProvider implements DataProvider {
             }
         }
         return 0;
+    }
+
+    @Override
+    public TaskGranularity getTaskGranularity() {
+        return taskGranularity;
+    }
+
+    public void setTaskGranularity(TaskGranularity taskGranularity) {
+        this.taskGranularity = taskGranularity;
     }
 
 }

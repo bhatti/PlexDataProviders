@@ -1,5 +1,3 @@
 rootProject.name = 'DataProviders'
 includeFlat 'dp-framework'
 includeFlat 'dp-sample'
-//include 'dp-framework'
-//include 'dp-sample'

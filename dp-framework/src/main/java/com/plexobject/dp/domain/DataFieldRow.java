@@ -2,6 +2,7 @@ package com.plexobject.dp.domain;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -22,11 +23,12 @@ public class DataFieldRow {
     public DataFieldRow() {
     }
 
-    public synchronized void addField(MetaField field, Object value) {
+    public synchronized void addField(MetaField metaField, Object value) {
+        Objects.requireNonNull(metaField, "metaField is required");
         if (value == null) {
             value = NullObject.instance;
         }
-        fields.put(field, value);
+        fields.put(metaField, value);
     }
 
     public synchronized int size() {
@@ -37,8 +39,10 @@ public class DataFieldRow {
         return fields;
     }
 
-    public synchronized boolean hasFieldValue(MetaField field) {
-        Object value = fields.get(field);
+    public synchronized boolean hasFieldValue(MetaField metaField) {
+        Objects.requireNonNull(metaField, "metaField is required");
+
+        Object value = fields.get(metaField);
         if (value == null || value instanceof NullObject
                 || value instanceof InitialValue || value instanceof Exception) {
             return false;
@@ -46,17 +50,19 @@ public class DataFieldRow {
         return true;
     }
 
-    public synchronized Object getValue(MetaField field) {
-        Object value = fields.get(field);
+    public synchronized Object getValue(MetaField metaField) {
+        Objects.requireNonNull(metaField, "metaField is required");
+
+        Object value = fields.get(metaField);
         if (value == null || value instanceof NullObject
                 || value instanceof InitialValue) {
-            throw new IllegalStateException("DataField " + field
+            throw new IllegalStateException("DataField " + metaField
                     + " doesn't exist");
         }
         if (value instanceof RuntimeException) {
             throw (RuntimeException) value;
         } else if (value instanceof Exception) {
-            throw new RuntimeException("Error found retrieving " + field,
+            throw new RuntimeException("Error found retrieving " + metaField,
                     (Exception) value);
         }
         return value;

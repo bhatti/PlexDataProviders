@@ -6,6 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MetaFieldFactory {
     private static Map<String, MetaField> fieldsCache = new ConcurrentHashMap<>();
 
+    public static MetaField lookup(String name) {
+        return fieldsCache.get(name);
+    }
+
     public static synchronized MetaField create(String name, MetaFieldType type) {
         MetaField field = fieldsCache.get(name);
         if (field != null) {
@@ -19,5 +23,9 @@ public class MetaFieldFactory {
         field = new MetaField(name, type);
         fieldsCache.put(name, field);
         return field;
+    }
+
+    public static void reset() {
+        fieldsCache.clear();
     }
 }

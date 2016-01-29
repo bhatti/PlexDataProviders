@@ -52,7 +52,7 @@ public class MetaFields {
     }
 
     public synchronized boolean contains(MetaField other) {
-        return getMissingCount(MetaFields.of(other)) == 0;
+        return getMissingCount(MetaFields.from(other)) == 0;
     }
 
     public synchronized int getMissingCount(MetaFields other) {
@@ -83,7 +83,7 @@ public class MetaFields {
         return metaFields.size();
     }
 
-    public static MetaFields of(MetaField... args) {
+    public static MetaFields from(MetaField... args) {
         final MetaFields metaFields = new MetaFields();
         for (MetaField arg : args) {
             metaFields.addMetaField(arg);
@@ -91,10 +91,10 @@ public class MetaFields {
         return metaFields;
     }
 
-    public static MetaFields of(String... args) {
+    public static MetaFields fromRaw(Object... args) {
         final MetaFields metaFields = new MetaFields();
         for (int i = 0; i < args.length; i += 2) {
-            MetaField field = MetaFieldFactory.create(args[i],
+            MetaField field = MetaFieldFactory.create((String) args[i],
                     MetaFieldType.valueOf(args[i + 1].toString()));
             metaFields.addMetaField(field);
         }

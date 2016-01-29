@@ -1,5 +1,9 @@
 package com.plexobject.dp.provider;
 
+import java.util.Map;
+
+import com.plexobject.dp.domain.DataConfiguration;
+import com.plexobject.dp.domain.DataFieldRowSet;
 
 /**
  * This interface extends DataProvider and defines methods for
@@ -14,7 +18,7 @@ package com.plexobject.dp.provider;
  * @author shahzad bhatti
  *
  */
-public interface DataProviders extends DataProducer {
+public interface DataProviders {
 
     /**
      * This method will register data provider that requires input fields and
@@ -32,4 +36,20 @@ public interface DataProviders extends DataProducer {
      * @param provider
      */
     void unregister(DataProvider provider);
+
+    /**
+     * This method will produce set of data fields given input
+     * 
+     * @param requestFields
+     *            - input parameter fields
+     * @param responseFields
+     *            - output fields
+     * @param config
+     *            - configuration parameters
+     * @param errorHandler
+     *            - error handler
+     * @return errors from providers if exist
+     */
+    Map<DataProvider, Throwable> produce(DataFieldRowSet requestFields,
+            DataFieldRowSet responseFields, DataConfiguration config);
 }

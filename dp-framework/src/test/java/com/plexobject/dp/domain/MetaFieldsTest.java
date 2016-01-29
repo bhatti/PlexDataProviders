@@ -120,8 +120,8 @@ public class MetaFieldsTest {
 
     @Test
     public void testGetMissingCount() {
-        MetaFields fields1 = MetaFields.of("name", "TEXT", "phone", "TEXT");
-        MetaFields fields2 = MetaFields.of("name", "TEXT", "phone", "TEXT",
+        MetaFields fields1 = MetaFields.fromRaw("name", "TEXT", "phone", "TEXT");
+        MetaFields fields2 = MetaFields.fromRaw("name", "TEXT", "phone", "TEXT",
                 "address", "TEXT");
         //
         assertEquals(1, fields1.getMissingCount(fields2));
@@ -133,7 +133,7 @@ public class MetaFieldsTest {
     public void testOf() {
         MetaField field1 = MetaFieldFactory.create("name", MetaFieldType.TEXT);
         MetaField field2 = MetaFieldFactory.create("phone", MetaFieldType.TEXT);
-        MetaFields fields = MetaFields.of(field1, field2);
+        MetaFields fields = MetaFields.from(field1, field2);
         assertEquals(2, fields.size());
         assertTrue(fields.getMetaFields().contains(field1));
         assertTrue(fields.getMetaFields().contains(field2));
@@ -141,22 +141,22 @@ public class MetaFieldsTest {
 
     @Test
     public void testOfString() {
-        MetaFields fields = MetaFields.of("name", "TEXT", "phone", "TEXT");
+        MetaFields fields = MetaFields.fromRaw("name", "TEXT", "phone", "TEXT");
         assertEquals(2, fields.size());
     }
 
     @Test
     public void testHashcode() {
-        MetaFields fields = MetaFields.of("name", "TEXT", "phone", "TEXT");
+        MetaFields fields = MetaFields.fromRaw("name", "TEXT", "phone", "TEXT");
         assertTrue(fields.hashCode() != 0);
     }
 
     @Test
     public void testEquals() {
-        MetaFields fields1 = MetaFields.of("name", "TEXT", "phone", "TEXT");
-        MetaFields fields2 = MetaFields.of("name", "TEXT", "phone", "TEXT");
-        MetaFields fields3 = MetaFields.of("name", "TEXT", "address", "TEXT");
-        MetaFields fields4 = MetaFields.of("name", "TEXT", "address", "TEXT", "phone", "TEXT");
+        MetaFields fields1 = MetaFields.fromRaw("name", "TEXT", "phone", "TEXT");
+        MetaFields fields2 = MetaFields.fromRaw("name", "TEXT", "phone", "TEXT");
+        MetaFields fields3 = MetaFields.fromRaw("name", "TEXT", "address", "TEXT");
+        MetaFields fields4 = MetaFields.fromRaw("name", "TEXT", "address", "TEXT", "phone", "TEXT");
         assertEquals(fields1, fields1);
         assertEquals(fields1, fields2);
         assertNotEquals(fields1, fields3);
@@ -167,7 +167,7 @@ public class MetaFieldsTest {
 
     @Test
     public void testToString() {
-        MetaFields fields = MetaFields.of("name", "TEXT", "phone", "TEXT");
+        MetaFields fields = MetaFields.fromRaw("name", "TEXT", "phone", "TEXT");
         assertTrue(fields.toString().contains("name"));
     }
 }

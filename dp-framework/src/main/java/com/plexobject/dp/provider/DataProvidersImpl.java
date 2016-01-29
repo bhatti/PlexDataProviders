@@ -5,14 +5,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 
@@ -43,55 +40,27 @@ public class DataProvidersImpl implements DataProviders {
     }
 
     @Override
-    public void produce(final DataFieldRowSet requestFields,
-            final DataFieldRowSet responseFields, DataConfiguration config)
-            throws DataProviderException {
+    public Map<DataProvider, Throwable> produce(DataFieldRowSet requestFields,
+            DataFieldRowSet responseFields, DataConfiguration config) {
         // Get all data providers needed
         Collection<DataProvider> providers = getDataProviders(
                 requestFields.getMetaFields(), responseFields.getMetaFields());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Executing requestFields " + requestFields
+                    + ", responseFields " + responseFields + " with "
+                    + providers);
+        }
         //
         // creating parallel thread executor
         final ExecutorService executor = defaultExecutor != null ? defaultExecutor
                 : Executors.newFixedThreadPool(getThreadPoolSize(providers));
         try {
-            // Add intermediate data needed, e.g. we could call provider A that
-            // returns some fields, which are used as input for provider B
-            DataFieldRowSet optionalRequestFields = new DataFieldRowSet(
-                    new MetaFields());
-            addIntermediateAndOptionalFields(requestFields,
-                    optionalRequestFields, responseFields, providers);
-            if (config.getQueryTimeoutMillis() > 0) {
-                Future<?> future = executor.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        doProduce(requestFields, responseFields, config,
-                                providers, executor, optionalRequestFields);
-                    }
-                });
-                // wait for main task to be completed
-                // this may throw TimeoutException
-                while (!future.isDone() && !future.isCancelled()) {
-                    try {
-                        future.get(config.getQueryTimeoutMillis(),
-                                TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException e) {
-                        Thread.interrupted();
-                    } catch (ExecutionException e) {
-                        throw new DataProviderException(
-                                "Failed to execute provider ", e,
-                                requestFields, responseFields);
-                    } catch (TimeoutException e) {
-                        throw new DataProviderException(
-                                "Failed to execute provider ", e,
-                                requestFields, responseFields);
-                    }
-                }
-            } else {
-                doProduce(requestFields, responseFields, config, providers,
-                        executor, optionalRequestFields);
-            }
+            return new ProvidersExecutor(requestFields, responseFields, config,
+                    providers, executor).execute();
         } finally {
-            executor.shutdown();
+            if (executor != defaultExecutor) {
+                executor.shutdown();
+            }
         }
     }
 
@@ -157,7 +126,7 @@ public class DataProvidersImpl implements DataProviders {
                     .get(responseField);
             if (providers == null) {
                 throw new DataProviderException("Failed to find provider for "
-                        + responseField, null, null);
+                        + responseField);
             }
             DataProvider provider = getBestDataProvider(providers,
                     requestFields);
@@ -182,29 +151,6 @@ public class DataProvidersImpl implements DataProviders {
         }
     }
 
-    // go through all providers and retrieve response data fields
-    // note that some of providers may not have all request data fields so we
-    // will wait until we have the request fields
-    private void doProduce(final DataFieldRowSet requestFields,
-            final DataFieldRowSet responseFields, DataConfiguration config,
-            Collection<DataProvider> providers, final ExecutorService executor,
-            DataFieldRowSet optionalRequestFields) {
-        while (providers.size() > 0) {
-            // Execute providers that have the request fields available
-            Collection<DataProvider> executedProviders = executeProviders(
-                    requestFields, optionalRequestFields, responseFields,
-                    config, providers, executor);
-            if (providers.size() > 0 && executedProviders.size() == 0) {
-                logger.warn("Providers " + providers
-                        + " cannot be fulfilled\n\trequestFields "
-                        + requestFields + "\n\tresponseFields" + responseFields);
-                throw new IllegalStateException("Providers " + providers
-                        + " cannot be fulfilled\n\trequestFields "
-                        + requestFields + "\n\tresponseFields" + responseFields);
-            }
-        }
-    }
-
     // This method finds data provider that matches or almost matches the
     // request parameters that we have
     private DataProvider getBestDataProvider(Set<DataProvider> providers,
@@ -223,106 +169,6 @@ public class DataProvidersImpl implements DataProviders {
             }
         }
         return bestProvider;
-    }
-
-    // Go through all providers and if we have all the necessary request
-    // parameters then we will execute it.
-    private Collection<DataProvider> executeProviders(
-            final DataFieldRowSet requestFields,
-            DataFieldRowSet optionalRequestFields,
-            final DataFieldRowSet responseFields,
-            final DataConfiguration config,
-            final Collection<DataProvider> providers,
-            final ExecutorService executor) {
-        final Collection<DataProvider> executedProviders = new ArrayList<>();
-        final Collection<Future<?>> futures = new ArrayList<>();
-        for (final DataProvider provider : providers) {
-            if (requestFields.getMetaFields().getMissingCount(
-                    provider.getMandatoryRequestFields()) == 0) {
-                executedProviders.add(provider);
-                if (provider.getTaskGranularity() == TaskGranularity.COARSE) {
-                    // execute in background thread
-                    Future<?> future = executor.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            executeProvider(requestFields,
-                                    optionalRequestFields, responseFields,
-                                    config, provider);
-                        }
-                    });
-                    futures.add(future);
-                } else {
-                    // execute in the same thread
-                    executeProvider(requestFields, optionalRequestFields,
-                            responseFields, config, provider);
-                }
-            }
-        }
-        providers.removeAll(executedProviders);
-        // waiting for providers to finish
-        for (Future<?> future : futures) {
-            while (!future.isDone() && !future.isCancelled()) {
-                try {
-                    future.get();
-                } catch (InterruptedException e) {
-                    Thread.interrupted();
-                } catch (ExecutionException e) {
-                    throw new DataProviderException(
-                            "Failed to execute provider ", e, requestFields,
-                            responseFields);
-                }
-            }
-        }
-        return executedProviders;
-    }
-
-    private void executeProvider(final DataFieldRowSet requestFields,
-            DataFieldRowSet optionalRequestFields,
-            final DataFieldRowSet responseFields,
-            final DataConfiguration config, final DataProvider provider) {
-        try {
-            // call data provider
-            provider.produce(requestFields, responseFields, config);
-            // add intermediate fields needed for future providers
-            // add optional fields as request parameters as well
-            for (int i = 0; i < responseFields.size(); i++) {
-                for (MetaField responseField : provider.getResponseFields()
-                        .getMetaFields()) {
-                    if ((responseFields.getMetaFields().contains(responseField) && responseFields
-                            .hasFieldValue(responseField, i))
-                            || (optionalRequestFields.getMetaFields().contains(
-                                    responseField) && responseFields
-                                    .hasFieldValue(responseField, i))) {
-                        Object value = responseFields
-                                .getField(responseField, i);
-                        requestFields.addDataField(responseField, value, i);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("PLEXSVC Failed to execute " + provider
-                    + " with input " + requestFields, e);
-        }
-    }
-
-    private void addIntermediateAndOptionalFields(
-            final DataFieldRowSet requestFields,
-            DataFieldRowSet optionalRequestFields,
-            final DataFieldRowSet responseFields,
-            Collection<DataProvider> providers) {
-        // add any intermediate data needed to the output
-        for (final DataProvider provider : providers) {
-            for (MetaField metaField : provider.getMandatoryRequestFields()
-                    .getMetaFields()) {
-                if (!responseFields.getMetaFields().contains(metaField)) {
-                    responseFields.getMetaFields().addMetaField(metaField);
-                }
-            }
-            for (MetaField metaField : provider.getOptionalRequestFields()
-                    .getMetaFields()) {
-                optionalRequestFields.getMetaFields().addMetaField(metaField);
-            }
-        }
     }
 
     private static int getThreadPoolSize(Collection<DataProvider> providers) {

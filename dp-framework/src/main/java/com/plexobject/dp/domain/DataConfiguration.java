@@ -1,5 +1,8 @@
 package com.plexobject.dp.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DataConfiguration {
     private int page;
     private int limit;
@@ -7,7 +10,8 @@ public class DataConfiguration {
     private String orderBy;
     private String groupBy;
     private int maxThreads;
-    private String whereClause;
+    private boolean abortUponPartialFailure;
+    private Map<String, Object> filterCriteria = new HashMap<>();
 
     public int getPage() {
         return page;
@@ -57,12 +61,24 @@ public class DataConfiguration {
         this.maxThreads = maxThreads;
     }
 
-    public String getWhereClause() {
-        return whereClause;
+    public void addFilterCriteria(String name, Object value) {
+        filterCriteria.put(name, value);
     }
 
-    public void setWhereClause(String whereClause) {
-        this.whereClause = whereClause;
+    public Map<String, Object> getFilterCriteria() {
+        return filterCriteria;
+    }
+
+    public void setFilterCriteria(Map<String, Object> filterCriteria) {
+        this.filterCriteria = filterCriteria;
+    }
+
+    public boolean isAbortUponPartialFailure() {
+        return abortUponPartialFailure;
+    }
+
+    public void setAbortUponPartialFailure(boolean abortUponPartialFailure) {
+        this.abortUponPartialFailure = abortUponPartialFailure;
     }
 
 }

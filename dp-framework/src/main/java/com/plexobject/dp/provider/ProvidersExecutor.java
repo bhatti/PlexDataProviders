@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 
@@ -176,8 +174,8 @@ public class ProvidersExecutor {
                     e.getValue().get();
                 } catch (InterruptedException ex) {
                     Thread.interrupted();
-                } catch (ExecutionException ex) {
-                    handleExecutionException(e.getKey(), ex);
+                } catch (Exception ex) {
+                    addError(e.getKey(), ex);
                 }
             }
         }
@@ -190,34 +188,10 @@ public class ProvidersExecutor {
                         TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 Thread.interrupted();
-            } catch (ExecutionException e) {
-                handleExecutionException(null, e);
-            } catch (TimeoutException e) {
+            } catch (Exception e) {
                 throw new DataProviderException("Failed to execute providers",
                         e);
             }
-        }
-    }
-
-    private void handleExecutionException(DataProvider provider,
-            ExecutionException e) {
-        Throwable cause = e;
-        if (e.getCause() != null) {
-            cause = e.getCause();
-        }
-        //
-        if (logger.isDebugEnabled()) {
-            logger.debug("Failed to execute providers" + " with input "
-                    + requestFields, cause);
-        }
-        //
-        if (provider != null) {
-            addError(provider, cause);
-        } else if (cause instanceof RuntimeException) {
-            throw (RuntimeException) cause;
-        } else {
-            throw new DataProviderException("Failed to execute providers",
-                    cause);
         }
     }
 

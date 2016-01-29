@@ -54,16 +54,18 @@ public class DataProvidersImplTest {
     }
 
     public static class FailingProvider extends BaseProvider {
-        public FailingProvider(String name) {
+        private final RuntimeException error;
+
+        public FailingProvider(String name, RuntimeException error) {
             super(metaFrom(name), metaFrom("none"), metaFrom(name + "-result"));
+            this.error = error;
         }
 
         @Override
         public void produce(final DataFieldRowSet requestRowSet,
                 final DataFieldRowSet responseRowSet,
                 final DataConfiguration config) throws DataProviderException {
-
-            throw new RuntimeException("failed");
+            throw error;
         }
 
         @Override
@@ -472,7 +474,8 @@ public class DataProvidersImplTest {
 
     @Test
     public void testError() {
-        FailingProvider provider = new FailingProvider("error");
+        FailingProvider provider = new FailingProvider("error",
+                new RuntimeException("failed"));
         provider.setTaskGranularity(TaskGranularity.COARSE);
         dataProviders.register(provider);
         dataProviders.register(new TestProvider(new String[] { "query" },
@@ -492,7 +495,8 @@ public class DataProvidersImplTest {
 
     @Test
     public void testErrorWithAbort() {
-        FailingProvider provider = new FailingProvider("error");
+        FailingProvider provider = new FailingProvider("error",
+                new RuntimeException("failed"));
         provider.setTaskGranularity(TaskGranularity.COARSE);
         dataProviders.register(provider);
         dataProviders.register(new TestProvider(new String[] { "query" },

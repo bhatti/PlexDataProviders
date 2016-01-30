@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.plexobject.dp.util.ConversionUtils;
+import com.plexobject.dp.util.ObjectConversionUtils;
 
 /**
  * This class defines collection of data fields that would be returned or
@@ -70,47 +70,47 @@ public class DataFieldRow {
 
     public String getValueAsText(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsText(value);
+        return ObjectConversionUtils.getAsText(value);
     }
 
     public long getValueAsLong(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsLong(value);
+        return ObjectConversionUtils.getAsLong(value);
     }
 
     public double getValueAsDecimal(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsDecimal(value);
+        return ObjectConversionUtils.getAsDecimal(value);
     }
 
     public byte[] getValueAsBinary(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsBinary(value);
+        return ObjectConversionUtils.getAsBinary(value);
     }
 
     public Date getValueAsDate(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsDate(value);
+        return ObjectConversionUtils.getAsDate(value);
     }
 
     public long[] getValueAsLongVector(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsLongVector(value);
+        return ObjectConversionUtils.getAsLongVector(value);
     }
 
     public double[] getValueAsDecimalVector(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsDecimalVector(value);
+        return ObjectConversionUtils.getAsDecimalVector(value);
     }
 
     public Date[] getValueAsDateVector(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsDateVector(value);
+        return ObjectConversionUtils.getAsDateVector(value);
     }
 
     public String[] getValueAsTextVector(MetaField field) {
         Object value = getValue(field);
-        return ConversionUtils.getAsTextVector(value);
+        return ObjectConversionUtils.getAsTextVector(value);
     }
 
     /**

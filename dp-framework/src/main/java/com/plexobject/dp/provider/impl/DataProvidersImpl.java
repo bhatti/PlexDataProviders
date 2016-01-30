@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 
 import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataFieldRowSet;
+import com.plexobject.dp.metrics.Metric;
+import com.plexobject.dp.metrics.Timer;
 import com.plexobject.dp.provider.DataProvider;
 import com.plexobject.dp.provider.DataProviderLocator;
 import com.plexobject.dp.provider.DataProviders;
@@ -54,6 +56,7 @@ public class DataProvidersImpl implements DataProviders {
         // creating parallel thread executor
         final ExecutorService executor = defaultExecutor != null ? defaultExecutor
                 : Executors.newFixedThreadPool(getThreadPoolSize(providers));
+        final Timer timer = Metric.newTimer("DataProvidersImpl.produce");
         try {
             return new ProvidersExecutor(requestFields, responseFields, config,
                     providers, executor).execute();
@@ -61,6 +64,7 @@ public class DataProvidersImpl implements DataProviders {
             if (executor != defaultExecutor) {
                 executor.shutdown();
             }
+            timer.stop();
         }
     }
 

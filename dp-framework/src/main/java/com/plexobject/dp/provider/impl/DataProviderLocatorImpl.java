@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.metrics.Metric;
+import com.plexobject.dp.metrics.Timer;
 import com.plexobject.dp.provider.DataProvider;
 import com.plexobject.dp.provider.DataProviderException;
 import com.plexobject.dp.provider.DataProviderLocator;
@@ -65,11 +67,16 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
     @Override
     public Collection<DataProvider> locate(Metadata requestFields,
             Metadata responseFields) {
-        final List<DataProvider> providers = new ArrayList<>();
-        populateDataProviders(new Metadata(requestFields.getMetaFields()),
-                new Metadata(responseFields.getMetaFields()), providers);
-        Collections.sort(providers); // sort by dependency
-        return providers;
+        final Timer timer = Metric.newTimer("DataProviderLocatorImpl.locate");
+        try {
+            final List<DataProvider> providers = new ArrayList<>();
+            populateDataProviders(new Metadata(requestFields.getMetaFields()),
+                    new Metadata(responseFields.getMetaFields()), providers);
+            Collections.sort(providers); // sort by dependency
+            return providers;
+        } finally {
+            timer.stop();
+        }
     }
 
     private void populateDataProviders(Metadata requestFields,

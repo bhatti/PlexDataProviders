@@ -9,16 +9,16 @@ import java.util.Date;
 
 import org.junit.Test;
 
-public class ConversionUtilsTest {
+public class ObjectConversionUtilsTest {
     @Test
     public void testGetAsText() {
-        assertEquals("xx", ConversionUtils.getAsText("xx"));
-        assertEquals("1", ConversionUtils.getAsText(1));
+        assertEquals("xx", ObjectConversionUtils.getAsText("xx"));
+        assertEquals("1", ObjectConversionUtils.getAsText(1));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsTextNull() {
-        ConversionUtils.getAsText(null);
+        ObjectConversionUtils.getAsText(null);
     }
 
     @Test
@@ -29,14 +29,14 @@ public class ConversionUtilsTest {
         Array.set(reflectionArr, 2, "three");
         String[] arr = { "one", "two", "three" };
         assertArrayEquals(arr,
-                ConversionUtils.getAsTextVector(Arrays.asList(arr)));
-        assertArrayEquals(arr, ConversionUtils.getAsTextVector(arr));
-        assertArrayEquals(arr, ConversionUtils.getAsTextVector(reflectionArr));
+                ObjectConversionUtils.getAsTextVector(Arrays.asList(arr)));
+        assertArrayEquals(arr, ObjectConversionUtils.getAsTextVector(arr));
+        assertArrayEquals(arr, ObjectConversionUtils.getAsTextVector(reflectionArr));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsTextArrayNull() {
-        ConversionUtils.getAsTextVector(null);
+        ObjectConversionUtils.getAsTextVector(null);
     }
 
     @Test
@@ -47,35 +47,35 @@ public class ConversionUtilsTest {
         Array.set(reflectionArr, 2, "three");
         String[] arr = { "one", "two", "three" };
         assertArrayEquals(arr,
-                ConversionUtils.getAsObjectVector(Arrays.asList(arr)));
-        assertArrayEquals(arr, ConversionUtils.getAsObjectVector(arr));
-        assertArrayEquals(arr, ConversionUtils.getAsObjectVector(reflectionArr));
+                ObjectConversionUtils.getAsObjectVector(Arrays.asList(arr)));
+        assertArrayEquals(arr, ObjectConversionUtils.getAsObjectVector(arr));
+        assertArrayEquals(arr, ObjectConversionUtils.getAsObjectVector(reflectionArr));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsObjectArrayNull() {
-        ConversionUtils.getAsObjectVector(null);
+        ObjectConversionUtils.getAsObjectVector(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsTextArrayBad() {
-        ConversionUtils.getAsTextVector(1);
+        ObjectConversionUtils.getAsTextVector(1);
     }
 
     @Test
     public void testGetAsLong() {
-        assertEquals(1L, ConversionUtils.getAsLong("1"));
-        assertEquals(1L, ConversionUtils.getAsLong(1.1));
+        assertEquals(1L, ObjectConversionUtils.getAsLong("1"));
+        assertEquals(1L, ObjectConversionUtils.getAsLong(1.1));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsLongNull() {
-        ConversionUtils.getAsLong(null);
+        ObjectConversionUtils.getAsLong(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsLongBad() {
-        ConversionUtils.getAsLong(new Date());
+        ObjectConversionUtils.getAsLong(new Date());
     }
 
     @Test
@@ -85,37 +85,37 @@ public class ConversionUtilsTest {
         Array.set(reflectionArr, 1, 2L);
         Array.set(reflectionArr, 2, 3L);
         long[] arr = { 1L, 2L, 3L };
-        assertEquals(Arrays.toString(arr), Arrays.toString(ConversionUtils
+        assertEquals(Arrays.toString(arr), Arrays.toString(ObjectConversionUtils
                 .getAsLongVector(Arrays.asList(1L, 2L, 3L))));
-        assertEquals(arr, ConversionUtils.getAsLongVector(arr));
+        assertEquals(arr, ObjectConversionUtils.getAsLongVector(arr));
         assertEquals(Arrays.toString(arr),
-                Arrays.toString(ConversionUtils.getAsLongVector(reflectionArr)));
+                Arrays.toString(ObjectConversionUtils.getAsLongVector(reflectionArr)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsLongArrayNull() {
-        ConversionUtils.getAsLongVector(null);
+        ObjectConversionUtils.getAsLongVector(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsLongArrayBad() {
-        ConversionUtils.getAsLongVector(new Date());
+        ObjectConversionUtils.getAsLongVector(new Date());
     }
 
     @Test
     public void testGetAsDouble() {
-        assertEquals(1.1, ConversionUtils.getAsDecimal("1.1"), 0.0001);
-        assertEquals(1.1, ConversionUtils.getAsDecimal(1.1), 0.0001);
+        assertEquals(1.1, ObjectConversionUtils.getAsDecimal("1.1"), 0.0001);
+        assertEquals(1.1, ObjectConversionUtils.getAsDecimal(1.1), 0.0001);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsDoubleNull() {
-        ConversionUtils.getAsDecimal(null);
+        ObjectConversionUtils.getAsDecimal(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsDoubleBad() {
-        ConversionUtils.getAsDecimal(new Date());
+        ObjectConversionUtils.getAsDecimal(new Date());
     }
 
     @Test
@@ -125,58 +125,58 @@ public class ConversionUtilsTest {
         Array.set(reflectionArr, 1, 2.1);
         Array.set(reflectionArr, 2, 3.1);
         double[] arr = { 1.1, 2.1, 3.1 };
-        assertEquals(Arrays.toString(arr), Arrays.toString(ConversionUtils
+        assertEquals(Arrays.toString(arr), Arrays.toString(ObjectConversionUtils
                 .getAsDecimalVector(Arrays.asList(1.1, 2.1, 3.1))));
-        assertEquals(arr, ConversionUtils.getAsDecimalVector(arr));
-        assertEquals(Arrays.toString(arr), Arrays.toString(ConversionUtils
+        assertEquals(arr, ObjectConversionUtils.getAsDecimalVector(arr));
+        assertEquals(Arrays.toString(arr), Arrays.toString(ObjectConversionUtils
                 .getAsDecimalVector(reflectionArr)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsDoubleArrayNull() {
-        ConversionUtils.getAsDecimalVector(null);
+        ObjectConversionUtils.getAsDecimalVector(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsDoubleArrayBad() {
-        ConversionUtils.getAsDecimalVector(new Date());
+        ObjectConversionUtils.getAsDecimalVector(new Date());
     }
 
     @Test
     public void testGetAsBinary() {
         String text = "hello";
-        assertEquals(text, new String(ConversionUtils.getAsBinary(text)));
+        assertEquals(text, new String(ObjectConversionUtils.getAsBinary(text)));
         assertEquals(text,
-                new String(ConversionUtils.getAsBinary(text.getBytes())));
+                new String(ObjectConversionUtils.getAsBinary(text.getBytes())));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsBinaryNull() {
-        ConversionUtils.getAsBinary(null);
+        ObjectConversionUtils.getAsBinary(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsBinaryBad() {
-        ConversionUtils.getAsBinary(new Date());
+        ObjectConversionUtils.getAsBinary(new Date());
     }
 
     @Test
     public void testGetAsDate() {
         Date date = new Date();
-        assertEquals(date, ConversionUtils.getAsDate(date));
-        assertEquals(date, ConversionUtils.getAsDate(date.getTime()));
+        assertEquals(date, ObjectConversionUtils.getAsDate(date));
+        assertEquals(date, ObjectConversionUtils.getAsDate(date.getTime()));
         assertEquals(date,
-                ConversionUtils.getAsDate(String.valueOf(date.getTime())));
+                ObjectConversionUtils.getAsDate(String.valueOf(date.getTime())));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsDateNull() {
-        ConversionUtils.getAsDate(null);
+        ObjectConversionUtils.getAsDate(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsDateBad() {
-        ConversionUtils.getAsDate(new StringBuilder());
+        ObjectConversionUtils.getAsDate(new StringBuilder());
     }
 
     @Test
@@ -191,19 +191,19 @@ public class ConversionUtilsTest {
         Array.set(reflectionArr, 2, date3);
         Date[] arr = { date1, date2, date3 };
         assertArrayEquals(arr,
-                ConversionUtils.getAsDateVector(Arrays.asList(arr)));
-        assertArrayEquals(arr, ConversionUtils.getAsDateVector(arr));
-        assertArrayEquals(arr, ConversionUtils.getAsDateVector(reflectionArr));
+                ObjectConversionUtils.getAsDateVector(Arrays.asList(arr)));
+        assertArrayEquals(arr, ObjectConversionUtils.getAsDateVector(arr));
+        assertArrayEquals(arr, ObjectConversionUtils.getAsDateVector(reflectionArr));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsDateArrayNull() {
-        ConversionUtils.getAsDateVector(null);
+        ObjectConversionUtils.getAsDateVector(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsDateArrayBad() {
-        ConversionUtils.getAsDateVector(new Date());
+        ObjectConversionUtils.getAsDateVector(new Date());
     }
 
 }

@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Date;
 
-public class ConversionUtils {
+public class ObjectConversionUtils {
     public static String getAsText(Object value) {
         if (value instanceof String) {
             return (String) value;
@@ -66,7 +66,7 @@ public class ConversionUtils {
             long[] values = new long[collection.size()];
             int i = 0;
             for (Object obj : collection) {
-                values[i++] = ConversionUtils.getAsLong(obj);
+                values[i++] = ObjectConversionUtils.getAsLong(obj);
             }
             return values;
         } else if (value instanceof long[]) {
@@ -91,7 +91,7 @@ public class ConversionUtils {
             double[] values = new double[collection.size()];
             int i = 0;
             for (Object obj : collection) {
-                values[i++] = ConversionUtils.getAsDecimal(obj);
+                values[i++] = ObjectConversionUtils.getAsDecimal(obj);
             }
             return values;
         } else if (value instanceof double[]) {
@@ -116,7 +116,7 @@ public class ConversionUtils {
             Date[] values = new Date[collection.size()];
             int i = 0;
             for (Object obj : collection) {
-                values[i++] = ConversionUtils.getAsDate(obj);
+                values[i++] = ObjectConversionUtils.getAsDate(obj);
             }
             return values;
         } else if (value instanceof Date[]) {
@@ -134,7 +134,7 @@ public class ConversionUtils {
             String[] values = new String[collection.size()];
             int i = 0;
             for (Object obj : collection) {
-                values[i++] = ConversionUtils.getAsText(obj);
+                values[i++] = ObjectConversionUtils.getAsText(obj);
             }
             return values;
         } else if (value instanceof String[]) {
@@ -152,12 +152,11 @@ public class ConversionUtils {
             Object[] values = new Object[collection.size()];
             int i = 0;
             for (Object obj : collection) {
-                values[i++] = ConversionUtils.getAsText(obj);
+                values[i++] = ObjectConversionUtils.getAsText(obj);
             }
             return values;
-        } else if (value instanceof String[]) {
-            Object[] array = (Object[]) value;
-            return array;
+        } else if (value instanceof Object[]) {
+            return (Object[]) value;
         }
         throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")

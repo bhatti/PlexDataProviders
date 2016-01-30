@@ -14,6 +14,8 @@ import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataFieldRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.metrics.Metric;
+import com.plexobject.dp.metrics.Timer;
 import com.plexobject.dp.provider.DataProvider;
 import com.plexobject.dp.provider.DataProviderException;
 import com.plexobject.dp.provider.TaskGranularity;
@@ -116,6 +118,10 @@ public class ProvidersExecutor {
     }
 
     private void executeProvider(final DataProvider provider) {
+        final Timer timer = Metric
+                .newTimer("ProvidersExecutor.executeProvider:"
+                        + provider.getName());
+
         try {
             // calling data provider
             provider.produce(requestFields, responseFields, config);
@@ -127,6 +133,8 @@ public class ProvidersExecutor {
                         + requestFields, e);
             }
             addError(provider, e);
+        } finally {
+            timer.stop();
         }
     }
 

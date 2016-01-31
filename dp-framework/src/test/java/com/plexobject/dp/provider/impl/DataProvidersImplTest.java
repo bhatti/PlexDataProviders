@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,8 +19,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.plexobject.dp.domain.DataConfiguration;
-import com.plexobject.dp.domain.DataFieldRow;
-import com.plexobject.dp.domain.DataFieldRowSet;
+import com.plexobject.dp.domain.DataRequest;
+import com.plexobject.dp.domain.DataResponse;
+import com.plexobject.dp.domain.DataRow;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.MetaFieldType;
@@ -43,9 +44,8 @@ public class DataProvidersImplTest {
         }
 
         @Override
-        public void produce(final DataFieldRowSet requestRowSet,
-                final DataFieldRowSet responseRowSet,
-                final DataConfiguration config) {
+        public void produce(final DataRowSet requestRowSet,
+                final DataRowSet responseRowSet, final DataConfiguration config) {
             try {
                 Thread.sleep(sleepMillis);
             } catch (InterruptedException e) {
@@ -69,9 +69,9 @@ public class DataProvidersImplTest {
         }
 
         @Override
-        public void produce(final DataFieldRowSet requestRowSet,
-                final DataFieldRowSet responseRowSet,
-                final DataConfiguration config) throws DataProviderException {
+        public void produce(final DataRowSet requestRowSet,
+                final DataRowSet responseRowSet, final DataConfiguration config)
+                throws DataProviderException {
             throw error;
         }
 
@@ -90,9 +90,9 @@ public class DataProvidersImplTest {
         }
 
         @Override
-        public void produce(final DataFieldRowSet requestRowSet,
-                final DataFieldRowSet responseRowSet,
-                final DataConfiguration config) throws DataProviderException {
+        public void produce(final DataRowSet requestRowSet,
+                final DataRowSet responseRowSet, final DataConfiguration config)
+                throws DataProviderException {
             for (int i = 0; i < requestRowSet.size(); i++) {
                 for (MetaField metaField : getMandatoryRequestFields()
                         .getMetaFields()) {
@@ -115,7 +115,7 @@ public class DataProvidersImplTest {
                         (responseRowSet.getMetadata().getMetaFields()));
                 for (MetaField metaField : responseFields) {
                     if (getResponseFields().contains(metaField)) {
-                        responseRowSet.addDataField(metaField,
+                        responseRowSet.addValueAtRow(metaField,
                                 metaField.getName() + "-value-" + i, i);
                     }
                 }
@@ -140,9 +140,9 @@ public class DataProvidersImplTest {
         }
 
         @Override
-        public void produce(final DataFieldRowSet requestRowSet,
-                final DataFieldRowSet responseRowSet,
-                final DataConfiguration config) throws DataProviderException {
+        public void produce(final DataRowSet requestRowSet,
+                final DataRowSet responseRowSet, final DataConfiguration config)
+                throws DataProviderException {
             for (int i = 0; i < requestRowSet.size(); i++) {
                 for (MetaField metaField : getMandatoryRequestFields()
                         .getMetaFields()) {
@@ -160,7 +160,7 @@ public class DataProvidersImplTest {
                 for (MetaField metaField : responseFields) {
                     if (getResponseFields().contains(metaField)) {
                         responseRowSet
-                                .addDataField(
+                                .addValueAtRow(
                                         metaField,
                                         Arrays.asList(new String[] {
                                                 metaField.getName()
@@ -251,16 +251,15 @@ public class DataProvidersImplTest {
                 new String[] { "output1b" }, new String[] { "optional1" },
                 "output2a", "output2b"));
 
-        DataFieldRowSet request = rowsetFrom(true, "input1");
-        DataFieldRowSet response = rowsetFrom(false, "output2a");
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
-        assertEquals(1, response.size());
-        assertEquals("output2a-value-0",
-                response.getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
-        assertEquals("optional1-value-0", response.getValueAsText(
-                MetaFieldFactory.lookup("optional1"), 0));
+        DataRequest request = new DataRequest(rowsetFrom("input1"),
+                metaFrom("output2a"), config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
+        assertEquals("output2a-value-0", response.getResponseFields()
+                .getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
+        assertEquals("optional1-value-0", response.getResponseFields()
+                .getValueAsText(MetaFieldFactory.lookup("optional1"), 0));
     }
 
     @Test
@@ -272,33 +271,39 @@ public class DataProvidersImplTest {
                 new String[] { "output1b" }, new String[] { "optional1" },
                 "output2a", "output2b"));
 
-        DataFieldRowSet request = rowsetFrom(true, "input1");
-        DataFieldRowSet response = rowsetFrom(false, "output2a");
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
-        assertEquals(1, response.size());
-        assertEquals("output2a-value-0",
-                response.getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
-        assertFalse(response.hasFieldValue(
+        DataRequest request = new DataRequest(rowsetFrom("input1"),
+                metaFrom("output2a"), config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
+
+        assertEquals("output2a-value-0", response.getResponseFields()
+                .getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
+        assertFalse(response.getResponseFields().hasFieldValue(
                 MetaFieldFactory.lookup("optional1"), 0));
     }
 
     @Test
     public void testProduce() {
         long started = System.currentTimeMillis();
-        DataFieldRowSet request = rowsetFrom(true, "A");
-        DataFieldRowSet response = rowsetFrom(false, "E", "F", "H");
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
-        assertEquals(1, response.size());
-        assertEquals("E-value-0",
-                response.getValueAsText(MetaFieldFactory.lookup("E"), 0));
-        assertEquals("F-value-0",
-                response.getValueAsText(MetaFieldFactory.lookup("F"), 0));
-        assertEquals("H-value-0",
-                response.getValueAsText(MetaFieldFactory.lookup("H"), 0));
+        DataRequest request = new DataRequest(rowsetFrom("A"), metaFrom("E",
+                "F", "H"), config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
+
+        assertEquals(
+                "E-value-0",
+                response.getResponseFields().getValueAsText(
+                        MetaFieldFactory.lookup("E"), 0));
+        assertEquals(
+                "F-value-0",
+                response.getResponseFields().getValueAsText(
+                        MetaFieldFactory.lookup("F"), 0));
+        assertEquals(
+                "H-value-0",
+                response.getResponseFields().getValueAsText(
+                        MetaFieldFactory.lookup("H"), 0));
         long elapsed = System.currentTimeMillis() - started;
         assertTrue(elapsed < 100);
     }
@@ -318,29 +323,27 @@ public class DataProvidersImplTest {
                 "orderCount"));
 
         long started = System.currentTimeMillis();
-        DataFieldRowSet request = rowsetArrayFrom(true, "uid", "search");
-        DataFieldRowSet response = rowsetArrayFrom(false, "uname", "symbol",
-                "positionCount");
+        DataRequest request = new DataRequest(rowsetArrayFrom("uid", "search"),
+                metaArrayFrom("uname", "symbol", "positionCount"), config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
 
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
-        assertEquals(1, response.size());
-        assertEquals("uname-array-value1", response.getValueAsTextVector(
-                MetaFieldFactory.lookup("uname"), 0)[0]);
-        assertEquals("uname-array-value2", response.getValueAsTextVector(
-                MetaFieldFactory.lookup("uname"), 0)[1]);
-        assertEquals("symbol-array-value1", response.getValueAsTextVector(
-                MetaFieldFactory.lookup("symbol"), 0)[0]);
-        assertEquals("symbol-array-value2", response.getValueAsTextVector(
-                MetaFieldFactory.lookup("symbol"), 0)[1]);
+        assertEquals("uname-array-value1", response.getResponseFields()
+                .getValueAsTextVector(MetaFieldFactory.lookup("uname"), 0)[0]);
+        assertEquals("uname-array-value2", response.getResponseFields()
+                .getValueAsTextVector(MetaFieldFactory.lookup("uname"), 0)[1]);
+        assertEquals("symbol-array-value1", response.getResponseFields()
+                .getValueAsTextVector(MetaFieldFactory.lookup("symbol"), 0)[0]);
+        assertEquals("symbol-array-value2", response.getResponseFields()
+                .getValueAsTextVector(MetaFieldFactory.lookup("symbol"), 0)[1]);
         assertEquals(
                 "positionCount-array-value1",
-                response.getValueAsTextVector(
+                response.getResponseFields().getValueAsTextVector(
                         MetaFieldFactory.lookup("positionCount"), 0)[0]);
         assertEquals(
                 "positionCount-array-value2",
-                response.getValueAsTextVector(
+                response.getResponseFields().getValueAsTextVector(
                         MetaFieldFactory.lookup("positionCount"), 0)[1]);
         long elapsed = System.currentTimeMillis() - started;
         assertTrue(elapsed < 100);
@@ -360,22 +363,23 @@ public class DataProvidersImplTest {
                 "bid", "bid" }, new String[] {}, "mark"));
 
         long started = System.currentTimeMillis();
-        DataFieldRowSet request = rowsetFrom(true, "q");
-        request.addDataField(MetaFieldFactory.create("maxOutputRows",
-                MetaFieldType.SCALAR_INTEGER), 10, 0);
-        DataFieldRowSet response = rowsetFrom(false, "symbol", "bid", "mark");
+        DataRequest request = new DataRequest(rowsetFrom("q"), metaFrom(
+                "symbol", "bid", "mark"), config);
+        request.getParameters().addValueAtRow(
+                MetaFieldFactory.create("maxOutputRows",
+                        MetaFieldType.SCALAR_INTEGER), 10, 0);
 
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
-        assertEquals(10, response.size());
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(10, response.getResponseFields().size());
+
         for (int i = 0; i < 10; i++) {
-            assertEquals("symbol-value-" + i, response.getValueAsText(
-                    MetaFieldFactory.lookup("symbol"), i));
-            assertEquals("bid-value-" + i,
-                    response.getValueAsText(MetaFieldFactory.lookup("bid"), i));
-            assertEquals("mark-value-" + i,
-                    response.getValueAsText(MetaFieldFactory.lookup("mark"), i));
+            assertEquals("symbol-value-" + i, response.getResponseFields()
+                    .getValueAsText(MetaFieldFactory.lookup("symbol"), i));
+            assertEquals("bid-value-" + i, response.getResponseFields()
+                    .getValueAsText(MetaFieldFactory.lookup("bid"), i));
+            assertEquals("mark-value-" + i, response.getResponseFields()
+                    .getValueAsText(MetaFieldFactory.lookup("mark"), i));
         }
         long elapsed = System.currentTimeMillis() - started;
         assertTrue(elapsed < 100);
@@ -403,16 +407,16 @@ public class DataProvidersImplTest {
         provider1.setTaskGranularity(TaskGranularity.FINE);
         dataProviderLocator.register(provider1);
 
-        DataFieldRowSet request = rowsetFrom(true, "a");
-        DataFieldRowSet response = rowsetFrom(false, "b");
+        DataRequest request = new DataRequest(rowsetFrom("a"), metaFrom("b"),
+                config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
 
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
-
-        assertEquals(1, response.size());
-        assertEquals("b-value-0",
-                response.getValueAsText(MetaFieldFactory.lookup("b"), 0));
+        assertEquals(
+                "b-value-0",
+                response.getResponseFields().getValueAsText(
+                        MetaFieldFactory.lookup("b"), 0));
     }
 
     @Test
@@ -429,26 +433,26 @@ public class DataProvidersImplTest {
         dataProviderLocator.register(provider1);
         dataProviderLocator.register(provider2);
         dataProviderLocator.register(provider3);
-
-        DataFieldRowSet request = rowsetFrom(true, "search");
-        DataFieldRowSet response = rowsetFrom(false, "quotes", "research");
         config.setQueryTimeoutMillis(10);
 
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
-        assertEquals(1, response.size());
-        assertEquals("quotes-value-0",
-                response.getValueAsText(MetaFieldFactory.lookup("quotes"), 0));
-        assertEquals("research-value-0",
-                response.getValueAsText(MetaFieldFactory.lookup("research"), 0));
+        DataRequest request = new DataRequest(rowsetFrom("search"), metaFrom(
+                "quotes", "research"), config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
 
-        request = rowsetFrom(true, "search");
-        response = rowsetFrom(false, "quotes", "research");
+        assertEquals("quotes-value-0", response.getResponseFields()
+                .getValueAsText(MetaFieldFactory.lookup("quotes"), 0));
+        assertEquals("research-value-0", response.getResponseFields()
+                .getValueAsText(MetaFieldFactory.lookup("research"), 0));
+
+        request = new DataRequest(rowsetFrom("search"), metaFrom("quotes",
+                "research"), config);
+
         try {
             dataProviderLocator.unregister(provider2);
             dataProviderLocator.unregister(provider3);
-            dataProviders.produce(request, response, config);
+            dataProviders.produce(request);
             fail("Should have failed");
         } catch (DataProviderException e) {
 
@@ -465,11 +469,11 @@ public class DataProvidersImplTest {
         dataProviderLocator.register(new ScalarProvider("two",
                 new String[] { "b" }, new String[] {}, "d", "e"));
 
-        DataFieldRowSet request = rowsetFrom(true, "timeout", "a");
-        DataFieldRowSet response = rowsetFrom(false, "d", "e", "timeout-result");
         config.setQueryTimeoutMillis(10);
 
-        dataProviders.produce(request, response, config);
+        DataRequest request = new DataRequest(rowsetFrom("timeout", "a"),
+                metaFrom("d", "e", "timeout-result"), config);
+        dataProviders.produce(request);
     }
 
     @Test(expected = DataProviderException.class)
@@ -482,15 +486,17 @@ public class DataProvidersImplTest {
         dataProviderLocator.register(new ScalarProvider("two",
                 new String[] { "b" }, new String[] {}, "d", "e"));
 
-        DataFieldRowSet request = rowsetFrom(true, "timeout", "a");
-        DataFieldRowSet response = rowsetFrom(false, "d", "e", "timeout-result");
         config.setQueryTimeoutMillis(10);
         final ExecutorService defaultExecutor = Executors.newFixedThreadPool(5);
         dataProviders.setDefaultExecutor(defaultExecutor);
         assertEquals(defaultExecutor, dataProviders.getDefaultExecutor());
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(0, errors.size());
+
+        DataRequest request = new DataRequest(rowsetFrom("timeout", "a"),
+                metaFrom("d", "e", "timeout-result"), config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
+
     }
 
     @Test
@@ -505,13 +511,12 @@ public class DataProvidersImplTest {
                 new String[] { "lookupResults" }, new String[] {},
                 "detailsData"));
 
-        DataFieldRowSet request = rowsetFrom(true, "error", "query");
-        DataFieldRowSet response = rowsetFrom(false, "lookupResults",
-                "detailsData", "error-result");
-
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(1, errors.size());
+        DataRequest request = new DataRequest(rowsetFrom("error", "query"),
+                metaFrom("lookupResults", "detailsData", "error-result"),
+                config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(1, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
     }
 
     @Test
@@ -526,13 +531,13 @@ public class DataProvidersImplTest {
                 new String[] { "lookupResults" }, new String[] {},
                 "detailsData"));
 
-        DataFieldRowSet request = rowsetFrom(true, "error", "query");
-        DataFieldRowSet response = rowsetFrom(false, "lookupResults",
-                "detailsData", "error-result");
         config.setAbortUponPartialFailure(true);
-        Map<DataProvider, Throwable> errors = dataProviders.produce(request,
-                response, config);
-        assertEquals(1, errors.size());
+        DataRequest request = new DataRequest(rowsetFrom("error", "query"),
+                metaFrom("lookupResults", "detailsData", "error-result"),
+                config);
+        DataResponse response = dataProviders.produce(request);
+        assertEquals(1, response.getErrors().size());
+        assertEquals(1, response.getResponseFields().size());
     }
 
     static Metadata metaFrom(String... args) {
@@ -553,30 +558,26 @@ public class DataProvidersImplTest {
         return metaFields;
     }
 
-    static DataFieldRowSet rowsetFrom(boolean addData, String... args) {
+    static DataRowSet rowsetFrom(String... args) {
         Metadata metaFields = metaFrom(args);
-        DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
-        if (addData) {
-            DataFieldRow row = new DataFieldRow();
-            for (String arg : args) {
-                row.addField(
-                        MetaFieldFactory.create(arg, MetaFieldType.SCALAR_TEXT),
-                        arg + "-input");
-            }
-            rowset.addRow(row);
+        DataRowSet rowset = new DataRowSet(metaFields);
+        DataRow row = new DataRow();
+        for (String arg : args) {
+            row.addField(
+                    MetaFieldFactory.create(arg, MetaFieldType.SCALAR_TEXT),
+                    arg + "-input");
         }
+        rowset.addRow(row);
         return rowset;
     }
 
-    static DataFieldRowSet rowsetArrayFrom(boolean addData, String... args) {
+    static DataRowSet rowsetArrayFrom(String... args) {
         Metadata metaFields = metaArrayFrom(args);
-        DataFieldRowSet rowset = new DataFieldRowSet(metaFields);
-        if (addData) {
-            for (int i = 0; i < args.length; i++) {
-                rowset.addDataField(MetaFieldFactory.create(args[i],
-                        MetaFieldType.VECTOR_TEXT), Collections
-                        .singleton(args[i]), 0);
-            }
+        DataRowSet rowset = new DataRowSet(metaFields);
+        for (int i = 0; i < args.length; i++) {
+            rowset.addValueAtRow(
+                    MetaFieldFactory.create(args[i], MetaFieldType.VECTOR_TEXT),
+                    Collections.singleton(args[i]), 0);
         }
         return rowset;
     }

@@ -40,4 +40,11 @@ public interface DataProviderLocator {
      */
     Collection<DataProvider> locate(Metadata requestFields,
             Metadata responseFields);
+
+    /**
+     * This method returns all providers
+     * 
+     * @return
+     */
+    Collection<DataProvider> getAll();
 }

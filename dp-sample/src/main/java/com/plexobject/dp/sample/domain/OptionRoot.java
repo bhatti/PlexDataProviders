@@ -2,11 +2,33 @@ package com.plexobject.dp.sample.domain;
 
 import java.math.BigDecimal;
 
-public class OptionRoot {
+public class OptionRoot implements Idable<Long> {
+    private long id;
     private String opraRoot;
     private Security underlying;
     private BigDecimal multiplier;
     private String excerciseStyle;
+
+    public OptionRoot() {
+
+    }
+
+    public OptionRoot(long id, String opraRoot, Security underlying,
+            BigDecimal multiplier, String excerciseStyle) {
+        this.id = id;
+        this.opraRoot = opraRoot;
+        this.underlying = underlying;
+        this.multiplier = multiplier;
+        this.excerciseStyle = excerciseStyle;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getOpraRoot() {
         return opraRoot;

@@ -79,6 +79,15 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
         }
     }
 
+    @Override
+    public Collection<DataProvider> getAll() {
+        Set<DataProvider> providers = new HashSet<DataProvider>();
+        for (Set<DataProvider> set : providersByOutputMetaField.values()) {
+            providers.addAll(set);
+        }
+        return providers;
+    }
+
     private void populateDataProviders(Metadata requestFields,
             Metadata responseFields, List<DataProvider> existingProviders) {
         responseFields.removeMetadata(requestFields);
@@ -133,4 +142,5 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
         }
         return bestProvider;
     }
+
 }

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.plexobject.dp.domain.DataConfiguration;
-import com.plexobject.dp.domain.DataFieldRowSet;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.metrics.Metric;
@@ -23,17 +23,17 @@ import com.plexobject.dp.provider.TaskGranularity;
 public class ProvidersExecutor {
     private static final Logger logger = Logger
             .getLogger(ProvidersExecutor.class);
-    private final DataFieldRowSet requestFields;
-    private final DataFieldRowSet responseFields;
+    private final DataRowSet requestFields;
+    private final DataRowSet responseFields;
     private final DataConfiguration config;
     private final Collection<DataProvider> providers;
     private final ExecutorService executor;
-    private final DataFieldRowSet optionalRequestFields = new DataFieldRowSet(
+    private final DataRowSet optionalRequestFields = new DataRowSet(
             new Metadata());
     private final Map<DataProvider, Throwable> providerErrors = new HashMap<>();
 
-    ProvidersExecutor(final DataFieldRowSet requestFields,
-            final DataFieldRowSet responseFields,
+    ProvidersExecutor(final DataRowSet requestFields,
+            final DataRowSet responseFields,
             final DataConfiguration config,
             final Collection<DataProvider> providers,
             final ExecutorService executor) {
@@ -149,9 +149,9 @@ public class ProvidersExecutor {
                         || (optionalRequestFields.getMetadata().contains(
                                 responseField) && responseFields.hasFieldValue(
                                 responseField, i))) {
-                    Object value = responseFields.getFieldValue(responseField,
+                    Object value = responseFields.getValue(responseField,
                             i);
-                    requestFields.addDataField(responseField, value, i);
+                    requestFields.addValueAtRow(responseField, value, i);
                 }
             }
         }

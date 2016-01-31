@@ -4,8 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PositionGroup extends Position {
+    private long positionGroupId;
     private String name;
-    private List<Position> position = new ArrayList<>();
+    private List<Position> positions = new ArrayList<>();
+
+    public PositionGroup() {
+
+    }
+
+    public PositionGroup(long positionGroupId, String name,
+            List<Position> positions) {
+        this.positionGroupId = positionGroupId;
+        this.name = name;
+        this.positions = positions;
+    }
 
     public String getName() {
         return name;
@@ -15,12 +27,20 @@ public class PositionGroup extends Position {
         this.name = name;
     }
 
-    public List<Position> getPosition() {
-        return position;
+    public List<Position> getPositions() {
+        return positions;
     }
 
-    public void setPosition(List<Position> position) {
-        this.position = position;
+    public void setPositions(List<Position> positions) {
+        this.positions = positions;
+    }
+
+    public long getPositionGroupId() {
+        return positionGroupId;
+    }
+
+    public void setPositionGroupId(long positionGroupId) {
+        this.positionGroupId = positionGroupId;
     }
 
 }

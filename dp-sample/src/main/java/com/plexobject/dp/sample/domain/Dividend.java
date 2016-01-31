@@ -9,6 +9,18 @@ public class Dividend {
     private BigDecimal dividendAmount;
     private Security security;
 
+    public Dividend() {
+
+    }
+
+    public Dividend(long dividendId, Date dividendDate,
+            BigDecimal dividendAmount, Security security) {
+        this.dividendId = dividendId;
+        this.dividendDate = dividendDate;
+        this.dividendAmount = dividendAmount;
+        this.security = security;
+    }
+
     public long getDividendId() {
         return dividendId;
     }
@@ -41,5 +53,4 @@ public class Dividend {
         this.security = security;
     }
 
-   
 }

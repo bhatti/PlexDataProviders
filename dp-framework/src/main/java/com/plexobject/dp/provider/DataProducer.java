@@ -1,7 +1,7 @@
 package com.plexobject.dp.provider;
 
 import com.plexobject.dp.domain.DataConfiguration;
-import com.plexobject.dp.domain.DataFieldRowSet;
+import com.plexobject.dp.domain.DataRowSet;
 
 /**
  * This interface defines method for producing collection of data fields given
@@ -23,6 +23,6 @@ public interface DataProducer {
      * @return
      * @throws DataProviderException
      */
-    void produce(DataFieldRowSet requestFields, DataFieldRowSet responseFields,
+    void produce(DataRowSet requestFields, DataRowSet responseFields,
             DataConfiguration config) throws DataProviderException;
 }

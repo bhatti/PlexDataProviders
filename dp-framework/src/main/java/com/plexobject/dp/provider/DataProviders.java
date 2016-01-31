@@ -1,9 +1,7 @@
 package com.plexobject.dp.provider;
 
-import java.util.Map;
-
-import com.plexobject.dp.domain.DataConfiguration;
-import com.plexobject.dp.domain.DataFieldRowSet;
+import com.plexobject.dp.domain.DataRequest;
+import com.plexobject.dp.domain.DataResponse;
 
 /**
  * This interface produces response fields given request fields via data
@@ -21,16 +19,9 @@ public interface DataProviders {
     /**
      * This method will produce set of data fields given input
      * 
-     * @param requestFields
+     * @param request
      *            - input parameter fields
-     * @param responseFields
-     *            - output fields
-     * @param config
-     *            - configuration parameters
-     * @param errorHandler
-     *            - error handler
-     * @return errors from providers if exist
+     * @return response containing output data rows and errors (if occurred)
      */
-    Map<DataProvider, Throwable> produce(DataFieldRowSet requestFields,
-            DataFieldRowSet responseFields, DataConfiguration config);
+    DataResponse produce(DataRequest request);
 }

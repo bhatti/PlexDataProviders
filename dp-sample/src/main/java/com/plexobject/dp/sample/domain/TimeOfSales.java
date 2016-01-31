@@ -10,6 +10,19 @@ public class TimeOfSales {
     private BigDecimal volume;
     private String exchange;
 
+    public TimeOfSales() {
+
+    }
+
+    public TimeOfSales(String symbol, Date date, BigDecimal price,
+            BigDecimal volume, String exchange) {
+        this.symbol = symbol;
+        this.date = date;
+        this.price = price;
+        this.volume = volume;
+        this.exchange = exchange;
+    }
+
     public String getSymbol() {
         return symbol;
     }

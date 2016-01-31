@@ -7,8 +7,17 @@ public class Equity extends Security {
     private BigDecimal dividendRate;
     private String dividendInterval;
     private Date exDividendDate;
-    private BigDecimal mpvValue;
-    private BigDecimal betaValue;
+
+    public Equity() {
+
+    }
+
+    public Equity(BigDecimal dividendRate, String dividendInterval,
+            Date exDividendDate) {
+        this.dividendRate = dividendRate;
+        this.dividendInterval = dividendInterval;
+        this.exDividendDate = exDividendDate;
+    }
 
     public BigDecimal getDividendRate() {
         return dividendRate;
@@ -32,22 +41,6 @@ public class Equity extends Security {
 
     public void setExDividendDate(Date exDividendDate) {
         this.exDividendDate = exDividendDate;
-    }
-
-    public BigDecimal getMpvValue() {
-        return mpvValue;
-    }
-
-    public void setMpvValue(BigDecimal mpvValue) {
-        this.mpvValue = mpvValue;
-    }
-
-    public BigDecimal getBetaValue() {
-        return betaValue;
-    }
-
-    public void setBetaValue(BigDecimal betaValue) {
-        this.betaValue = betaValue;
     }
 
 }

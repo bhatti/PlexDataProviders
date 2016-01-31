@@ -7,8 +7,9 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-import com.plexobject.dp.domain.DataConfiguration;
-import com.plexobject.dp.domain.DataFieldRowSet;
+import com.plexobject.dp.domain.DataRequest;
+import com.plexobject.dp.domain.DataResponse;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.metrics.Metric;
 import com.plexobject.dp.metrics.Timer;
 import com.plexobject.dp.provider.DataProvider;
@@ -42,24 +43,26 @@ public class DataProvidersImpl implements DataProviders {
     }
 
     @Override
-    public Map<DataProvider, Throwable> produce(DataFieldRowSet requestFields,
-            DataFieldRowSet responseFields, DataConfiguration config) {
+    public DataResponse produce(DataRequest request) {
         // Get all data providers needed
-        Collection<DataProvider> providers = dataProviderLocator.locate(
-                requestFields.getMetadata(), responseFields.getMetadata());
+        Collection<DataProvider> providers = dataProviderLocator.locate(request
+                .getParameters().getMetadata(), request.getResponseFields());
         if (logger.isDebugEnabled()) {
-            logger.debug("Executing requestFields " + requestFields
-                    + ", responseFields " + responseFields + " with "
-                    + providers);
+            logger.debug("Executing requestFields " + request.getParameters()
+                    + ", responseFields " + request.getResponseFields()
+                    + " with " + providers);
         }
+        DataRowSet responseFields = new DataRowSet(request.getResponseFields());
         //
         // creating parallel thread executor
         final ExecutorService executor = defaultExecutor != null ? defaultExecutor
                 : Executors.newFixedThreadPool(getThreadPoolSize(providers));
         final Timer timer = Metric.newTimer("DataProvidersImpl.produce");
         try {
-            return new ProvidersExecutor(requestFields, responseFields, config,
-                    providers, executor).execute();
+            Map<DataProvider, Throwable> errors = new ProvidersExecutor(
+                    request.getParameters(), responseFields,
+                    request.getConfig(), providers, executor).execute();
+            return new DataResponse(responseFields, errors);
         } finally {
             if (executor != defaultExecutor) {
                 executor.shutdown();
@@ -77,4 +80,5 @@ public class DataProvidersImpl implements DataProviders {
         }
         return Math.min(count, 3) + 1;
     }
+
 }

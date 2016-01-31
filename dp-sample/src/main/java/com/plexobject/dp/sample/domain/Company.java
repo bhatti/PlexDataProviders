@@ -3,12 +3,35 @@ package com.plexobject.dp.sample.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Company {
+public class Company implements Idable<Long> {
+    private long id;
     private String symbol;
     private String exchange;
     private String name;
     private Address address;
     private List<CompanyEvent> events = new ArrayList<>();
+
+    public Company() {
+
+    }
+
+    public Company(long id, String symbol, String exchange, String name,
+            Address address, List<CompanyEvent> events) {
+        this.id = id;
+        this.symbol = symbol;
+        this.exchange = exchange;
+        this.name = name;
+        this.address = address;
+        this.events = events;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getSymbol() {
         return symbol;
@@ -48,6 +71,31 @@ public class Company {
 
     public void setEvents(List<CompanyEvent> events) {
         this.events = events;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((symbol == null) ? 0 : symbol.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Company other = (Company) obj;
+        if (symbol == null) {
+            if (other.symbol != null)
+                return false;
+        } else if (!symbol.equals(other.symbol))
+            return false;
+        return true;
     }
 
 }

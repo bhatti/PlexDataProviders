@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.plexobject.dp.util.ObjectConversionUtils;
 
 /**
@@ -16,11 +14,10 @@ import com.plexobject.dp.util.ObjectConversionUtils;
  * @author shahzad bhatti
  *
  */
-@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class DataFieldRow {
+public class DataRow {
     private final Map<MetaField, Object> fields = new ConcurrentHashMap<>();
 
-    public DataFieldRow() {
+    public DataRow() {
     }
 
     public synchronized void addField(MetaField metaField, Object value) {
@@ -56,7 +53,7 @@ public class DataFieldRow {
         Object value = fields.get(metaField);
         if (value == null || value instanceof NullObject
                 || value instanceof InitialValue) {
-            throw new IllegalStateException("DataField " + metaField
+            throw new IllegalStateException("metaField " + metaField
                     + " doesn't exist");
         }
         if (value instanceof RuntimeException) {
@@ -119,8 +116,8 @@ public class DataFieldRow {
      * @param objects
      * @return
      */
-    public static DataFieldRow from(Object... objects) {
-        DataFieldRow row = new DataFieldRow();
+    public static DataRow from(Object... objects) {
+        DataRow row = new DataRow();
         for (int i = 0; i < objects.length; i += 2) {
             MetaField field = (MetaField) objects[i];
             Object value = objects[i + 1];

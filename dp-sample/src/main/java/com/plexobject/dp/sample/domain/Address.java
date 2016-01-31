@@ -1,11 +1,34 @@
 package com.plexobject.dp.sample.domain;
 
-public class Address {
+public class Address implements Idable<Long> {
+    private long id;
     private String street;
     private String city;
     private String state;
     private String zip;
     private String country;
+
+    public Address() {
+
+    }
+
+    public Address(long id, String street, String city, String state,
+            String zip, String country) {
+        this.id = id;
+        this.street = street;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.country = country;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getStreet() {
         return street;

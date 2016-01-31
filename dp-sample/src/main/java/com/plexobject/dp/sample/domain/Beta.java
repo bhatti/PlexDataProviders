@@ -1,14 +1,25 @@
 package com.plexobject.dp.sample.domain;
 
+import java.math.BigDecimal;
+
 public class Beta {
-    private double beta;
+    private BigDecimal beta;
     private int month;
 
-    public double getBeta() {
+    public Beta() {
+
+    }
+
+    public Beta(BigDecimal beta, int month) {
+        this.beta = beta;
+        this.month = month;
+    }
+
+    public BigDecimal getBeta() {
         return beta;
     }
 
-    public void setBeta(double beta) {
+    public void setBeta(BigDecimal beta) {
         this.beta = beta;
     }
 

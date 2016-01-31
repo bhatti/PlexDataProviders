@@ -1,12 +1,38 @@
 package com.plexobject.dp.sample.domain;
 
-public class Security {
+public abstract class Security implements Idable<Long> {
+    private long id;
     private String exchange;
     private String symbol;
     private String underlyingSymbol;
     private String description;
     private SecurityType type;
     private Beta beta;
+
+    public Security() {
+
+    }
+
+    public Security(long id, String exchange, String symbol,
+            String underlyingSymbol, String description, SecurityType type,
+            Beta beta) {
+        super();
+        this.id = id;
+        this.exchange = exchange;
+        this.symbol = symbol;
+        this.underlyingSymbol = underlyingSymbol;
+        this.description = description;
+        this.type = type;
+        this.beta = beta;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getExchange() {
         return exchange;
@@ -54,6 +80,31 @@ public class Security {
 
     public void setBeta(Beta beta) {
         this.beta = beta;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((symbol == null) ? 0 : symbol.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Security other = (Security) obj;
+        if (symbol == null) {
+            if (other.symbol != null)
+                return false;
+        } else if (!symbol.equals(other.symbol))
+            return false;
+        return true;
     }
 
 }

@@ -4,10 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.plexobject.dp.domain.DataFieldRow;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.MetaFieldType;
+import com.plexobject.dp.domain.Metadata;
 
 public class MarshallerFactoryTest {
     static class User {
@@ -64,26 +65,31 @@ public class MarshallerFactoryTest {
 
     }
 
-    static class UserMarshaller implements DataFieldRowMarshaller<User> {
+    static class UserMarshaller implements DataRowSetMarshaller<User> {
         private MetaField name = MetaFieldFactory.create("name",
                 MetaFieldType.SCALAR_TEXT);
         private MetaField username = MetaFieldFactory.create("username",
                 MetaFieldType.SCALAR_TEXT);
 
         @Override
-        public DataFieldRow marshal(User user) {
-            DataFieldRow row = new DataFieldRow();
-            row.addField(name, user.getName());
-            row.addField(username, user.getUsername());
-            return row;
+        public DataRowSet marshal(User user) {
+            DataRowSet rowset = new DataRowSet(getMetadata());
+            rowset.addValueAtRow(name, user.getName(), 0);
+            rowset.addValueAtRow(username, user.getUsername(), 0);
+            return rowset;
         }
 
         @Override
-        public User unmarshal(DataFieldRow from) {
+        public User unmarshal(DataRowSet from) {
             User user = new User();
-            user.setName(from.getValueAsText(name));
-            user.setUsername(from.getValueAsText(username));
+            user.setName(from.getValueAsText(name, 0));
+            user.setUsername(from.getValueAsText(username, 0));
             return user;
+        }
+
+        @Override
+        public Metadata getMetadata() {
+            return Metadata.from(name, username);
         }
 
     }
@@ -93,12 +99,12 @@ public class MarshallerFactoryTest {
         User user = new User();
         user.setName("jake");
         user.setUsername("jake1000");
-        MarshallerFactory.getInstance().register(User.class,
-                DataFieldRow.class, new UserMarshaller());
-        DataFieldRow row = MarshallerFactory.getInstance()
-                .getMarshaller(User.class, DataFieldRow.class).marshal(user);
+        MarshallerFactory.getInstance().register(User.class, DataRowSet.class,
+                new UserMarshaller());
+        DataRowSet row = MarshallerFactory.getInstance()
+                .getMarshaller(User.class, DataRowSet.class).marshal(user);
         User unmarshalledUser = MarshallerFactory.getInstance()
-                .getMarshaller(User.class, DataFieldRow.class).unmarshal(row);
+                .getMarshaller(User.class, DataRowSet.class).unmarshal(row);
         assertEquals(user, unmarshalledUser);
     }
 

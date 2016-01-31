@@ -1,14 +1,13 @@
 package com.plexobject.dp.sample.domain;
 
 import java.math.BigDecimal;
-import java.security.Security;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
-public class Order {
+public class Order implements Idable<Long> {
+    private long id;
     private Date date = new Date();
-    private long orderId;
     private Account account;
     private Security security;
     private String exchange;
@@ -22,20 +21,45 @@ public class Order {
     private BigDecimal fillPrice;
     private BigDecimal fillQuantity;
 
+    public Order() {
+
+    }
+
+    public Order(long id, Date date, Account account, Security security,
+            String exchange, Collection<OrderLeg> orderLegs,
+            OrderStatus status, MarketSession marketSession,
+            PriceType priceType, BigDecimal price, BigDecimal quantity,
+            Date fillDate, BigDecimal fillPrice, BigDecimal fillQuantity) {
+        this.id = id;
+        this.date = date;
+        this.account = account;
+        this.security = security;
+        this.exchange = exchange;
+        this.orderLegs = orderLegs;
+        this.status = status;
+        this.marketSession = marketSession;
+        this.priceType = priceType;
+        this.price = price;
+        this.quantity = quantity;
+        this.fillDate = fillDate;
+        this.fillPrice = fillPrice;
+        this.fillQuantity = fillQuantity;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public Date getDate() {
         return date;
     }
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(long orderId) {
-        this.orderId = orderId;
     }
 
     public Account getAccount() {

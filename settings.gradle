@@ -1,3 +1,6 @@
 rootProject.name = 'DataProviders'
 includeFlat 'dp-framework'
-includeFlat 'dp-sample'
+includeFlat 'dp-sample' 
+
+//project(':dp-framework').projectDir = new File('dp-framework')
+//include 'dp-framework', 'dp-sample'

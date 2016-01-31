@@ -4,15 +4,40 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderLeg {
+public class OrderLeg implements Idable<Long> {
+    private long id;
     private OrderSide side;
     private BigDecimal price;
     private BigDecimal quantity;
     private BigDecimal fillPrice;
     private BigDecimal fillQuantity;
     private PositionType positionType;
-    private String symbol;
     private List<Trade> trades = new ArrayList<>();
+
+    public OrderLeg() {
+
+    }
+
+    public OrderLeg(long id, OrderSide side, BigDecimal price,
+            BigDecimal quantity, BigDecimal fillPrice, BigDecimal fillQuantity,
+            PositionType positionType, List<Trade> trades) {
+        this.id = id;
+        this.side = side;
+        this.price = price;
+        this.quantity = quantity;
+        this.fillPrice = fillPrice;
+        this.fillQuantity = fillQuantity;
+        this.positionType = positionType;
+        this.trades = trades;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public OrderSide getSide() {
         return side;
@@ -60,14 +85,6 @@ public class OrderLeg {
 
     public void setPositionType(PositionType positionType) {
         this.positionType = positionType;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
     }
 
     public List<Trade> getTrades() {

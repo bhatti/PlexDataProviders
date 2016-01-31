@@ -3,21 +3,34 @@ package com.plexobject.dp.sample.domain;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class Trade {
-    private Long tradeId;
-    private String symbol;
+public class Trade implements Idable<Long> {
+    private Long id;
     private BigDecimal quantity;
     private BigDecimal price;
     private String exchange;
     private Date date;
     private Security security;
 
-    public Long getTradeId() {
-        return tradeId;
+    public Trade() {
+
     }
 
-    public void setTradeId(Long tradeId) {
-        this.tradeId = tradeId;
+    public Trade(Long id, BigDecimal quantity, BigDecimal price,
+            String exchange, Date date, Security security) {
+        this.id = id;
+        this.quantity = quantity;
+        this.price = price;
+        this.exchange = exchange;
+        this.date = date;
+        this.security = security;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public BigDecimal getQuantity() {
@@ -50,14 +63,6 @@ public class Trade {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
     }
 
     public Security getSecurity() {

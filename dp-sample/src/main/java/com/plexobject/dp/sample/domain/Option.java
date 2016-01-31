@@ -9,6 +9,22 @@ public class Option extends Security {
     private BigDecimal strikePrice;
     private Date expirationDate;
 
+    public Option() {
+
+    }
+
+    public Option(long securityId, String exchange, String symbol,
+            String underlyingSymbol, String description, SecurityType type,
+            Beta beta, OptionRoot optionRoot, OptionType optionType,
+            BigDecimal strikePrice, Date expirationDate) {
+        super(securityId, exchange, symbol, underlyingSymbol, description,
+                type, beta);
+        this.optionRoot = optionRoot;
+        this.optionType = optionType;
+        this.strikePrice = strikePrice;
+        this.expirationDate = expirationDate;
+    }
+
     public OptionRoot getOptionRoot() {
         return optionRoot;
     }

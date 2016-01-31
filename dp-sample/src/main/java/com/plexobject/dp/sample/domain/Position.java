@@ -2,19 +2,32 @@ package com.plexobject.dp.sample.domain;
 
 import java.math.BigDecimal;
 
-public class Position {
-    private long positionId;
+public class Position implements Idable<Long> {
+    private long id;
     private Account account;
     private BigDecimal quantity;
     private BigDecimal price;
     private Security security;
 
-    public long getPositionId() {
-        return positionId;
+    public Position() {
+
     }
 
-    public void setPositionId(long positionId) {
-        this.positionId = positionId;
+    public Position(long id, Account account, BigDecimal quantity,
+            BigDecimal price, Security security) {
+        this.id = id;
+        this.account = account;
+        this.quantity = quantity;
+        this.price = price;
+        this.security = security;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long positionId) {
+        this.id = positionId;
     }
 
     public Account getAccount() {

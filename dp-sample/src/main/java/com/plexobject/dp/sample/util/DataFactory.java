@@ -70,10 +70,14 @@ public class DataFactory {
                     Order order = createOrder(account);
                     DaoLocator.orderDao.save(order);
                     DaoLocator.quoteDao.save(createQuote(order.getSecurity()));
+                    DaoLocator.securityDao.save(order.getSecurity());
                 }
             }
             for (Watchlist watchlist : user.getWatchlists()) {
                 DaoLocator.watchlistDao.save(watchlist);
+                for (Security security : watchlist.getSecurities()) {
+                    DaoLocator.securityDao.save(security);
+                }
             }
         }
     }
@@ -313,7 +317,6 @@ public class DataFactory {
     public static Equity createEquity(String symbol) {
         long id = nextId.incrementAndGet();
         Equity equity = new Equity();
-        equity.setId(id);
         equity.setExchange(EXCHANGES[(int) id % EXCHANGES.length]);
         equity.setSymbol(symbol);
         equity.setUnderlyingSymbol(equity.getSymbol());
@@ -326,7 +329,6 @@ public class DataFactory {
     public static Option createOption() {
         long id = nextId.incrementAndGet();
         Option option = new Option();
-        option.setId(id);
         option.setExchange(EXCHANGES[(int) id % EXCHANGES.length]);
         int symbolIndex = (int) id % OPTION_SYMBOLS.length;
         option.setSymbol(OPTION_SYMBOLS[symbolIndex]);

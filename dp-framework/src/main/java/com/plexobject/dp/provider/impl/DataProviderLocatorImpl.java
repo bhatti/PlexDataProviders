@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
+
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.metrics.Metric;
@@ -17,6 +19,9 @@ import com.plexobject.dp.provider.DataProviderException;
 import com.plexobject.dp.provider.DataProviderLocator;
 
 public class DataProviderLocatorImpl implements DataProviderLocator {
+    private static final Logger logger = Logger
+            .getLogger(DataProviderLocatorImpl.class);
+
     private ConcurrentHashMap<MetaField, Set<DataProvider>> providersByOutputMetaField = new ConcurrentHashMap<>();
 
     @Override
@@ -73,6 +78,10 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
             populateDataProviders(new Metadata(requestFields.getMetaFields()),
                     new Metadata(responseFields.getMetaFields()), providers);
             Collections.sort(providers); // sort by dependency
+            if (logger.isDebugEnabled()) {
+                logger.info("locate selected " + providers + " for input "
+                        + requestFields + ", output " + responseFields);
+            }
             return providers;
         } finally {
             timer.stop();
@@ -128,14 +137,22 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
         DataProvider bestProvider = null;
         int minCount = Integer.MAX_VALUE;
         int maxRank = Integer.MIN_VALUE;
+        int numRequiredFields = Integer.MAX_VALUE;
         for (DataProvider provider : providers) {
             int count = provider.getMandatoryRequestFields().getMissingCount(
                     requestFields);
             if (count < minCount) {
+                numRequiredFields = provider.getMandatoryRequestFields().size();
                 minCount = count;
                 maxRank = provider.getRank();
                 bestProvider = provider;
             } else if (count == minCount && provider.getRank() > maxRank) {
+                numRequiredFields = provider.getMandatoryRequestFields().size();
+                maxRank = provider.getRank();
+                bestProvider = provider;
+            } else if (count == minCount
+                    && provider.getMandatoryRequestFields().size() < numRequiredFields) {
+                numRequiredFields = provider.getMandatoryRequestFields().size();
                 maxRank = provider.getRank();
                 bestProvider = provider;
             }

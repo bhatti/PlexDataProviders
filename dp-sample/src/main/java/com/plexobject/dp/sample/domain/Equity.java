@@ -12,8 +12,11 @@ public class Equity extends Security {
 
     }
 
-    public Equity(BigDecimal dividendRate, String dividendInterval,
+    public Equity(String exchange, String symbol, String underlyingSymbol,
+            String description, SecurityType type, Beta beta,
+            BigDecimal dividendRate, String dividendInterval,
             Date exDividendDate) {
+        super(exchange, symbol, underlyingSymbol, description, type, beta);
         this.dividendRate = dividendRate;
         this.dividendInterval = dividendInterval;
         this.exDividendDate = exDividendDate;

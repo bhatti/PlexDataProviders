@@ -1,7 +1,6 @@
 package com.plexobject.dp.sample.domain;
 
-public abstract class Security implements Idable<Long> {
-    private long id;
+public abstract class Security implements Idable<String> {
     private String exchange;
     private String symbol;
     private String underlyingSymbol;
@@ -13,11 +12,8 @@ public abstract class Security implements Idable<Long> {
 
     }
 
-    public Security(long id, String exchange, String symbol,
-            String underlyingSymbol, String description, SecurityType type,
-            Beta beta) {
-        super();
-        this.id = id;
+    public Security(String exchange, String symbol, String underlyingSymbol,
+            String description, SecurityType type, Beta beta) {
         this.exchange = exchange;
         this.symbol = symbol;
         this.underlyingSymbol = underlyingSymbol;
@@ -26,12 +22,8 @@ public abstract class Security implements Idable<Long> {
         this.beta = beta;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public String getId() {
+        return symbol;
     }
 
     public String getExchange() {

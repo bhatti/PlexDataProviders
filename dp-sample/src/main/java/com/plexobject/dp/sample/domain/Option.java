@@ -13,11 +13,11 @@ public class Option extends Security {
 
     }
 
-    public Option(long securityId, String exchange, String symbol,
+    public Option(String exchange, String symbol,
             String underlyingSymbol, String description, SecurityType type,
             Beta beta, OptionRoot optionRoot, OptionType optionType,
             BigDecimal strikePrice, Date expirationDate) {
-        super(securityId, exchange, symbol, underlyingSymbol, description,
+        super(exchange, symbol, underlyingSymbol, description,
                 type, beta);
         this.optionRoot = optionRoot;
         this.optionType = optionType;

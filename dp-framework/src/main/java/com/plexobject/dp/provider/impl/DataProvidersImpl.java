@@ -54,9 +54,6 @@ public class DataProvidersImpl implements DataProviders {
                     + ", responseFields " + request.getResponseFields()
                     + " with " + providers);
         }
-        System.out.println("#####Executing "
-                + request.getResponseFields().getMetaFields() + " with "
-                + providers); // TODO remove
         DataRowSet responseFields = new DataRowSet(request.getResponseFields());
         //
         // creating parallel thread executor

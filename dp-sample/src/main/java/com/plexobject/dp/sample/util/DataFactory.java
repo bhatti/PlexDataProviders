@@ -38,9 +38,9 @@ import com.plexobject.dp.sample.domain.Watchlist;
 public class DataFactory {
     private static AtomicLong nextId = new AtomicLong();
     private static String[] EQUITY_SYMBOLS = { "AAPL", "GOOG", "M", "F", "C",
-            "N", "A", "B", "D", "E" };
+            "N", "A", "B", "D", "E", "G" };
     private static String[] OPTION_SYMBOLS = { "AAPL_X", "GOOG_X", "M_X",
-            "F_X", "C_X", "N_X", "A_X", "B_X", "D_X", "E_X" };
+            "F_X", "C_X", "N_X", "A_X", "B_X", "D_X", "E_X", "G_X" };
     private static String[] EXCHANGES = { "NYSE", "NASDAQ", "DOW" };
     private static String[] OPRAS = { "A", "B", "C", "D" };
 

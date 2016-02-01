@@ -12,7 +12,7 @@ public class QuoteMarshaller implements DataRowSetMarshaller<Quote> {
     private static MetaField symbol = MetaFieldFactory.create("symbol",
             MetaFieldType.SCALAR_TEXT);
     private static MetaField marketSession = MetaFieldFactory.create(
-            "marketSession", MetaFieldType.SCALAR_TEXT);
+            "quote.marketSession", MetaFieldType.SCALAR_TEXT);
     private static MetaField bidPrice = MetaFieldFactory.create(
             "quote.bidPrice", MetaFieldType.SCALAR_DECIMAL);
     private static MetaField askPrice = MetaFieldFactory.create(

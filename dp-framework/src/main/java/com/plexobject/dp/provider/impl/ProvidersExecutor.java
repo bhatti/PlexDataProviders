@@ -30,11 +30,10 @@ public class ProvidersExecutor {
     private final ExecutorService executor;
     private final DataRowSet optionalRequestFields = new DataRowSet(
             new Metadata());
-    private final Map<DataProvider, Throwable> providerErrors = new HashMap<>();
+    private final Map<String, Throwable> providerErrors = new HashMap<>();
 
     ProvidersExecutor(final DataRowSet requestFields,
-            final DataRowSet responseFields,
-            final DataConfiguration config,
+            final DataRowSet responseFields, final DataConfiguration config,
             final Collection<DataProvider> providers,
             final ExecutorService executor) {
         this.requestFields = requestFields;
@@ -44,7 +43,7 @@ public class ProvidersExecutor {
         this.executor = executor;
     }
 
-    public Map<DataProvider, Throwable> execute() {
+    public Map<String, Throwable> execute() {
         // Add intermediate data needed, e.g. we could call provider A that
         // returns some fields, which are used as input for provider B
         addIntermediateAndOptionalMetaFields();
@@ -128,10 +127,8 @@ public class ProvidersExecutor {
             // adding intermediate data fields
             addRequestDataForIntermediateFields(provider);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Failed to execute " + provider + " with input "
-                        + requestFields, e);
-            }
+            logger.warn("Failed to execute " + provider + " with input "
+                    + requestFields, e);
             addError(provider, e);
         } finally {
             timer.stop();
@@ -149,8 +146,7 @@ public class ProvidersExecutor {
                         || (optionalRequestFields.getMetadata().contains(
                                 responseField) && responseFields.hasFieldValue(
                                 responseField, i))) {
-                    Object value = responseFields.getValue(responseField,
-                            i);
+                    Object value = responseFields.getValue(responseField, i);
                     requestFields.addValueAtRow(responseField, value, i);
                 }
             }
@@ -207,6 +203,6 @@ public class ProvidersExecutor {
     }
 
     private void addError(DataProvider provider, Throwable cause) {
-        providerErrors.put(provider, cause);
+        providerErrors.put(provider.getName(), cause);
     }
 }

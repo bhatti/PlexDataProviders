@@ -2,6 +2,10 @@ package com.plexobject.dp.domain;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataRequest {
     private static final String RESPONSE_FIELDS = "responseFields";
     private DataRowSet parameters;

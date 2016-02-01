@@ -12,8 +12,8 @@ import com.plexobject.dp.sample.domain.OrderStatus;
 public class OrderMarshaller implements DataRowSetMarshaller<Order> {
     private static MetaField orderId = MetaFieldFactory.create("orderId",
             MetaFieldType.SCALAR_INTEGER);
-    private static MetaField accountId = MetaFieldFactory.create("accountId",
-            MetaFieldType.SCALAR_INTEGER);
+    private static MetaField accountId = MetaFieldFactory.create(
+            "order.accountId", MetaFieldType.SCALAR_INTEGER);
     private static MetaField date = MetaFieldFactory.create("order.date",
             MetaFieldType.SCALAR_DATE);
     private static MetaField fillDate = MetaFieldFactory.create(

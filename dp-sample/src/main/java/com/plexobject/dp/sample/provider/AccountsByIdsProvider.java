@@ -33,11 +33,7 @@ public class AccountsByIdsProvider extends BaseProvider {
             Account account = DaoLocator.accountDao.getById(id);
             if (account != null) {
                 DataRowSet rowset = marshaller.marshal(account);
-                for (MetaField field : response.getMetadata().getMetaFields()) {
-                    response.addValueAtRow(field, rowset.getValue(field, 0),
-                            nextRow);
-                }
-                nextRow++;
+                nextRow = addRowSet(response, rowset, nextRow);
             }
         }
     }

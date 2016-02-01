@@ -35,11 +35,7 @@ public class UsersByIdsProvider extends BaseProvider {
                 continue;
             }
             DataRowSet rowset = marshaller.marshal(user);
-            for (MetaField field : response.getMetadata().getMetaFields()) {
-                response.addValueAtRow(field, rowset.getValue(field, 0),
-                        nextRow);
-            }
-            nextRow++;
+            nextRow = addRowSet(response, rowset, nextRow);
         }
     }
 }

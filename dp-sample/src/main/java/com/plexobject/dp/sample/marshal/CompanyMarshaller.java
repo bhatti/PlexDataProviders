@@ -28,6 +28,7 @@ public class CompanyMarshaller implements DataRowSetMarshaller<Company> {
         rowset.addValueAtRow(companyId, company.getId(), 0);
         rowset.addValueAtRow(symbol, company.getSymbol(), 0);
         rowset.addValueAtRow(name, company.getName(), 0);
+        rowset.addValueAtRow(exchange, company.getExchange(), 0);
         rowset.addValueAtRow(address, company.getAddress(), 0);
         return rowset;
     }

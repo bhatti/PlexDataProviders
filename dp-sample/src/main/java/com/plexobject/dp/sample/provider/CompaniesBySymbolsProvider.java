@@ -36,16 +36,13 @@ public class CompaniesBySymbolsProvider extends BaseProvider {
         for (int i = 0; i < parameter.size(); i++) {
             String id = parameter.getValueAsText(symbol, i);
             Map<String, Object> criteria = new HashMap<>();
-            criteria.put("symbol", id);
+            criteria.put("symbol", id.toUpperCase());
             Collection<Company> companies = DaoLocator.companyDao
                     .query(criteria);
             if (companies.size() > 0) {
                 Company company = companies.iterator().next();
                 DataRowSet rowset = marshaller.marshal(company);
-                for (MetaField field : response.getMetadata().getMetaFields()) {
-                    response.addValueAtRow(field, rowset.getValue(field, 0), nextRow);
-                }
-                nextRow++;
+                nextRow = addRowSet(response, rowset, nextRow);
             }
         }
     }

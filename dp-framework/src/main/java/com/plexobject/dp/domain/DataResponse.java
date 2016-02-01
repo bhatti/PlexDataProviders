@@ -1,21 +1,27 @@
 package com.plexobject.dp.domain;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import com.plexobject.dp.provider.DataProvider;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataResponse {
     private DataRowSet responseFields;
-    private Map<DataProvider, Throwable> errors;
+    private Map<String, Throwable> errorsByProviderName;
+    private Set<String> providers = new HashSet<>();
 
     public DataResponse() {
 
     }
 
-    public DataResponse(DataRowSet responseFields,
-            Map<DataProvider, Throwable> errors) {
+    public DataResponse(DataRowSet responseFields, Set<String> providers,
+            Map<String, Throwable> errors) {
         this.responseFields = responseFields;
-        this.errors = errors;
+        this.providers = providers;
+        this.errorsByProviderName = errors;
     }
 
     public DataRowSet getResponseFields() {
@@ -26,12 +32,20 @@ public class DataResponse {
         this.responseFields = responseFields;
     }
 
-    public Map<DataProvider, Throwable> getErrors() {
-        return errors;
+    public Map<String, Throwable> getErrorsByProviderName() {
+        return errorsByProviderName;
     }
 
-    public void setErrors(Map<DataProvider, Throwable> errors) {
-        this.errors = errors;
+    public void setErrorsByProviderName(Map<String, Throwable> errors) {
+        this.errorsByProviderName = errors;
+    }
+
+    public Set<String> getProviders() {
+        return providers;
+    }
+
+    public void setProviders(Set<String> providers) {
+        this.providers = providers;
     }
 
 }

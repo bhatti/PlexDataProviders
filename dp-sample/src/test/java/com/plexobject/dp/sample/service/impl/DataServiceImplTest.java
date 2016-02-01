@@ -1,6 +1,7 @@
 package com.plexobject.dp.sample.service.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,8 +9,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -20,9 +19,27 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.plexobject.domain.Configuration;
 import com.plexobject.domain.Constants;
+import com.plexobject.dp.domain.DataResponse;
+import com.plexobject.dp.domain.DataRow;
+import com.plexobject.dp.domain.MetaField;
+import com.plexobject.dp.domain.MetaFieldFactory;
+import com.plexobject.dp.domain.MetaFieldType;
+import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.json.DataProviderDeserializer;
+import com.plexobject.dp.json.DataProviderSerializer;
+import com.plexobject.dp.json.DataRowDeserializer;
+import com.plexobject.dp.json.DataRowSerializer;
+import com.plexobject.dp.json.MetadataDeserializer;
+import com.plexobject.dp.json.MetadataSerializer;
+import com.plexobject.dp.provider.DataProvider;
 import com.plexobject.dp.sample.util.DataFactory;
+import com.plexobject.encode.CodecConfigurer;
+import com.plexobject.encode.CodecType;
+import com.plexobject.encode.ObjectCodecFactory;
 import com.plexobject.handler.BasePayload;
 import com.plexobject.handler.RequestHandler;
 import com.plexobject.handler.ws.WSRequestHandlerAdapter;
@@ -34,6 +51,19 @@ import com.plexobject.service.ServiceRegistry;
 public class DataServiceImplTest {
     public static final int DEFAULT_PORT = 8186;
 
+    public static class QueryResponse {
+        private DataResponse queryResponse;
+
+        public DataResponse getQueryResponse() {
+            return queryResponse;
+        }
+
+        public void setQueryResponse(DataResponse queryResponse) {
+            this.queryResponse = queryResponse;
+        }
+
+    }
+
     private static ServiceRegistry serviceRegistry;
     private static WSRequestHandlerAdapter requestHandlerAdapter;
 
@@ -43,7 +73,7 @@ public class DataServiceImplTest {
         props.setProperty(Constants.HTTP_PORT, String.valueOf(DEFAULT_PORT));
         props.setProperty(Constants.JAXWS_NAMESPACE, "");
         Configuration config = new Configuration(props);
-        if (config.getBoolean("logTest")) {
+        if (true || config.getBoolean("log")) {
             BasicConfigurator.configure();
             LogManager.getRootLogger().setLevel(Level.INFO);
         }
@@ -61,7 +91,6 @@ public class DataServiceImplTest {
                     @Override
                     public BasePayload<Object> intercept(
                             BasePayload<Object> input) {
-                        System.out.println("INPUT: " + input);
                         return input;
                     }
                 });
@@ -70,11 +99,33 @@ public class DataServiceImplTest {
                     @Override
                     public BasePayload<Object> intercept(
                             BasePayload<Object> output) {
-                        System.out.println("OUTPUT: " + output);
                         return output;
                     }
                 });
-
+        ObjectCodecFactory.getInstance().getObjectCodec(CodecType.JSON)
+                .setCodecConfigurer(new CodecConfigurer() {
+                    @Override
+                    public void configureCodec(Object underlyingEncoder) {
+                        if (underlyingEncoder instanceof ObjectMapper) {
+                            ObjectMapper mapper = (ObjectMapper) underlyingEncoder;
+                            SimpleModule module = new SimpleModule();
+                            module.addSerializer(DataRow.class,
+                                    new DataRowSerializer(DataRow.class));
+                            module.addSerializer(Metadata.class,
+                                    new MetadataSerializer(Metadata.class));
+                            module.addSerializer(DataProvider.class,
+                                    new DataProviderSerializer(
+                                            DataProvider.class));
+                            module.addDeserializer(DataRow.class,
+                                    new DataRowDeserializer());
+                            module.addDeserializer(Metadata.class,
+                                    new MetadataDeserializer());
+                            module.addDeserializer(DataProvider.class,
+                                    new DataProviderDeserializer(null));
+                            mapper.registerModule(module);
+                        }
+                    }
+                });
         serviceRegistry.start();
         Thread.sleep(500);
     }
@@ -86,9 +137,113 @@ public class DataServiceImplTest {
 
     @Test
     public void testGetSymbols() throws Throwable {
-        String resp = httpGet("http://localhost:" + DEFAULT_PORT
+        String jsonResp = httpGet("http://localhost:" + DEFAULT_PORT
                 + "/data?responseFields=symbol");
-        System.out.println(resp);
+        QueryResponse response = decode(jsonResp);
+        assertTrue(response.queryResponse.getProviders().contains(
+                "SymbolsProvider"));
+
+        assertTrue(response.queryResponse.getResponseFields().size() > 0);
+        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
+    }
+
+    @Test
+    public void testSearch() throws Throwable {
+        String jsonResp = httpGet("http://localhost:"
+                + DEFAULT_PORT
+                + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
+        QueryResponse response = decode(jsonResp);
+        assertTrue(response.queryResponse.getResponseFields().size() > 0);
+        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
+        assertTrue(response.queryResponse.getProviders().contains(
+                "SymbolSearchProvider"));
+        MetaField symbol = MetaFieldFactory.create("symbol",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField underlyingSymbol = MetaFieldFactory.create(
+                "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
+
+        for (int i = 0; i < response.queryResponse.getResponseFields().size(); i++) {
+            assertTrue(response.queryResponse.getResponseFields()
+                    .getValueAsText(symbol, i).contains("G"));
+            assertTrue(response.queryResponse.getResponseFields()
+                    .getValueAsText(underlyingSymbol, i).contains("G"));
+        }
+    }
+
+    @Test
+    public void testGetSecuritiesBySearch() throws Throwable {
+        String jsonResp = httpGet("http://localhost:"
+                + DEFAULT_PORT
+                + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
+        QueryResponse response = decode(jsonResp);
+        assertTrue(response.queryResponse.getResponseFields().size() > 0);
+        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
+        assertTrue(response.queryResponse.getProviders().contains(
+                "SymbolSearchProvider"));
+        MetaField symbol = MetaFieldFactory.create("symbol",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField underlyingSymbol = MetaFieldFactory.create(
+                "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
+
+        for (int i = 0; i < response.queryResponse.getResponseFields().size(); i++) {
+            assertTrue(response.queryResponse.getResponseFields()
+                    .getValueAsText(symbol, i).contains("G"));
+            assertTrue(response.queryResponse.getResponseFields()
+                    .getValueAsText(underlyingSymbol, i).contains("G"));
+        }
+    }
+
+    @Test
+    public void testGetCompaniesBySearch() throws Throwable {
+        String jsonResp = httpGet("http://localhost:"
+                + DEFAULT_PORT
+                + "/data?responseFields=exchange,symbol,underlyingSymbol,security.type,company.name,company.address&symbolQuery=G");
+        QueryResponse response = decode(jsonResp);
+        // System.out.println("XX " +
+        // response.queryResponse.getResponseFields());
+
+        assertTrue(response.queryResponse.getResponseFields().size() > 0);
+        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
+        assertTrue(response.queryResponse.getProviders().contains(
+                "SymbolSearchProvider"));
+        MetaField symbol = MetaFieldFactory.create("symbol",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField underlyingSymbol = MetaFieldFactory.create(
+                "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
+
+        for (int i = 0; i < response.queryResponse.getResponseFields().size(); i++) {
+            assertTrue(response.queryResponse.getResponseFields()
+                    .getValueAsText(symbol, i).contains("G"));
+            assertTrue(response.queryResponse.getResponseFields()
+                    .getValueAsText(underlyingSymbol, i).contains("G"));
+        }
+    }
+
+    @Test
+    public void testGetSecuritiesBySymbol() throws Throwable {
+        String jsonResp = httpGet("http://localhost:" + DEFAULT_PORT
+                + "/data?responseFields=exchange,underlyingSymbol&symbol=F");
+        QueryResponse response = decode(jsonResp);
+        assertTrue(response.queryResponse.getProviders().contains(
+                "SecuritiesBySymbolsProvider"));
+
+        assertTrue(response.queryResponse.getResponseFields().size() > 0);
+        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
+        MetaField symbol = MetaFieldFactory.create("symbol",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField underlyingSymbol = MetaFieldFactory.create(
+                "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
+        assertEquals("F", response.queryResponse.getResponseFields()
+                .getValueAsText(symbol, 0));
+        assertEquals("F", response.queryResponse.getResponseFields()
+                .getValueAsText(underlyingSymbol, 0));
+    }
+
+    private QueryResponse decode(String jsonResp) {
+        QueryResponse response = ObjectCodecFactory.getInstance()
+                .getObjectCodec(CodecType.JSON)
+                .decode(jsonResp, QueryResponse.class, null);
+        return response;
     }
 
     static String httpGet(String target, String... headers) throws IOException {
@@ -116,7 +271,7 @@ public class DataServiceImplTest {
         return resp;
     }
 
-    public static String toString(InputStream is) throws IOException {
+    private static String toString(InputStream is) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
         String inputLine;
         StringBuffer response = new StringBuffer();

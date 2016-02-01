@@ -2,6 +2,8 @@ package com.plexobject.dp.util;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -31,7 +33,8 @@ public class ObjectConversionUtilsTest {
         assertArrayEquals(arr,
                 ObjectConversionUtils.getAsTextVector(Arrays.asList(arr)));
         assertArrayEquals(arr, ObjectConversionUtils.getAsTextVector(arr));
-        assertArrayEquals(arr, ObjectConversionUtils.getAsTextVector(reflectionArr));
+        assertArrayEquals(arr,
+                ObjectConversionUtils.getAsTextVector(reflectionArr));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -49,7 +52,8 @@ public class ObjectConversionUtilsTest {
         assertArrayEquals(arr,
                 ObjectConversionUtils.getAsObjectVector(Arrays.asList(arr)));
         assertArrayEquals(arr, ObjectConversionUtils.getAsObjectVector(arr));
-        assertArrayEquals(arr, ObjectConversionUtils.getAsObjectVector(reflectionArr));
+        assertArrayEquals(arr,
+                ObjectConversionUtils.getAsObjectVector(reflectionArr));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -60,6 +64,20 @@ public class ObjectConversionUtilsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsTextArrayBad() {
         ObjectConversionUtils.getAsTextVector(1);
+    }
+
+    @Test
+    public void testGetAsBoolean() {
+        assertTrue(ObjectConversionUtils.getAsBoolean("true"));
+        assertTrue(ObjectConversionUtils.getAsBoolean(1.1));
+        assertFalse(ObjectConversionUtils.getAsBoolean(0));
+        assertTrue(ObjectConversionUtils.getAsBoolean(true));
+        assertTrue(ObjectConversionUtils.getAsBoolean(Boolean.TRUE));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetAsBooleanNull() {
+        ObjectConversionUtils.getAsBoolean(null);
     }
 
     @Test
@@ -85,11 +103,13 @@ public class ObjectConversionUtilsTest {
         Array.set(reflectionArr, 1, 2L);
         Array.set(reflectionArr, 2, 3L);
         long[] arr = { 1L, 2L, 3L };
-        assertEquals(Arrays.toString(arr), Arrays.toString(ObjectConversionUtils
-                .getAsLongVector(Arrays.asList(1L, 2L, 3L))));
+        assertEquals(Arrays.toString(arr),
+                Arrays.toString(ObjectConversionUtils.getAsLongVector(Arrays
+                        .asList(1L, 2L, 3L))));
         assertEquals(arr, ObjectConversionUtils.getAsLongVector(arr));
         assertEquals(Arrays.toString(arr),
-                Arrays.toString(ObjectConversionUtils.getAsLongVector(reflectionArr)));
+                Arrays.toString(ObjectConversionUtils
+                        .getAsLongVector(reflectionArr)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -100,6 +120,32 @@ public class ObjectConversionUtilsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsLongArrayBad() {
         ObjectConversionUtils.getAsLongVector(new Date());
+    }
+
+    @Test
+    public void testGetAsBooleanVector() {
+        Object reflectionArr = Array.newInstance(Boolean.class, 3);
+        Array.set(reflectionArr, 0, true);
+        Array.set(reflectionArr, 1, false);
+        Array.set(reflectionArr, 2, true);
+        boolean[] arr = { true, false, true };
+        assertEquals(Arrays.toString(arr),
+                Arrays.toString(ObjectConversionUtils.getAsBooleanVector(Arrays
+                        .asList(true, false, true))));
+        assertEquals(arr, ObjectConversionUtils.getAsBooleanVector(arr));
+        assertEquals(Arrays.toString(arr),
+                Arrays.toString(ObjectConversionUtils
+                        .getAsBooleanVector(reflectionArr)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetAsBooleanArrayNull() {
+        ObjectConversionUtils.getAsBooleanVector(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetAsBooleanArrayBad() {
+        ObjectConversionUtils.getAsBooleanVector(new Date());
     }
 
     @Test
@@ -125,11 +171,13 @@ public class ObjectConversionUtilsTest {
         Array.set(reflectionArr, 1, 2.1);
         Array.set(reflectionArr, 2, 3.1);
         double[] arr = { 1.1, 2.1, 3.1 };
-        assertEquals(Arrays.toString(arr), Arrays.toString(ObjectConversionUtils
-                .getAsDecimalVector(Arrays.asList(1.1, 2.1, 3.1))));
+        assertEquals(Arrays.toString(arr),
+                Arrays.toString(ObjectConversionUtils.getAsDecimalVector(Arrays
+                        .asList(1.1, 2.1, 3.1))));
         assertEquals(arr, ObjectConversionUtils.getAsDecimalVector(arr));
-        assertEquals(Arrays.toString(arr), Arrays.toString(ObjectConversionUtils
-                .getAsDecimalVector(reflectionArr)));
+        assertEquals(Arrays.toString(arr),
+                Arrays.toString(ObjectConversionUtils
+                        .getAsDecimalVector(reflectionArr)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -193,7 +241,8 @@ public class ObjectConversionUtilsTest {
         assertArrayEquals(arr,
                 ObjectConversionUtils.getAsDateVector(Arrays.asList(arr)));
         assertArrayEquals(arr, ObjectConversionUtils.getAsDateVector(arr));
-        assertArrayEquals(arr, ObjectConversionUtils.getAsDateVector(reflectionArr));
+        assertArrayEquals(arr,
+                ObjectConversionUtils.getAsDateVector(reflectionArr));
     }
 
     @Test(expected = IllegalArgumentException.class)

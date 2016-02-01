@@ -1,6 +1,5 @@
 package com.plexobject.dp.domain;
 
-
 public class MetaField implements Comparable<MetaField> {
     private final String name;
     private final MetaFieldType type;
@@ -37,7 +36,7 @@ public class MetaField implements Comparable<MetaField> {
 
     @Override
     public String toString() {
-        return "[" + name + "/" + type + "]";
+        return name + "/" + type;
     }
 
     @Override

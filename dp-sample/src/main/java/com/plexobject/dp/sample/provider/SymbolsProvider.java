@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataRowSet;
-import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.provider.BaseProvider;
 import com.plexobject.dp.provider.DataProviderException;
@@ -27,13 +26,10 @@ public class SymbolsProvider extends BaseProvider {
             DataConfiguration config) throws DataProviderException {
 
         Collection<Security> securities = DaoLocator.securityDao.getAll();
-        int i = 0;
+        int nextRow = 0;
         for (Security security : securities) {
             DataRowSet rowset = marshaller.marshal(security);
-            for (MetaField field : response.getMetadata().getMetaFields()) {
-                response.addValueAtRow(field, rowset.getValue(field, 0), i);
-            }
-            i++;
+            nextRow = addRowSet(response, rowset, nextRow);
         }
     }
 }

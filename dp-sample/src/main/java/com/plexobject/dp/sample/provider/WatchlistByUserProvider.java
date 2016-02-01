@@ -24,8 +24,7 @@ public class WatchlistByUserProvider extends BaseProvider {
     private static MetaField watchlistName = MetaFieldFactory.create(
             "watchlistName", MetaFieldType.SCALAR_TEXT);
     private static Metadata parameterMeta = Metadata.from(userId);
-    private static Metadata optionalMeta = Metadata.from(symbol,
-            watchlistName);
+    private static Metadata optionalMeta = Metadata.from(symbol, watchlistName);
     private static WatchlistMarshaller marshaller = new WatchlistMarshaller();
 
     public WatchlistByUserProvider() {
@@ -66,12 +65,7 @@ public class WatchlistByUserProvider extends BaseProvider {
                 }
                 if (matched) {
                     DataRowSet rowset = marshaller.marshal(watchlist);
-                    for (MetaField field : response.getMetadata()
-                            .getMetaFields()) {
-                        response.addValueAtRow(field,
-                                rowset.getValue(field, 0), nextRow);
-                    }
-                    nextRow++;
+                    nextRow = addRowSet(response, rowset, nextRow);
                 }
             }
         }

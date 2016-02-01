@@ -19,7 +19,8 @@ public class DataRowTest {
     public void setup() {
         MetaFieldFactory.reset();
         text = MetaFieldFactory.create("text", MetaFieldType.SCALAR_TEXT);
-        integer = MetaFieldFactory.create("integer", MetaFieldType.SCALAR_INTEGER);
+        integer = MetaFieldFactory.create("integer",
+                MetaFieldType.SCALAR_INTEGER);
     }
 
     @Test
@@ -134,6 +135,14 @@ public class DataRowTest {
     }
 
     @Test
+    public void testGetValueAsBoolean() {
+        DataRow row = new DataRow();
+        MetaField field = new MetaField("object", MetaFieldType.SCALAR_BOOLEAN);
+        row.addField(field, 1);
+        assertTrue(row.getValueAsBoolean(field));
+    }
+
+    @Test
     public void testGetValueAsDecimal() {
         DataRow row = new DataRow();
         MetaField field = new MetaField("object", MetaFieldType.SCALAR_DECIMAL);
@@ -166,6 +175,15 @@ public class DataRowTest {
         MetaField field = new MetaField("object", MetaFieldType.VECTOR_INTEGER);
         row.addField(field, numbers);
         assertEquals(numbers, row.getValueAsLongVector(field));
+    }
+
+    @Test
+    public void testGetValueAsBooleanVector() {
+        boolean[] values = { true, false };
+        DataRow row = new DataRow();
+        MetaField field = new MetaField("object", MetaFieldType.VECTOR_BOOLEAN);
+        row.addField(field, values);
+        assertEquals(values, row.getValueAsBooleanVector(field));
     }
 
     @Test

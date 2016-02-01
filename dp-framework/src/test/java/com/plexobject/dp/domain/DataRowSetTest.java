@@ -103,6 +103,16 @@ public class DataRowSetTest {
     }
 
     @Test
+    public void testGetValueAsBoolean() {
+        metaFields.addMetaField(MetaFieldFactory.create("object",
+                MetaFieldType.SCALAR_BOOLEAN));
+        DataRowSet rowset = new DataRowSet(metaFields);
+        rowset.addValueAtRow(MetaFieldFactory.lookup("object"), true, 0);
+        assertTrue(rowset.getValueAsBoolean(MetaFieldFactory.lookup("object"),
+                0));
+    }
+
+    @Test
     public void testGetValueAsDecimal() {
         metaFields.addMetaField(MetaFieldFactory.create("object",
                 MetaFieldType.SCALAR_DECIMAL));
@@ -136,6 +146,19 @@ public class DataRowSetTest {
         rowset.addValueAtRow(MetaFieldFactory.lookup("object"), date, 0);
         assertEquals(date,
                 rowset.getValueAsDate(MetaFieldFactory.lookup("object"), 0));
+    }
+
+    @Test
+    public void testGetValueAsBooleanVector() {
+        boolean[] values = { true, false };
+        metaFields.addMetaField(MetaFieldFactory.create("object",
+                MetaFieldType.VECTOR_BOOLEAN));
+        DataRowSet rowset = new DataRowSet(metaFields);
+        rowset.addValueAtRow(MetaFieldFactory.lookup("object"), values, 0);
+        assertEquals(
+                Arrays.toString(values),
+                Arrays.toString(rowset.getValueAsBooleanVector(
+                        MetaFieldFactory.lookup("object"), 0)));
     }
 
     @Test

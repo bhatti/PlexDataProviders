@@ -1,10 +1,12 @@
 package com.plexobject.dp.sample.dao.memory;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.log4j.Logger;
 
 import com.plexobject.dp.sample.dao.BaseDao;
 import com.plexobject.dp.sample.dao.Filter;
@@ -12,6 +14,8 @@ import com.plexobject.dp.sample.domain.Idable;
 
 public abstract class BaseDaoImpl<Id, Type extends Idable<Id>> implements
         BaseDao<Id, Type> {
+    private final Logger logger = Logger.getLogger(getClass());
+
     protected Map<Id, Type> store = new HashMap<>();
 
     @Override
@@ -71,14 +75,15 @@ public abstract class BaseDaoImpl<Id, Type extends Idable<Id>> implements
             int matched = 0;
             for (Map.Entry<String, Object> c : criteria.entrySet()) {
                 try {
-                    Field f = e.getValue().getClass()
-                            .getDeclaredField(c.getKey());
-                    f.setAccessible(true);
-                    Object value = f.get(e.getValue());
+                    Object value = PropertyUtils.getProperty(e.getValue(),
+                            c.getKey());
                     if (value != null && value.equals(c.getValue())) {
                         matched++;
                     }
+                } catch (NoSuchMethodException ex) {
                 } catch (Exception ex) {
+                    ex.printStackTrace();
+                    logger.error("Failed to access " + c.getKey(), ex);
                 }
             }
             if (matched == criteria.size()) {

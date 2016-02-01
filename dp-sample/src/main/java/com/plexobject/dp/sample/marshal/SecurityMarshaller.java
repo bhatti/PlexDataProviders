@@ -33,10 +33,10 @@ public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
     private static MetaField exDividendDate = MetaFieldFactory.create(
             "security.exDividendDate", MetaFieldType.SCALAR_DATE);
 
-    private static MetaField optionRoot = MetaFieldFactory.create("security.optionRoot",
-            MetaFieldType.SCALAR_OBJECT);
-    private static MetaField optionType = MetaFieldFactory.create("security.optionType",
-            MetaFieldType.SCALAR_TEXT);
+    private static MetaField optionRoot = MetaFieldFactory.create(
+            "security.optionRoot", MetaFieldType.SCALAR_OBJECT);
+    private static MetaField optionType = MetaFieldFactory.create(
+            "security.optionType", MetaFieldType.SCALAR_TEXT);
     private static MetaField strikePrice = MetaFieldFactory.create(
             "security.strikePrice", MetaFieldType.SCALAR_DECIMAL);
     private static MetaField expirationDate = MetaFieldFactory.create(
@@ -51,7 +51,7 @@ public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
     public DataRowSet marshal(Security security) {
         DataRowSet rowset = new DataRowSet(responseMeta);
         rowset.addValueAtRow(securityId, security.getId(), 0);
-        rowset.addValueAtRow(dividendRate, security.getExchange(), 0);
+        rowset.addValueAtRow(exchange, security.getExchange(), 0);
         rowset.addValueAtRow(symbol, security.getSymbol(), 0);
         rowset.addValueAtRow(underlyingSymbol, security.getUnderlyingSymbol(),
                 0);

@@ -1,7 +1,9 @@
 package com.plexobject.dp.provider.impl;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,6 +54,9 @@ public class DataProvidersImpl implements DataProviders {
                     + ", responseFields " + request.getResponseFields()
                     + " with " + providers);
         }
+        System.out.println("#####Executing "
+                + request.getResponseFields().getMetaFields() + " with "
+                + providers); // TODO remove
         DataRowSet responseFields = new DataRowSet(request.getResponseFields());
         //
         // creating parallel thread executor
@@ -59,10 +64,14 @@ public class DataProvidersImpl implements DataProviders {
                 : Executors.newFixedThreadPool(getThreadPoolSize(providers));
         final Timer timer = Metric.newTimer("DataProvidersImpl.produce");
         try {
-            Map<DataProvider, Throwable> errors = new ProvidersExecutor(
+            Set<String> providerNames = new HashSet<>();
+            for (DataProvider provider : providers) {
+                providerNames.add(provider.getName());
+            }
+            Map<String, Throwable> errors = new ProvidersExecutor(
                     request.getParameters(), responseFields,
                     request.getConfig(), providers, executor).execute();
-            return new DataResponse(responseFields, errors);
+            return new DataResponse(responseFields, providerNames, errors);
         } finally {
             if (executor != defaultExecutor) {
                 executor.shutdown();

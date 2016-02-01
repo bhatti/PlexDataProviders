@@ -61,6 +61,16 @@ public class Metadata {
         return count;
     }
 
+    public synchronized int getMatchingCount(Metadata other) {
+        int count = 0;
+        for (MetaField field : other.metaFields) {
+            if (metaFields.contains(field)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public synchronized Metadata getMissingMetadata(Metadata other) {
         Set<MetaField> missingMetaFields = new HashSet<MetaField>();
         for (MetaField field : other.metaFields) {

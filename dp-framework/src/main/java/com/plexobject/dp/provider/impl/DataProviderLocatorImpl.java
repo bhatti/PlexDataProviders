@@ -23,9 +23,17 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
             .getLogger(DataProviderLocatorImpl.class);
 
     private ConcurrentHashMap<MetaField, Set<DataProvider>> providersByOutputMetaField = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, DataProvider> providersByName = new ConcurrentHashMap<>();
 
     @Override
     public void register(DataProvider provider) {
+        synchronized (providersByName) {
+            if (providersByName.get(provider.getName()) != null) {
+                throw new IllegalArgumentException("Provider with name "
+                        + provider.getName() + " is already registered");
+            }
+            providersByName.put(provider.getName(), provider);
+        }
         for (MetaField outputField : provider.getResponseFields()
                 .getMetaFields()) {
             synchronized (outputField) {
@@ -46,6 +54,9 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
 
     @Override
     public void unregister(DataProvider provider) {
+        synchronized (providersByName) {
+            providersByName.remove(provider.getName());
+        }
         for (MetaField outputField : provider.getResponseFields()
                 .getMetaFields()) {
             synchronized (outputField) {
@@ -97,10 +108,30 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
         return providers;
     }
 
-    private void populateDataProviders(Metadata requestFields,
-            Metadata responseFields, List<DataProvider> existingProviders) {
+    @Override
+    public DataProvider getByName(String name) {
+        return providersByName.get(name);
+    }
+
+    private void populateDataProviders(final Metadata requestFields,
+            final Metadata responseFields,
+            final List<DataProvider> existingProviders) {
         responseFields.removeMetadata(requestFields);
+        //
+
         for (MetaField responseField : responseFields.getMetaFields()) {
+            // check if responseField is available from existing providers
+            boolean matchedExistingProviders = false;
+            for (DataProvider provider : existingProviders) {
+                if (provider.getResponseFields().contains(responseField)) {
+                    matchedExistingProviders = true;
+                    break;
+                }
+            }
+            if (matchedExistingProviders) {
+                continue;
+            }
+            // Otherwise find providers that have the field in the response list
             Set<DataProvider> providers = providersByOutputMetaField
                     .get(responseField);
             if (providers == null) {
@@ -132,28 +163,35 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
 
     // This method finds data provider that matches or almost matches the
     // request parameters that we have
-    private DataProvider getBestDataProvider(Set<DataProvider> providers,
-            Metadata requestFields) {
+    private DataProvider getBestDataProvider(
+            Collection<DataProvider> providers, Metadata requestFields) {
         DataProvider bestProvider = null;
-        int minCount = Integer.MAX_VALUE;
-        int maxRank = Integer.MIN_VALUE;
-        int numRequiredFields = Integer.MAX_VALUE;
+        int bestMinCount = Integer.MAX_VALUE;
+        int bestMatchingCount = Integer.MIN_VALUE;
+        int bestRank = Integer.MIN_VALUE;
+        int bestRequiredFields = Integer.MAX_VALUE;
+
         for (DataProvider provider : providers) {
-            int count = provider.getMandatoryRequestFields().getMissingCount(
-                    requestFields);
-            if (count < minCount) {
-                numRequiredFields = provider.getMandatoryRequestFields().size();
-                minCount = count;
-                maxRank = provider.getRank();
-                bestProvider = provider;
-            } else if (count == minCount && provider.getRank() > maxRank) {
-                numRequiredFields = provider.getMandatoryRequestFields().size();
-                maxRank = provider.getRank();
-                bestProvider = provider;
-            } else if (count == minCount
-                    && provider.getMandatoryRequestFields().size() < numRequiredFields) {
-                numRequiredFields = provider.getMandatoryRequestFields().size();
-                maxRank = provider.getRank();
+            int missingCount = provider.getMandatoryRequestFields()
+                    .getMissingCount(requestFields);
+            int matchingCount = provider.getMandatoryRequestFields()
+                    .getMatchingCount(requestFields);
+            // The best provider will the provider that has least number of
+            // missing required fields from the request fields provided,
+            // otherwise we would use the rank or the provider with least number
+            // of required fields or most number of matching fields with input
+            if (missingCount < bestMinCount
+                    || (missingCount == bestMinCount && provider.getRank() > bestRank)
+                    || (missingCount == bestMinCount && provider
+                            .getMandatoryRequestFields().size() < bestRequiredFields)
+                    || (missingCount == bestMinCount && matchingCount > bestMatchingCount)
+                    || (missingCount == bestMinCount && provider
+                            .getMandatoryRequestFields().size() < bestRequiredFields)) {
+                bestRequiredFields = provider.getMandatoryRequestFields()
+                        .size();
+                bestMinCount = missingCount;
+                bestMatchingCount = matchingCount;
+                bestRank = provider.getRank();
                 bestProvider = provider;
             }
         }

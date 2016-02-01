@@ -40,11 +40,7 @@ public class QuotesBySymbolsProvider extends BaseProvider {
             if (quotes.size() > 0) {
                 Quote quote = quotes.iterator().next();
                 DataRowSet rowset = marshaller.marshal(quote);
-                for (MetaField field : response.getMetadata().getMetaFields()) {
-                    response.addValueAtRow(field, rowset.getValue(field, 0),
-                            nextRow);
-                }
-                nextRow++;
+                nextRow = addRowSet(response, rowset, nextRow);
             }
         }
     }

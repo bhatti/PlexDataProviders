@@ -1,15 +1,19 @@
 package com.plexobject.dp.provider;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
 
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public abstract class BaseProvider implements DataProvider {
     private final String name;
-    private final Metadata mandatoryRequestFields;
-    private final Metadata optionalRequestFields;
-    private final Metadata responseFields;
-    private TaskGranularity taskGranularity = TaskGranularity.COARSE;
-    private int rank;
+    private transient final Metadata mandatoryRequestFields;
+    private transient final Metadata optionalRequestFields;
+    private transient final Metadata responseFields;
+    private transient TaskGranularity taskGranularity = TaskGranularity.COARSE;
+    private transient int rank;
 
     public BaseProvider(String name, Metadata mandatoryRequestFields,
             Metadata optionalRequestFields, Metadata responseFields) {
@@ -71,4 +75,21 @@ public abstract class BaseProvider implements DataProvider {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    protected int addRowSet(DataRowSet response, DataRowSet rowset, int rowNum) {
+        for (int i = 0; i < rowset.size(); i++) {
+            for (MetaField field : response.getMetadata().getMetaFields()) {
+                if (getResponseFields().contains(field)) {
+                    response.addValueAtRow(field, rowset.getValue(field, i),
+                            rowNum);
+                }
+            }
+            rowNum++;
+        }
+        return rowNum;
+    }
 }

@@ -25,7 +25,9 @@ public class DataRow {
         if (value == null) {
             value = NullObject.instance;
         }
-        fields.put(metaField, value);
+        if (!fields.containsKey(metaField)) {
+            fields.put(metaField, value);
+        }
     }
 
     public synchronized int size() {
@@ -75,6 +77,11 @@ public class DataRow {
         return ObjectConversionUtils.getAsLong(value);
     }
 
+    public boolean getValueAsBoolean(MetaField field) {
+        Object value = getValue(field);
+        return ObjectConversionUtils.getAsBoolean(value);
+    }
+
     public double getValueAsDecimal(MetaField field) {
         Object value = getValue(field);
         return ObjectConversionUtils.getAsDecimal(value);
@@ -93,6 +100,11 @@ public class DataRow {
     public long[] getValueAsLongVector(MetaField field) {
         Object value = getValue(field);
         return ObjectConversionUtils.getAsLongVector(value);
+    }
+
+    public boolean[] getValueAsBooleanVector(MetaField field) {
+        Object value = getValue(field);
+        return ObjectConversionUtils.getAsBooleanVector(value);
     }
 
     public double[] getValueAsDecimalVector(MetaField field) {

@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataRowSet;
-import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.provider.BaseProvider;
 import com.plexobject.dp.provider.DataProviderException;
@@ -30,10 +29,7 @@ public class UsersProvider extends BaseProvider {
         int nextRow = 0;
         for (User user : users) {
             DataRowSet rowset = marshaller.marshal(user);
-            for (MetaField field : response.getMetadata().getMetaFields()) {
-                response.addValueAtRow(field, rowset.getValue(field, 0), nextRow);
-            }
-            nextRow++;
+            nextRow = addRowSet(response, rowset, nextRow);
         }
     }
 }

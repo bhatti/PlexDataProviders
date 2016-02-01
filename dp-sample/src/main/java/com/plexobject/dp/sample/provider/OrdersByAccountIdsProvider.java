@@ -44,11 +44,7 @@ public class OrdersByAccountIdsProvider extends BaseProvider {
             if (orders.size() > 0) {
                 Order order = orders.iterator().next();
                 DataRowSet rowset = marshaller.marshal(order);
-                for (MetaField field : response.getMetadata().getMetaFields()) {
-                    response.addValueAtRow(field, rowset.getValue(field, 0),
-                            nextRow);
-                }
-                nextRow++;
+                nextRow = addRowSet(response, rowset, nextRow);
             }
         }
     }

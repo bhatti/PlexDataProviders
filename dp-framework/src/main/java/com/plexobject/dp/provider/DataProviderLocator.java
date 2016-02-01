@@ -47,4 +47,12 @@ public interface DataProviderLocator {
      * @return
      */
     Collection<DataProvider> getAll();
+
+    /**
+     * This method finds provider with given name
+     * 
+     * @param name
+     * @return
+     */
+    DataProvider getByName(String name);
 }

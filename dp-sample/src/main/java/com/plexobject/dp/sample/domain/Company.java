@@ -3,8 +3,7 @@ package com.plexobject.dp.sample.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Company implements Idable<Long> {
-    private long id;
+public class Company implements Idable<String> {
     private String symbol;
     private String exchange;
     private String name;
@@ -15,9 +14,8 @@ public class Company implements Idable<Long> {
 
     }
 
-    public Company(long id, String symbol, String exchange, String name,
+    public Company(String symbol, String exchange, String name,
             Address address, List<CompanyEvent> events) {
-        this.id = id;
         this.symbol = symbol;
         this.exchange = exchange;
         this.name = name;
@@ -25,12 +23,8 @@ public class Company implements Idable<Long> {
         this.events = events;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public String getId() {
+        return symbol;
     }
 
     public String getSymbol() {
@@ -96,6 +90,13 @@ public class Company implements Idable<Long> {
         } else if (!symbol.equals(other.symbol))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Company [symbol=" + symbol + ", exchange=" + exchange
+                + ", name=" + name + ", address=" + address + ", events="
+                + events + "]";
     }
 
 }

@@ -14,6 +14,19 @@ public class ObjectConversionUtils {
         throw new IllegalArgumentException("unexpected null value found ");
     }
 
+    public static boolean getAsBoolean(Object value) {
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue();
+        } else if (value instanceof Number) {
+            return ((Number) value).longValue() != 0;
+        } else if (value instanceof String) {
+            return Boolean.valueOf((String) value);
+        }
+        throw new IllegalArgumentException("unexpected type found "
+                + (value != null ? value.getClass().getSimpleName() : "null")
+                + ", value " + value);
+    }
+
     public static long getAsLong(Object value) {
         if (value instanceof Number) {
             return ((Number) value).longValue();
@@ -54,6 +67,31 @@ public class ObjectConversionUtils {
             return new Date(((Number) value).longValue());
         } else if (value instanceof String) {
             return new Date(Long.valueOf((String) value));
+        }
+        throw new IllegalArgumentException("unexpected type found "
+                + (value != null ? value.getClass().getSimpleName() : "null")
+                + ", value " + value);
+    }
+
+    public static boolean[] getAsBooleanVector(Object value) {
+        if (value instanceof Collection) {
+            Collection<?> collection = (Collection<?>) (value);
+            boolean[] values = new boolean[collection.size()];
+            int i = 0;
+            for (Object obj : collection) {
+                values[i++] = ObjectConversionUtils.getAsBoolean(obj);
+            }
+            return values;
+        } else if (value instanceof boolean[]) {
+            boolean[] array = (boolean[]) value;
+            return array;
+        } else if (value instanceof Boolean[]) {
+            Boolean[] array = (Boolean[]) value;
+            boolean[] values = new boolean[Array.getLength(array)];
+            for (int i = 0; i < values.length; i++) {
+                values[i] = array[i];
+            }
+            return values;
         }
         throw new IllegalArgumentException("unexpected type found "
                 + (value != null ? value.getClass().getSimpleName() : "null")

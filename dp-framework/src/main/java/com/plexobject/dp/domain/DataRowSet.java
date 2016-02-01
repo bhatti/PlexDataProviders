@@ -9,10 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataRowSet {
     private final Metadata metadata;
     private final List<DataRow> rows = new ArrayList<>();
     private final transient Map<String, MetaField> metaFieldsByName = new HashMap<>();
+
+    DataRowSet() {
+        metadata = Metadata.from(); // For serialization
+    }
 
     public DataRowSet(Metadata metadata) {
         this(metadata, Arrays.<DataRow> asList());
@@ -111,6 +119,13 @@ public class DataRowSet {
         return rows.get(row).getValueAsLong(metaField);
     }
 
+    public boolean getValueAsBoolean(MetaField metaField, int row) {
+        Objects.requireNonNull(metaField, "metaField cannot be null");
+        assert (metadata.contains(metaField));
+        validateRow(row);
+        return rows.get(row).getValueAsBoolean(metaField);
+    }
+
     public double getValueAsDecimal(MetaField metaField, int row) {
         Objects.requireNonNull(metaField, "metaField cannot be null");
         assert (metadata.contains(metaField));
@@ -137,6 +152,13 @@ public class DataRowSet {
         assert (metadata.contains(metaField));
         validateRow(row);
         return rows.get(row).getValueAsLongVector(metaField);
+    }
+
+    public boolean[] getValueAsBooleanVector(MetaField metaField, int row) {
+        Objects.requireNonNull(metaField, "metaField cannot be null");
+        assert (metadata.contains(metaField));
+        validateRow(row);
+        return rows.get(row).getValueAsBooleanVector(metaField);
     }
 
     public double[] getValueAsDecimalVector(MetaField metaField, int row) {

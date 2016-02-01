@@ -11,8 +11,8 @@ import com.plexobject.dp.sample.domain.Position;
 public class PositionMarshaller implements DataRowSetMarshaller<Position> {
     private static MetaField positionId = MetaFieldFactory.create("positionId",
             MetaFieldType.SCALAR_INTEGER);
-    private static MetaField accountId = MetaFieldFactory.create("accountId",
-            MetaFieldType.SCALAR_INTEGER);
+    private static MetaField accountId = MetaFieldFactory.create(
+            "position.accountId", MetaFieldType.SCALAR_INTEGER);
     private static MetaField price = MetaFieldFactory.create("position.price",
             MetaFieldType.SCALAR_DECIMAL);
     private static MetaField quantity = MetaFieldFactory.create(

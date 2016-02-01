@@ -15,7 +15,7 @@ public class MetricTest {
     public void tearDown() throws Exception {
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public final void testGetMetricWithNull() {
         Metric.getMetric(null);
     }

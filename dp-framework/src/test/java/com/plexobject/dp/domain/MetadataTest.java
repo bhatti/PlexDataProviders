@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-public class MetaFieldsTest {
+public class MetadataTest {
 
     @Test
     public void testCreateEmpty() {
@@ -19,8 +19,10 @@ public class MetaFieldsTest {
 
     @Test
     public void testCreateVector() {
-        MetaField field1 = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field2 = MetaFieldFactory.create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1 = MetaFieldFactory.create("name",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField field2 = MetaFieldFactory.create("phone",
+                MetaFieldType.SCALAR_TEXT);
         Metadata fields = new Metadata(field1, field2);
         assertEquals(2, fields.size());
         assertTrue(fields.getMetaFields().contains(field1));
@@ -29,8 +31,10 @@ public class MetaFieldsTest {
 
     @Test
     public void testCreateCollection() {
-        MetaField field1 = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field2 = MetaFieldFactory.create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1 = MetaFieldFactory.create("name",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField field2 = MetaFieldFactory.create("phone",
+                MetaFieldType.SCALAR_TEXT);
         Metadata fields = new Metadata(Arrays.asList(field1, field2));
         assertEquals(2, fields.size());
         assertTrue(fields.getMetaFields().contains(field1));
@@ -40,8 +44,10 @@ public class MetaFieldsTest {
     @Test
     public void testAddMetaField() {
         Metadata fields = new Metadata();
-        MetaField field1 = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field2 = MetaFieldFactory.create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1 = MetaFieldFactory.create("name",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField field2 = MetaFieldFactory.create("phone",
+                MetaFieldType.SCALAR_TEXT);
         fields.addMetaField(field1);
         fields.addMetaField(field1);
         fields.addMetaField(field2);
@@ -53,8 +59,10 @@ public class MetaFieldsTest {
     @Test
     public void testRemoveMetaField() {
         Metadata fields = new Metadata();
-        MetaField field1 = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field2 = MetaFieldFactory.create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1 = MetaFieldFactory.create("name",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField field2 = MetaFieldFactory.create("phone",
+                MetaFieldType.SCALAR_TEXT);
         fields.addMetaField(field1);
         fields.addMetaField(field2);
         assertEquals(2, fields.size());
@@ -69,9 +77,10 @@ public class MetaFieldsTest {
     @Test
     public void testAddMetaFields() {
         Metadata fields1 = new Metadata();
-        MetaField field1a = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field1b = MetaFieldFactory
-                .create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1a = MetaFieldFactory.create("name",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField field1b = MetaFieldFactory.create("phone",
+                MetaFieldType.SCALAR_TEXT);
         fields1.addMetaField(field1a);
         fields1.addMetaField(field1b);
         Metadata fields2 = new Metadata();
@@ -85,9 +94,10 @@ public class MetaFieldsTest {
     @Test
     public void testRemoveMetaFields() {
         Metadata fields1 = new Metadata();
-        MetaField field1a = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field1b = MetaFieldFactory
-                .create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1a = MetaFieldFactory.create("name",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField field1b = MetaFieldFactory.create("phone",
+                MetaFieldType.SCALAR_TEXT);
         fields1.addMetaField(field1a);
         fields1.addMetaField(field1b);
         Metadata fields2 = new Metadata();
@@ -103,9 +113,10 @@ public class MetaFieldsTest {
     @Test
     public void testContains() {
         Metadata fields1 = new Metadata();
-        MetaField field1a = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field1b = MetaFieldFactory
-                .create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1a = MetaFieldFactory.create("name",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField field1b = MetaFieldFactory.create("phone",
+                MetaFieldType.SCALAR_TEXT);
         fields1.addMetaField(field1a);
         fields1.addMetaField(field1b);
         Metadata fields2 = new Metadata();
@@ -120,9 +131,10 @@ public class MetaFieldsTest {
 
     @Test
     public void testGetMissingCount() {
-        Metadata fields1 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone", "SCALAR_TEXT");
-        Metadata fields2 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone", "SCALAR_TEXT",
-                "address", "SCALAR_TEXT");
+        Metadata fields1 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT");
+        Metadata fields2 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT", "address", "SCALAR_TEXT");
         //
         assertEquals(1, fields1.getMissingCount(fields2));
         Metadata missing = fields1.getMissingMetadata(fields2);
@@ -130,9 +142,21 @@ public class MetaFieldsTest {
     }
 
     @Test
+    public void testGetMatchingCount() {
+        Metadata fields1 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT");
+        Metadata fields2 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT", "address", "SCALAR_TEXT");
+        //
+        assertEquals(2, fields1.getMatchingCount(fields2));
+    }
+
+    @Test
     public void testOf() {
-        MetaField field1 = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field2 = MetaFieldFactory.create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1 = MetaFieldFactory.create("name",
+                MetaFieldType.SCALAR_TEXT);
+        MetaField field2 = MetaFieldFactory.create("phone",
+                MetaFieldType.SCALAR_TEXT);
         Metadata fields = Metadata.from(field1, field2);
         assertEquals(2, fields.size());
         assertTrue(fields.getMetaFields().contains(field1));
@@ -141,22 +165,28 @@ public class MetaFieldsTest {
 
     @Test
     public void testOfString() {
-        Metadata fields = Metadata.fromRaw("name", "SCALAR_TEXT", "phone", "SCALAR_TEXT");
+        Metadata fields = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT");
         assertEquals(2, fields.size());
     }
 
     @Test
     public void testHashcode() {
-        Metadata fields = Metadata.fromRaw("name", "SCALAR_TEXT", "phone", "SCALAR_TEXT");
+        Metadata fields = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT");
         assertTrue(fields.hashCode() != 0);
     }
 
     @Test
     public void testEquals() {
-        Metadata fields1 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone", "SCALAR_TEXT");
-        Metadata fields2 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone", "SCALAR_TEXT");
-        Metadata fields3 = Metadata.fromRaw("name", "SCALAR_TEXT", "address", "SCALAR_TEXT");
-        Metadata fields4 = Metadata.fromRaw("name", "SCALAR_TEXT", "address", "SCALAR_TEXT", "phone", "SCALAR_TEXT");
+        Metadata fields1 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT");
+        Metadata fields2 = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT");
+        Metadata fields3 = Metadata.fromRaw("name", "SCALAR_TEXT", "address",
+                "SCALAR_TEXT");
+        Metadata fields4 = Metadata.fromRaw("name", "SCALAR_TEXT", "address",
+                "SCALAR_TEXT", "phone", "SCALAR_TEXT");
         assertEquals(fields1, fields1);
         assertEquals(fields1, fields2);
         assertNotEquals(fields1, fields3);
@@ -167,7 +197,8 @@ public class MetaFieldsTest {
 
     @Test
     public void testToString() {
-        Metadata fields = Metadata.fromRaw("name", "SCALAR_TEXT", "phone", "SCALAR_TEXT");
+        Metadata fields = Metadata.fromRaw("name", "SCALAR_TEXT", "phone",
+                "SCALAR_TEXT");
         assertTrue(fields.toString().contains("name"));
     }
 }

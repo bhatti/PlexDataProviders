@@ -20,14 +20,19 @@ public class DataRow {
     public DataRow() {
     }
 
-    public synchronized void addField(MetaField metaField, Object value) {
+    public synchronized boolean addField(MetaField metaField, Object value) {
         Objects.requireNonNull(metaField, "metaField is required");
+        boolean added = true;
         if (value == null) {
             value = NullObject.instance;
+            added = false;
         }
         if (!fields.containsKey(metaField)) {
             fields.put(metaField, value);
+        } else {
+            added = false;
         }
+        return added;
     }
 
     public synchronized int size() {

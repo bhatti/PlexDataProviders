@@ -42,11 +42,11 @@ public class DataRowSet {
         }
     }
 
-    public synchronized void addValueAtRow(MetaField metaField, Object value,
-            int rowNumber) {
+    public synchronized boolean addValueAtRow(MetaField metaField,
+            Object value, int rowNumber) {
         DataRow row = getOrCreateRow(rowNumber);
-        row.addField(metaField, value);
         addMetaField(metaField);
+        return row.addField(metaField, value);
     }
 
     public synchronized DataRow getOrCreateRow(int row) {

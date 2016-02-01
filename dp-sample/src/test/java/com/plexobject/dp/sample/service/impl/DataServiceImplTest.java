@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.plexobject.domain.Configuration;
 import com.plexobject.domain.Constants;
-import com.plexobject.dp.domain.DataResponse;
 import com.plexobject.dp.domain.DataRow;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
@@ -36,6 +35,7 @@ import com.plexobject.dp.json.DataRowSerializer;
 import com.plexobject.dp.json.MetadataDeserializer;
 import com.plexobject.dp.json.MetadataSerializer;
 import com.plexobject.dp.provider.DataProvider;
+import com.plexobject.dp.sample.domain.QueryResponse;
 import com.plexobject.dp.sample.util.DataFactory;
 import com.plexobject.encode.CodecConfigurer;
 import com.plexobject.encode.CodecType;
@@ -50,19 +50,6 @@ import com.plexobject.service.ServiceRegistry;
 
 public class DataServiceImplTest {
     public static final int DEFAULT_PORT = 8186;
-
-    public static class QueryResponse {
-        private DataResponse queryResponse;
-
-        public DataResponse getQueryResponse() {
-            return queryResponse;
-        }
-
-        public void setQueryResponse(DataResponse queryResponse) {
-            this.queryResponse = queryResponse;
-        }
-
-    }
 
     private static ServiceRegistry serviceRegistry;
     private static WSRequestHandlerAdapter requestHandlerAdapter;
@@ -140,11 +127,11 @@ public class DataServiceImplTest {
         String jsonResp = httpGet("http://localhost:" + DEFAULT_PORT
                 + "/data?responseFields=symbol");
         QueryResponse response = decode(jsonResp);
-        assertTrue(response.queryResponse.getProviders().contains(
+        assertTrue(response.getQueryResponse().getProviders().contains(
                 "SymbolsProvider"));
 
-        assertTrue(response.queryResponse.getResponseFields().size() > 0);
-        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
+        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
     }
 
     @Test
@@ -153,19 +140,19 @@ public class DataServiceImplTest {
                 + DEFAULT_PORT
                 + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
         QueryResponse response = decode(jsonResp);
-        assertTrue(response.queryResponse.getResponseFields().size() > 0);
-        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
-        assertTrue(response.queryResponse.getProviders().contains(
+        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
+        assertTrue(response.getQueryResponse().getProviders().contains(
                 "SymbolSearchProvider"));
         MetaField symbol = MetaFieldFactory.create("symbol",
                 MetaFieldType.SCALAR_TEXT);
         MetaField underlyingSymbol = MetaFieldFactory.create(
                 "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
 
-        for (int i = 0; i < response.queryResponse.getResponseFields().size(); i++) {
-            assertTrue(response.queryResponse.getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getResponseFields().size(); i++) {
+            assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(symbol, i).contains("G"));
-            assertTrue(response.queryResponse.getResponseFields()
+            assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(underlyingSymbol, i).contains("G"));
         }
     }
@@ -176,19 +163,19 @@ public class DataServiceImplTest {
                 + DEFAULT_PORT
                 + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
         QueryResponse response = decode(jsonResp);
-        assertTrue(response.queryResponse.getResponseFields().size() > 0);
-        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
-        assertTrue(response.queryResponse.getProviders().contains(
+        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
+        assertTrue(response.getQueryResponse().getProviders().contains(
                 "SymbolSearchProvider"));
         MetaField symbol = MetaFieldFactory.create("symbol",
                 MetaFieldType.SCALAR_TEXT);
         MetaField underlyingSymbol = MetaFieldFactory.create(
                 "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
 
-        for (int i = 0; i < response.queryResponse.getResponseFields().size(); i++) {
-            assertTrue(response.queryResponse.getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getResponseFields().size(); i++) {
+            assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(symbol, i).contains("G"));
-            assertTrue(response.queryResponse.getResponseFields()
+            assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(underlyingSymbol, i).contains("G"));
         }
     }
@@ -202,19 +189,19 @@ public class DataServiceImplTest {
         // System.out.println("XX " +
         // response.queryResponse.getResponseFields());
 
-        assertTrue(response.queryResponse.getResponseFields().size() > 0);
-        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
-        assertTrue(response.queryResponse.getProviders().contains(
+        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
+        assertTrue(response.getQueryResponse().getProviders().contains(
                 "SymbolSearchProvider"));
         MetaField symbol = MetaFieldFactory.create("symbol",
                 MetaFieldType.SCALAR_TEXT);
         MetaField underlyingSymbol = MetaFieldFactory.create(
                 "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
 
-        for (int i = 0; i < response.queryResponse.getResponseFields().size(); i++) {
-            assertTrue(response.queryResponse.getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getResponseFields().size(); i++) {
+            assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(symbol, i).contains("G"));
-            assertTrue(response.queryResponse.getResponseFields()
+            assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(underlyingSymbol, i).contains("G"));
         }
     }
@@ -224,18 +211,18 @@ public class DataServiceImplTest {
         String jsonResp = httpGet("http://localhost:" + DEFAULT_PORT
                 + "/data?responseFields=exchange,underlyingSymbol&symbol=F");
         QueryResponse response = decode(jsonResp);
-        assertTrue(response.queryResponse.getProviders().contains(
+        assertTrue(response.getQueryResponse().getProviders().contains(
                 "SecuritiesBySymbolsProvider"));
 
-        assertTrue(response.queryResponse.getResponseFields().size() > 0);
-        assertEquals(0, response.queryResponse.getErrorsByProviderName().size());
+        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
         MetaField symbol = MetaFieldFactory.create("symbol",
                 MetaFieldType.SCALAR_TEXT);
         MetaField underlyingSymbol = MetaFieldFactory.create(
                 "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
-        assertEquals("F", response.queryResponse.getResponseFields()
+        assertEquals("F", response.getQueryResponse().getResponseFields()
                 .getValueAsText(symbol, 0));
-        assertEquals("F", response.queryResponse.getResponseFields()
+        assertEquals("F", response.getQueryResponse().getResponseFields()
                 .getValueAsText(underlyingSymbol, 0));
     }
 

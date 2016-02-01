@@ -15,16 +15,18 @@ public class PositionGroupMarshaller implements
     private static MetaField name = MetaFieldFactory.create(
             "positionGroup.name", MetaFieldType.SCALAR_TEXT);
     private static MetaField positions = MetaFieldFactory.create(
-            "positionGroup.positions", MetaFieldType.VECTOR_OBJECT);
+            "positionGroup.positions", MetaFieldType.ROWSET);
     private static Metadata responseMeta = Metadata.from(positionGroupId, name,
             positions);
+    private static final PositionMarshaller positionMarshaller = new PositionMarshaller();
 
     @Override
     public DataRowSet marshal(PositionGroup group) {
         DataRowSet rowset = new DataRowSet(responseMeta);
         rowset.addValueAtRow(positionGroupId, group.getId(), 0);
         rowset.addValueAtRow(name, group.getName(), 0);
-        rowset.addValueAtRow(positions, group.getPositions(), 0);
+        rowset.addValueAtRow(positions,
+                positionMarshaller.marshal(group.getPositions()), 0);
         return rowset;
     }
 

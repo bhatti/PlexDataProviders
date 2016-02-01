@@ -345,7 +345,6 @@ public class DataFactory {
     public static OptionRoot createOptionRoot(String symbol) {
         long id = nextId.incrementAndGet();
         OptionRoot optionRoot = new OptionRoot();
-        optionRoot.setId(id);
         optionRoot.setOpraRoot(OPRAS[(int) id % OPRAS.length]);
         optionRoot.setUnderlying(createEquity(symbol));
         optionRoot.setMultiplier(BigDecimal.valueOf(100));

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.plexobject.dp.domain.DataRow;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
 
@@ -25,7 +26,13 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
     public DataRow deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
         JsonNode node = jp.getCodec().readTree(jp);
+        return doDeserialize(jp, ctxt, node);
+    }
+
+    static DataRow doDeserialize(JsonParser jp, DeserializationContext ctxt,
+            JsonNode node) throws IOException, JsonProcessingException {
         DataRow row = new DataRow();
+        //
         Iterator<JsonNode> it = node.elements();
         while (it.hasNext()) {
             JsonNode next = it.next();
@@ -111,6 +118,13 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
                 case BINARY:
                     row.addField(field,
                             next.get("value").asText().getBytes("UTF-8"));
+                    break;
+                case ROWSET: {
+                    DataRowSet rowset = DataRowSetDeserializer.doDeserialize(
+                            jp, ctxt, next.get("value"));
+                    row.addField(field, rowset);
+                    break;
+                }
                 default:
                     logger.error("Failed to deserialize object " + next);
                     break;

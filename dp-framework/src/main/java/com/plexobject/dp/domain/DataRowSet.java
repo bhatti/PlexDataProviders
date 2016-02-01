@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataRowSet {
-    private final Metadata metadata;
+    private final transient Metadata metadata;
     private final List<DataRow> rows = new ArrayList<>();
     private final transient Map<String, MetaField> metaFieldsByName = new HashMap<>();
 
@@ -56,7 +56,7 @@ public class DataRowSet {
         return rows.get(row);
     }
 
-    public synchronized void addRowSet(DataRowSet rows) {
+    public synchronized void merge(DataRowSet rows) {
         Objects.requireNonNull(rows, "rowset cannot be null");
         for (MetaField field : rows.getMetadata().getMetaFields()) {
             addMetaField(field);
@@ -68,6 +68,9 @@ public class DataRowSet {
 
     public synchronized void addRow(DataRow row) {
         Objects.requireNonNull(row, "row cannot be null");
+        for (MetaField field : row.getFields().keySet()) {
+            addMetaField(field);
+        }
         rows.add(row);
     }
 

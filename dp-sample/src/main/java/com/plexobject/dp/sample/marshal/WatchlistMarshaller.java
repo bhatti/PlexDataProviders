@@ -14,16 +14,18 @@ public class WatchlistMarshaller implements DataRowSetMarshaller<Watchlist> {
     private static MetaField name = MetaFieldFactory.create("watchlist.name",
             MetaFieldType.SCALAR_TEXT);
     private static MetaField securities = MetaFieldFactory.create(
-            "watchlist.securities", MetaFieldType.VECTOR_OBJECT);
+            "watchlist.securities", MetaFieldType.ROWSET);
     private static Metadata responseMeta = Metadata.from(watchlistId, name,
             securities);
+    private static final SecurityMarshaller securityMarshaller = new SecurityMarshaller();
 
     @Override
     public DataRowSet marshal(Watchlist watchlist) {
         DataRowSet rowset = new DataRowSet(responseMeta);
         rowset.addValueAtRow(watchlistId, watchlist.getId(), 0);
         rowset.addValueAtRow(name, watchlist.getName(), 0);
-        rowset.addValueAtRow(securities, watchlist.getSecurities(), 0);
+        rowset.addValueAtRow(securities,
+                securityMarshaller.marshal(watchlist.getSecurities()), 0);
         return rowset;
     }
 

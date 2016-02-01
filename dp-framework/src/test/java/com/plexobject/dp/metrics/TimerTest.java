@@ -25,7 +25,7 @@ public class TimerTest {
         final Timer timer = metric.newTimer();
         Thread.sleep(10);
         timer.stop();
-        Assert.assertEquals(1, metric.getTotalCalls());
+        Assert.assertEquals(5, metric.getTotalCalls());
         Assert.assertTrue(metric.getAverageDurationInMilliSecs() > 1);
 
     }
@@ -40,7 +40,7 @@ public class TimerTest {
         }
         timer.stop();
 
-        Assert.assertEquals(5, metric.getTotalCalls());
+        Assert.assertEquals(4, metric.getTotalCalls());
         Assert.assertTrue(metric.getAverageDurationInMilliSecs() > 1);
 
     }

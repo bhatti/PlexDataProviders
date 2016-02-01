@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.plexobject.dp.domain.DataRow;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 
 public class DataRowSerializer extends StdSerializer<DataRow> {
@@ -24,6 +25,11 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
     @Override
     public void serialize(DataRow row, JsonGenerator jgen, SerializerProvider sp)
             throws IOException, JsonGenerationException {
+        DataRowSerializer.doSerialize(row, jgen, sp);
+    }
+
+    static void doSerialize(DataRow row, JsonGenerator jgen,
+            SerializerProvider sp) throws IOException, JsonGenerationException {
         jgen.writeStartArray(row.size());
         for (Map.Entry<MetaField, Object> e : row.getFields().entrySet()) {
             jgen.writeStartObject();
@@ -96,11 +102,19 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
             case BINARY:
                 jgen.writeStringField("value",
                         new String(row.getValueAsBinary(e.getKey()), "UTF-8"));
+                break;
+            case ROWSET:
+                jgen.writeArrayFieldStart("value");
+                DataRowSetSerializer.doSerialize((DataRowSet) e.getValue(),
+                        jgen, sp);
+                jgen.writeEndArray();
+                break;
             default:
                 logger.error("Failed to serialize object " + e.getKey() + "/"
                         + e.getValue() + " of " + row);
                 break;
             }
+
             //
             jgen.writeEndObject();
         }

@@ -25,7 +25,7 @@ public class CompanyEventMarshaller implements
     public DataRowSet marshal(CompanyEvent event) {
         DataRowSet rowset = new DataRowSet(responseMeta);
         rowset.addValueAtRow(companyEventId, event.getId(), 0);
-        rowset.addValueAtRow(companyEventType, event.getType(), 0);
+        rowset.addValueAtRow(companyEventType, event.getType().name(), 0);
         rowset.addValueAtRow(companyEventName, event.getName(), 0);
         rowset.addValueAtRow(companyEventDate, event.getDate(), 0);
         return rowset;

@@ -62,8 +62,9 @@ public class DataProvidersImplTest {
     static class FailingProvider extends BaseProvider {
         private final RuntimeException error;
 
-        public FailingProvider(String name, RuntimeException error) {
-            super(name, metaFrom(name), metaFrom("none"), metaFrom(name
+        public FailingProvider(String name, String errorName,
+                RuntimeException error) {
+            super(name, metaFrom(errorName), metaFrom("none"), metaFrom(errorName
                     + "-result"));
             this.error = error;
         }
@@ -510,18 +511,18 @@ public class DataProvidersImplTest {
 
     @Test
     public void testError() {
-        FailingProvider provider = new FailingProvider("error",
+        FailingProvider provider = new FailingProvider("testError0", "error",
                 new RuntimeException("failed"));
         provider.setTaskGranularity(TaskGranularity.COARSE);
         dataProviderLocator.register(provider);
-        dataProviderLocator.register(new ScalarProvider("one",
+        dataProviderLocator.register(new ScalarProvider("testError1",
                 new String[] { "query" }, new String[] {}, "lookupResults"));
-        dataProviderLocator.register(new ScalarProvider("two",
+        dataProviderLocator.register(new ScalarProvider("testError2",
                 new String[] { "lookupResults" }, new String[] {},
-                "detailsData"));
+                "somedata"));
 
         DataRequest request = new DataRequest(rowsetFrom("error", "query"),
-                metaFrom("lookupResults", "detailsData", "error-result"),
+                metaFrom("lookupResults", "somedata", "error-result"),
                 config);
         DataResponse response = dataProviders.produce(request);
         assertEquals(1, response.getErrorsByProviderName().size());
@@ -530,13 +531,13 @@ public class DataProvidersImplTest {
 
     @Test
     public void testErrorWithAbort() {
-        FailingProvider provider = new FailingProvider("error",
+        FailingProvider provider = new FailingProvider("testErrorWithAbort1", "error",
                 new RuntimeException("failed"));
         provider.setTaskGranularity(TaskGranularity.COARSE);
         dataProviderLocator.register(provider);
-        dataProviderLocator.register(new ScalarProvider("one",
+        dataProviderLocator.register(new ScalarProvider("testErrorWithAbort2",
                 new String[] { "query" }, new String[] {}, "lookupResults"));
-        dataProviderLocator.register(new ScalarProvider("two",
+        dataProviderLocator.register(new ScalarProvider("testErrorWithAbort3",
                 new String[] { "lookupResults" }, new String[] {},
                 "detailsData"));
 
@@ -545,8 +546,8 @@ public class DataProvidersImplTest {
                 metaFrom("lookupResults", "detailsData", "error-result"),
                 config);
         DataResponse response = dataProviders.produce(request);
-        assertEquals(1, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
+        assertEquals("Error " + response.getErrorsByProviderName(), 1, response
+                .getErrorsByProviderName().size());
     }
 
     static Metadata metaFrom(String... args) {

@@ -35,32 +35,34 @@ public class OrderMarshaller implements DataRowSetMarshaller<Order> {
     private static MetaField fillPrice = MetaFieldFactory.create(
             "order.fillPrice", MetaFieldType.SCALAR_DECIMAL);
     private static MetaField fillQuantity = MetaFieldFactory.create(
-            "forder.illQuantity", MetaFieldType.SCALAR_DECIMAL);
+            "forder.fillQuantity", MetaFieldType.SCALAR_DECIMAL);
     private static MetaField orderLegs = MetaFieldFactory.create(
-            "order.orderLegs", MetaFieldType.VECTOR_OBJECT);
+            "order.orderLegs", MetaFieldType.ROWSET);
     private static Metadata responseMeta = Metadata.from(orderId, accountId,
             date, fillDate, marketSession, symbol, exchange, status, priceType,
             price, quantity, fillPrice, fillQuantity, orderLegs);
+    private static final OrderLegMarshaller orderLegMarshaller = new OrderLegMarshaller();
 
     @Override
     public DataRowSet marshal(Order order) {
         DataRowSet rowset = new DataRowSet(responseMeta);
         rowset.addValueAtRow(orderId, order.getId(), 0);
         rowset.addValueAtRow(accountId, order.getAccount().getId(), 0);
-        rowset.addValueAtRow(marketSession, order.getMarketSession(), 0);
+        rowset.addValueAtRow(marketSession, order.getMarketSession().name(), 0);
         rowset.addValueAtRow(symbol, order.getSecurity().getSymbol(), 0);
         rowset.addValueAtRow(exchange, order.getExchange(), 0);
         rowset.addValueAtRow(status, order.getStatus(), 0);
-        rowset.addValueAtRow(priceType, order.getPriceType(), 0);
+        rowset.addValueAtRow(priceType, order.getPriceType().name(), 0);
         rowset.addValueAtRow(price, order.getPrice(), 0);
         rowset.addValueAtRow(quantity, order.getQuantity(), 0);
-        rowset.addValueAtRow(orderLegs, order.getOrderLegs(), 0);
         rowset.addValueAtRow(date, order.getDate(), 0);
         if (order.getStatus() == OrderStatus.FILLED) {
             rowset.addValueAtRow(fillDate, order.getFillDate(), 0);
             rowset.addValueAtRow(fillPrice, order.getFillPrice(), 0);
             rowset.addValueAtRow(fillQuantity, order.getFillQuantity(), 0);
         }
+        rowset.addValueAtRow(orderLegs,
+                orderLegMarshaller.marshal(order.getOrderLegs()), 0);
         return rowset;
     }
 

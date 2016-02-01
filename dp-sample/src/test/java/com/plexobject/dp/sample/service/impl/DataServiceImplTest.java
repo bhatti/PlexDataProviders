@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.plexobject.domain.Configuration;
 import com.plexobject.domain.Constants;
 import com.plexobject.dp.domain.DataRow;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.MetaFieldType;
@@ -32,6 +33,8 @@ import com.plexobject.dp.json.DataProviderDeserializer;
 import com.plexobject.dp.json.DataProviderSerializer;
 import com.plexobject.dp.json.DataRowDeserializer;
 import com.plexobject.dp.json.DataRowSerializer;
+import com.plexobject.dp.json.DataRowSetDeserializer;
+import com.plexobject.dp.json.DataRowSetSerializer;
 import com.plexobject.dp.json.MetadataDeserializer;
 import com.plexobject.dp.json.MetadataSerializer;
 import com.plexobject.dp.provider.DataProvider;
@@ -62,7 +65,7 @@ public class DataServiceImplTest {
         Configuration config = new Configuration(props);
         if (true || config.getBoolean("log")) {
             BasicConfigurator.configure();
-            LogManager.getRootLogger().setLevel(Level.INFO);
+            LogManager.getRootLogger().setLevel(Level.WARN);
         }
         DataFactory.addData();
         serviceRegistry = new ServiceRegistry(config);
@@ -98,17 +101,23 @@ public class DataServiceImplTest {
                             SimpleModule module = new SimpleModule();
                             module.addSerializer(DataRow.class,
                                     new DataRowSerializer(DataRow.class));
+                            module.addSerializer(DataRowSet.class,
+                                    new DataRowSetSerializer(DataRowSet.class));
                             module.addSerializer(Metadata.class,
                                     new MetadataSerializer(Metadata.class));
                             module.addSerializer(DataProvider.class,
                                     new DataProviderSerializer(
                                             DataProvider.class));
+                            //
                             module.addDeserializer(DataRow.class,
                                     new DataRowDeserializer());
+                            module.addDeserializer(DataRowSet.class,
+                                    new DataRowSetDeserializer());
                             module.addDeserializer(Metadata.class,
                                     new MetadataDeserializer());
                             module.addDeserializer(DataProvider.class,
                                     new DataProviderDeserializer(null));
+                            //
                             mapper.registerModule(module);
                         }
                     }
@@ -126,12 +135,14 @@ public class DataServiceImplTest {
     public void testGetSymbols() throws Throwable {
         String jsonResp = httpGet("http://localhost:" + DEFAULT_PORT
                 + "/data?responseFields=symbol");
+        System.out.println(jsonResp);
         QueryResponse response = decode(jsonResp);
-        assertTrue(response.getQueryResponse().getProviders().contains(
-                "SymbolsProvider"));
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("SymbolsProvider"));
 
         assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
-        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
     }
 
     @Test
@@ -141,15 +152,17 @@ public class DataServiceImplTest {
                 + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
         QueryResponse response = decode(jsonResp);
         assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
-        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
-        assertTrue(response.getQueryResponse().getProviders().contains(
-                "SymbolSearchProvider"));
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("SymbolSearchProvider"));
         MetaField symbol = MetaFieldFactory.create("symbol",
                 MetaFieldType.SCALAR_TEXT);
         MetaField underlyingSymbol = MetaFieldFactory.create(
                 "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
 
-        for (int i = 0; i < response.getQueryResponse().getResponseFields().size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+                .size(); i++) {
             assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(symbol, i).contains("G"));
             assertTrue(response.getQueryResponse().getResponseFields()
@@ -164,15 +177,17 @@ public class DataServiceImplTest {
                 + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
         QueryResponse response = decode(jsonResp);
         assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
-        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
-        assertTrue(response.getQueryResponse().getProviders().contains(
-                "SymbolSearchProvider"));
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("SymbolSearchProvider"));
         MetaField symbol = MetaFieldFactory.create("symbol",
                 MetaFieldType.SCALAR_TEXT);
         MetaField underlyingSymbol = MetaFieldFactory.create(
                 "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
 
-        for (int i = 0; i < response.getQueryResponse().getResponseFields().size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+                .size(); i++) {
             assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(symbol, i).contains("G"));
             assertTrue(response.getQueryResponse().getResponseFields()
@@ -190,15 +205,17 @@ public class DataServiceImplTest {
         // response.queryResponse.getResponseFields());
 
         assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
-        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
-        assertTrue(response.getQueryResponse().getProviders().contains(
-                "SymbolSearchProvider"));
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("SymbolSearchProvider"));
         MetaField symbol = MetaFieldFactory.create("symbol",
                 MetaFieldType.SCALAR_TEXT);
         MetaField underlyingSymbol = MetaFieldFactory.create(
                 "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
 
-        for (int i = 0; i < response.getQueryResponse().getResponseFields().size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+                .size(); i++) {
             assertTrue(response.getQueryResponse().getResponseFields()
                     .getValueAsText(symbol, i).contains("G"));
             assertTrue(response.getQueryResponse().getResponseFields()
@@ -211,11 +228,12 @@ public class DataServiceImplTest {
         String jsonResp = httpGet("http://localhost:" + DEFAULT_PORT
                 + "/data?responseFields=exchange,underlyingSymbol&symbol=F");
         QueryResponse response = decode(jsonResp);
-        assertTrue(response.getQueryResponse().getProviders().contains(
-                "SecuritiesBySymbolsProvider"));
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("SecuritiesBySymbolsProvider"));
 
         assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
-        assertEquals(0, response.getQueryResponse().getErrorsByProviderName().size());
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
         MetaField symbol = MetaFieldFactory.create("symbol",
                 MetaFieldType.SCALAR_TEXT);
         MetaField underlyingSymbol = MetaFieldFactory.create(

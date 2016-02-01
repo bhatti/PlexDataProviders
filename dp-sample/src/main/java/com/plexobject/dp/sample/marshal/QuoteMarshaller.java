@@ -26,16 +26,18 @@ public class QuoteMarshaller implements DataRowSetMarshaller<Quote> {
     private static MetaField volume = MetaFieldFactory.create("quote.volume",
             MetaFieldType.SCALAR_DECIMAL);
     private static MetaField sales = MetaFieldFactory.create("quote.sales",
-            MetaFieldType.VECTOR_OBJECT);
+            MetaFieldType.ROWSET);
     private static Metadata responseMeta = Metadata.from(symbol, marketSession,
             bidPrice, askPrice, closePrice, tradePrice, markPrice, volume,
             sales);
+
+    private static final TimeOfSalesMarshaller TimeOfSalesMarshaller = new TimeOfSalesMarshaller();
 
     @Override
     public DataRowSet marshal(Quote quote) {
         DataRowSet rowset = new DataRowSet(responseMeta);
         rowset.addValueAtRow(symbol, quote.getSecurity().getSymbol(), 0);
-        rowset.addValueAtRow(marketSession, quote.getMarketSession(), 0);
+        rowset.addValueAtRow(marketSession, quote.getMarketSession().name(), 0);
         rowset.addValueAtRow(bidPrice, quote.getBidPrice(), 0);
         rowset.addValueAtRow(askPrice, quote.getAskPrice(), 0);
         rowset.addValueAtRow(closePrice, quote.getClosePrice(), 0);
@@ -43,7 +45,8 @@ public class QuoteMarshaller implements DataRowSetMarshaller<Quote> {
         rowset.addValueAtRow(tradePrice, quote.getClosePrice(), 0);
         rowset.addValueAtRow(markPrice, quote.getClosePrice(), 0);
         rowset.addValueAtRow(volume, quote.getVolume(), 0);
-        rowset.addValueAtRow(sales, quote.getSales(), 0);
+        rowset.addValueAtRow(sales,
+                TimeOfSalesMarshaller.marshal(quote.getSales()), 0);
         return rowset;
     }
 

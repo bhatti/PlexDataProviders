@@ -11,11 +11,14 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.plexobject.dp.domain.DataRequest;
 import com.plexobject.dp.domain.DataResponse;
 import com.plexobject.dp.domain.DataRow;
+import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.json.DataProviderDeserializer;
 import com.plexobject.dp.json.DataProviderSerializer;
 import com.plexobject.dp.json.DataRowDeserializer;
 import com.plexobject.dp.json.DataRowSerializer;
+import com.plexobject.dp.json.DataRowSetDeserializer;
+import com.plexobject.dp.json.DataRowSetSerializer;
 import com.plexobject.dp.json.MetadataDeserializer;
 import com.plexobject.dp.json.MetadataSerializer;
 import com.plexobject.dp.provider.DataProvider;
@@ -71,6 +74,8 @@ public class DataServiceImpl implements DataService {
                             SimpleModule module = new SimpleModule();
                             module.addSerializer(DataRow.class,
                                     new DataRowSerializer(DataRow.class));
+                            module.addSerializer(DataRowSet.class,
+                                    new DataRowSetSerializer(DataRowSet.class));
                             module.addSerializer(Metadata.class,
                                     new MetadataSerializer(Metadata.class));
                             module.addSerializer(DataProvider.class,
@@ -79,6 +84,8 @@ public class DataServiceImpl implements DataService {
                             //
                             module.addDeserializer(DataRow.class,
                                     new DataRowDeserializer());
+                            module.addDeserializer(DataRowSet.class,
+                                    new DataRowSetDeserializer());
                             module.addDeserializer(Metadata.class,
                                     new MetadataDeserializer());
                             module.addDeserializer(DataProvider.class,

@@ -127,7 +127,7 @@ public class DataRowSetTest {
     public void testGetValueAsBinary() {
         String hello = "hello";
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.SCALAR_TEXT));
+                MetaFieldType.BINARY));
         DataRowSet rowset = new DataRowSet(metaFields);
         rowset.addValueAtRow(MetaFieldFactory.lookup("object"),
                 hello.getBytes(), 0);
@@ -202,7 +202,7 @@ public class DataRowSetTest {
     public void testGetValueAsTextVector() {
         String[] values = { "one", "two" };
         metaFields.addMetaField(MetaFieldFactory.create("object",
-                MetaFieldType.VECTOR_DATE));
+                MetaFieldType.VECTOR_TEXT));
         DataRowSet rowset = new DataRowSet(metaFields);
         rowset.addValueAtRow(MetaFieldFactory.lookup("object"), values, 0);
         assertArrayEquals(values, rowset.getValueAsTextVector(

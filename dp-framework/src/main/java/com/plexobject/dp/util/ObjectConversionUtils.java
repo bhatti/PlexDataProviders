@@ -184,20 +184,4 @@ public class ObjectConversionUtils {
                 + ", value " + value);
     }
 
-    public static Object[] getAsObjectVector(Object value) {
-        if (value instanceof Collection) {
-            Collection<?> collection = (Collection<?>) (value);
-            Object[] values = new Object[collection.size()];
-            int i = 0;
-            for (Object obj : collection) {
-                values[i++] = ObjectConversionUtils.getAsText(obj);
-            }
-            return values;
-        } else if (value instanceof Object[]) {
-            return (Object[]) value;
-        }
-        throw new IllegalArgumentException("unexpected type found "
-                + (value != null ? value.getClass().getSimpleName() : "null")
-                + ", value " + value);
-    }
 }

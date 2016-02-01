@@ -42,25 +42,6 @@ public class ObjectConversionUtilsTest {
         ObjectConversionUtils.getAsTextVector(null);
     }
 
-    @Test
-    public void testGetAsObjectVector() {
-        Object reflectionArr = Array.newInstance(String.class, 3);
-        Array.set(reflectionArr, 0, "one");
-        Array.set(reflectionArr, 1, "two");
-        Array.set(reflectionArr, 2, "three");
-        String[] arr = { "one", "two", "three" };
-        assertArrayEquals(arr,
-                ObjectConversionUtils.getAsObjectVector(Arrays.asList(arr)));
-        assertArrayEquals(arr, ObjectConversionUtils.getAsObjectVector(arr));
-        assertArrayEquals(arr,
-                ObjectConversionUtils.getAsObjectVector(reflectionArr));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetAsObjectArrayNull() {
-        ObjectConversionUtils.getAsObjectVector(null);
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testGetAsTextArrayBad() {
         ObjectConversionUtils.getAsTextVector(1);

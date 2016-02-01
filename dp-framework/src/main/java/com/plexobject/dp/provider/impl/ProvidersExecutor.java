@@ -74,7 +74,8 @@ public class ProvidersExecutor {
             if (providers.size() > 0 && executedProviders.size() == 0) {
                 throw new IllegalStateException("Providers " + providers
                         + " cannot be fulfilled\n\trequestFields "
-                        + requestFields + "\n\tresponseFields" + responseFields);
+                        + requestFields + "\n\tresponseFields" + responseFields
+                        + ", providerErrors " + providerErrors);
             }
             //
             // abort if configuration is set to abort upon partial failure

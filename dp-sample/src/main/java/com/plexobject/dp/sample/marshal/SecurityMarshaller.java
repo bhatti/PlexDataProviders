@@ -1,5 +1,7 @@
 package com.plexobject.dp.sample.marshal;
 
+import java.util.Collection;
+
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
@@ -24,7 +26,7 @@ public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
     private static MetaField type = MetaFieldFactory.create("security.type",
             MetaFieldType.SCALAR_TEXT);
     private static MetaField beta = MetaFieldFactory.create("beta",
-            MetaFieldType.SCALAR_OBJECT);
+            MetaFieldType.ROWSET);
 
     private static MetaField dividendRate = MetaFieldFactory.create(
             "security.dividendRate", MetaFieldType.SCALAR_DECIMAL);
@@ -34,7 +36,7 @@ public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
             "security.exDividendDate", MetaFieldType.SCALAR_DATE);
 
     private static MetaField optionRoot = MetaFieldFactory.create(
-            "security.optionRoot", MetaFieldType.SCALAR_OBJECT);
+            "security.optionRoot", MetaFieldType.ROWSET);
     private static MetaField optionType = MetaFieldFactory.create(
             "security.optionType", MetaFieldType.SCALAR_TEXT);
     private static MetaField strikePrice = MetaFieldFactory.create(
@@ -46,32 +48,52 @@ public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
             symbol, underlyingSymbol, description, type, beta, dividendRate,
             dividendInterval, exDividendDate, optionRoot, optionType,
             strikePrice, expirationDate);
+    private static final BetaMarshaller betaMarshaller = new BetaMarshaller();
+    private static final OptionRootMarshaller optionRootMarshaller = new OptionRootMarshaller();
 
     @Override
     public DataRowSet marshal(Security security) {
         DataRowSet rowset = new DataRowSet(responseMeta);
-        rowset.addValueAtRow(securityId, security.getId(), 0);
-        rowset.addValueAtRow(exchange, security.getExchange(), 0);
-        rowset.addValueAtRow(symbol, security.getSymbol(), 0);
-        rowset.addValueAtRow(underlyingSymbol, security.getUnderlyingSymbol(),
-                0);
-        rowset.addValueAtRow(description, security.getDescription(), 0);
-        rowset.addValueAtRow(type, security.getType(), 0);
-        rowset.addValueAtRow(beta, security.getBeta(), 0);
-        if (security instanceof Equity) {
-            Equity equity = (Equity) security;
-            rowset.addValueAtRow(dividendRate, equity.getDividendRate(), 0);
-            rowset.addValueAtRow(dividendInterval,
-                    equity.getDividendInterval(), 0);
-            rowset.addValueAtRow(exDividendDate, equity.getExDividendDate(), 0);
-        } else if (security instanceof Option) {
-            Option option = (Option) security;
-            rowset.addValueAtRow(optionRoot, option.getOptionRoot(), 0);
-            rowset.addValueAtRow(optionType, option.getOptionType(), 0);
-            rowset.addValueAtRow(strikePrice, option.getStrikePrice(), 0);
-            rowset.addValueAtRow(expirationDate, option.getExpirationDate(), 0);
+        marshal(rowset, security, 0);
+        return rowset;
+    }
+
+    public DataRowSet marshal(Collection<Security> securities) {
+        DataRowSet rowset = new DataRowSet(responseMeta);
+        for (Security security : securities) {
+            marshal(rowset, security, rowset.size());
         }
         return rowset;
+    }
+
+    private void marshal(DataRowSet rowset, Security security, int rowNum) {
+        rowset.addValueAtRow(securityId, security.getId(), rowNum);
+        rowset.addValueAtRow(exchange, security.getExchange(), rowNum);
+        rowset.addValueAtRow(symbol, security.getSymbol(), rowNum);
+        rowset.addValueAtRow(underlyingSymbol, security.getUnderlyingSymbol(),
+                rowNum);
+        rowset.addValueAtRow(description, security.getDescription(), rowNum);
+        rowset.addValueAtRow(type, security.getType().name(), rowNum);
+        rowset.addValueAtRow(beta, betaMarshaller.marshal(security.getBeta()),
+                rowNum);
+        if (security instanceof Equity) {
+            Equity equity = (Equity) security;
+            rowset.addValueAtRow(dividendRate, equity.getDividendRate(), rowNum);
+            rowset.addValueAtRow(dividendInterval,
+                    equity.getDividendInterval(), rowNum);
+            rowset.addValueAtRow(exDividendDate, equity.getExDividendDate(),
+                    rowNum);
+        } else if (security instanceof Option) {
+            Option option = (Option) security;
+            rowset.addValueAtRow(optionRoot,
+                    optionRootMarshaller.marshal(option.getOptionRoot()),
+                    rowNum);
+            rowset.addValueAtRow(optionType, option.getOptionType().name(),
+                    rowNum);
+            rowset.addValueAtRow(strikePrice, option.getStrikePrice(), rowNum);
+            rowset.addValueAtRow(expirationDate, option.getExpirationDate(),
+                    rowNum);
+        }
     }
 
     @Override

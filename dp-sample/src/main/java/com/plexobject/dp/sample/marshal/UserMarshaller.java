@@ -16,15 +16,17 @@ public class UserMarshaller implements DataRowSetMarshaller<User> {
     private static MetaField email = MetaFieldFactory.create("user.email",
             MetaFieldType.SCALAR_DECIMAL);
     private static MetaField address = MetaFieldFactory.create("user.address",
-            MetaFieldType.SCALAR_OBJECT);
+            MetaFieldType.ROWSET);
     private static MetaField dateOfBirth = MetaFieldFactory.create(
             "user.dateOfBirth", MetaFieldType.SCALAR_DECIMAL);
     private static MetaField roles = MetaFieldFactory.create("user.roles",
             MetaFieldType.SCALAR_DECIMAL);
     private static MetaField portfolio = MetaFieldFactory.create(
-            "user.portfolio", MetaFieldType.SCALAR_OBJECT);
+            "user.portfolio", MetaFieldType.ROWSET);
     private static Metadata responseMeta = Metadata.from(userId, name, email,
             address, dateOfBirth, roles, portfolio);
+    private static AddressMarshaller addressMarshaller = new AddressMarshaller();
+    private static final PortfolioMarshaller portfolioMarshaller = new PortfolioMarshaller();
 
     @Override
     public DataRowSet marshal(User user) {
@@ -32,10 +34,12 @@ public class UserMarshaller implements DataRowSetMarshaller<User> {
         rowset.addValueAtRow(userId, user.getId(), 0);
         rowset.addValueAtRow(name, user.getName(), 0);
         rowset.addValueAtRow(email, user.getEmail(), 0);
-        rowset.addValueAtRow(address, user.getAddress(), 0);
+        rowset.addValueAtRow(address,
+                addressMarshaller.marshal(user.getAddress()), 0);
         rowset.addValueAtRow(dateOfBirth, user.getDateOfBirth(), 0);
         rowset.addValueAtRow(roles, user.getRoles(), 0);
-        rowset.addValueAtRow(portfolio, user.getPortfolio(), 0);
+        rowset.addValueAtRow(portfolio,
+                portfolioMarshaller.marshal(user.getPortfolio()), 0);
         return rowset;
     }
 

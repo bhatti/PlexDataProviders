@@ -1,5 +1,6 @@
 package com.plexobject.dp.domain;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -26,6 +27,9 @@ public class DataRow {
         if (value == null) {
             value = NullObject.instance;
             added = false;
+        } else if (!isValidValue(metaField, value)) {
+            throw new IllegalArgumentException("The value " + value + " for "
+                    + metaField.getName() + " doesn't match type " + metaField);
         }
         if (!fields.containsKey(metaField)) {
             fields.put(metaField, value);
@@ -79,7 +83,12 @@ public class DataRow {
 
     public long getValueAsLong(MetaField field) {
         Object value = getValue(field);
-        return ObjectConversionUtils.getAsLong(value);
+        try {
+            return ObjectConversionUtils.getAsLong(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Failed to parse long for "
+                    + field + ", value " + value);
+        }
     }
 
     public boolean getValueAsBoolean(MetaField field) {
@@ -89,7 +98,12 @@ public class DataRow {
 
     public double getValueAsDecimal(MetaField field) {
         Object value = getValue(field);
-        return ObjectConversionUtils.getAsDecimal(value);
+        try {
+            return ObjectConversionUtils.getAsDecimal(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Failed to parse decimal for "
+                    + field + ", value " + value);
+        }
     }
 
     public byte[] getValueAsBinary(MetaField field) {
@@ -148,4 +162,42 @@ public class DataRow {
         return "[fields=" + fields + "]";
     }
 
+    public static boolean isValidValue(MetaField metaField, Object value) {
+        if (value == null || value instanceof InitialValue
+                || value instanceof NullObject || value instanceof Exception) {
+            return true;
+        }
+        switch (metaField.getType()) {
+        case SCALAR_TEXT:
+            return value instanceof String;
+        case SCALAR_INTEGER:
+            return value instanceof Number || value instanceof String;
+        case SCALAR_DECIMAL:
+            return value instanceof Number || value instanceof String;
+        case SCALAR_DATE:
+            return value instanceof Number || value instanceof Date;
+        case SCALAR_BOOLEAN:
+            return value instanceof Number || value instanceof String
+                    || value instanceof Boolean;
+        case VECTOR_TEXT:
+            return value instanceof String[] || value instanceof Collection;
+        case VECTOR_INTEGER:
+            return value instanceof long[] || value instanceof Long[]
+                    || value instanceof Collection;
+        case VECTOR_DECIMAL:
+            return value instanceof double[] || value instanceof Double[]
+                    || value instanceof Collection;
+        case VECTOR_DATE:
+            return value instanceof Date[] || value instanceof Collection;
+        case VECTOR_BOOLEAN:
+            return value instanceof boolean[] || value instanceof Boolean[]
+                    || value instanceof Collection;
+        case BINARY:
+            return value instanceof byte[];
+        case ROWSET:
+            return value instanceof DataRowSet;
+        default:
+            return false;
+        }
+    }
 }

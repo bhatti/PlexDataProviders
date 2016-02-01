@@ -1,5 +1,7 @@
 package com.plexobject.dp.sample.marshal;
 
+import java.util.Collection;
+
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
@@ -25,12 +27,24 @@ public class PositionMarshaller implements DataRowSetMarshaller<Position> {
     @Override
     public DataRowSet marshal(Position position) {
         DataRowSet rowset = new DataRowSet(responseMeta);
-        rowset.addValueAtRow(positionId, position.getId(), 0);
-        rowset.addValueAtRow(accountId, position.getAccount().getId(), 0);
-        rowset.addValueAtRow(symbol, position.getSecurity().getSymbol(), 0);
-        rowset.addValueAtRow(price, position.getPrice(), 0);
-        rowset.addValueAtRow(quantity, position.getQuantity(), 0);
+        marshal(rowset, position, 0);
         return rowset;
+    }
+
+    public DataRowSet marshal(Collection<Position> positions) {
+        DataRowSet rowset = new DataRowSet(responseMeta);
+        for (Position position : positions) {
+            marshal(rowset, position, rowset.size());
+        }
+        return rowset;
+    }
+
+    private void marshal(DataRowSet rowset, Position position, int rowNum) {
+        rowset.addValueAtRow(positionId, position.getId(), rowNum);
+        rowset.addValueAtRow(accountId, position.getAccount().getId(), rowNum);
+        rowset.addValueAtRow(symbol, position.getSecurity().getSymbol(), rowNum);
+        rowset.addValueAtRow(price, position.getPrice(), rowNum);
+        rowset.addValueAtRow(quantity, position.getQuantity(), rowNum);
     }
 
     @Override

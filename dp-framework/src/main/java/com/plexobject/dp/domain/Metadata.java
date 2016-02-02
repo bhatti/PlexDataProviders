@@ -27,7 +27,7 @@ public class Metadata {
         }
     }
 
-    public synchronized void addMetadata(Metadata metadata) {
+    public synchronized void merge(Metadata metadata) {
         for (MetaField metaField : metadata.getMetaFields()) {
             addMetaField(metaField);
         }
@@ -83,6 +83,32 @@ public class Metadata {
 
     public synchronized Collection<MetaField> getMetaFields() {
         return metaFields;
+    }
+
+    public synchronized Collection<MetaField> getMetaFieldsByCategories(
+            String[] categories) {
+        Set<MetaField> matchingFields = new HashSet<MetaField>();
+        for (MetaField field : metaFields) {
+            for (String category : categories) {
+                if (field.getCategory() != null
+                        && field.getCategory().equals(category)) {
+                    matchingFields.add(field);
+                }
+            }
+        }
+        return matchingFields;
+    }
+
+    public synchronized boolean hasMetaFieldsByCategories(String[] categories) {
+        for (MetaField field : metaFields) {
+            for (String category : categories) {
+                if (field.getCategory() != null
+                        && field.getCategory().equals(category)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public synchronized int size() {

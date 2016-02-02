@@ -33,6 +33,8 @@ import com.plexobject.dp.provider.DataProviderLocator;
 import com.plexobject.dp.provider.TaskGranularity;
 
 public class DataProvidersImplTest {
+    private static final String CATEGORY_NAME = "Test";
+
     static class TimeoutProvider extends BaseProvider {
         private long sleepMillis;
 
@@ -105,10 +107,12 @@ public class DataProvidersImplTest {
                     }
                 }
             }
-            int maxOutputRows = requestRowSet.hasFieldValue(
-                    MetaFieldFactory.createInteger("maxOutputRows"), 0) ? (int) requestRowSet
-                    .getValueAsLong(
-                            MetaFieldFactory.createInteger("maxOutputRows"), 0)
+            int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
+                    .createInteger("maxOutputRows",
+                            DataConfiguration.class.getSimpleName(), false), 0) ? (int) requestRowSet
+                    .getValueAsLong(MetaFieldFactory.createInteger(
+                            "maxOutputRows",
+                            DataConfiguration.class.getSimpleName(), false), 0)
                     : requestRowSet.size();
             for (int i = 0; i < maxOutputRows; i++) {
                 Collection<MetaField> responseFields = new ArrayList<>(
@@ -149,10 +153,12 @@ public class DataProvidersImplTest {
                     requestRowSet.getValueAsTextVector(metaField, i);
                 }
             }
-            int maxOutputRows = requestRowSet.hasFieldValue(
-                    MetaFieldFactory.createInteger("maxOutputRows"), 0) ? (int) requestRowSet
-                    .getValueAsLong(
-                            MetaFieldFactory.createInteger("maxOutputRows"), 0)
+            int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
+                    .createInteger("maxOutputRows",
+                            DataConfiguration.class.getSimpleName(), false), 0) ? (int) requestRowSet
+                    .getValueAsLong(MetaFieldFactory.createInteger(
+                            "maxOutputRows",
+                            DataConfiguration.class.getSimpleName(), false), 0)
                     : requestRowSet.size();
             for (int i = 0; i < maxOutputRows; i++) {
                 Collection<MetaField> responseFields = new ArrayList<>(
@@ -366,7 +372,8 @@ public class DataProvidersImplTest {
         DataRequest request = new DataRequest(rowsetFrom("q"), metaFrom(
                 "symbol", "bid", "mark"), config);
         request.getParameters().addValueAtRow(
-                MetaFieldFactory.createInteger("maxOutputRows"), 10, 0);
+                MetaFieldFactory.createInteger("maxOutputRows",
+                        DataConfiguration.class.getSimpleName(), false), 10, 0);
 
         DataResponse response = dataProviders.produce(request);
         assertEquals(0, response.getErrorsByProviderName().size());
@@ -484,6 +491,7 @@ public class DataProvidersImplTest {
         dataProviders.produce(request);
     }
 
+    
     @Test(expected = DataProviderException.class)
     public void testTimeoutCoarse() {
         TimeoutProvider provider = new TimeoutProvider(200, "timeout");
@@ -549,7 +557,8 @@ public class DataProvidersImplTest {
     static Metadata metaFrom(String... args) {
         Metadata metaFields = new Metadata();
         for (String arg : args) {
-            metaFields.addMetaField(MetaFieldFactory.createText(arg));
+            metaFields.addMetaField(MetaFieldFactory.createText(arg,
+                    CATEGORY_NAME, false));
         }
         return metaFields;
     }
@@ -557,7 +566,8 @@ public class DataProvidersImplTest {
     static Metadata metaArrayFrom(String... args) {
         Metadata metaFields = new Metadata();
         for (String arg : args) {
-            metaFields.addMetaField(MetaFieldFactory.createVectorText(arg));
+            metaFields.addMetaField(MetaFieldFactory.createVectorText(arg,
+                    CATEGORY_NAME, false));
         }
         return metaFields;
     }
@@ -567,7 +577,9 @@ public class DataProvidersImplTest {
         DataRowSet rowset = new DataRowSet(metaFields);
         DataRow row = new DataRow();
         for (String arg : args) {
-            row.addField(MetaFieldFactory.createText(arg), arg + "-input");
+            row.addField(
+                    MetaFieldFactory.createText(arg, CATEGORY_NAME, false), arg
+                            + "-input");
         }
         rowset.addRow(row);
         return rowset;
@@ -577,9 +589,8 @@ public class DataProvidersImplTest {
         Metadata metaFields = metaArrayFrom(args);
         DataRowSet rowset = new DataRowSet(metaFields);
         for (int i = 0; i < args.length; i++) {
-            rowset.addValueAtRow(
-                    MetaFieldFactory.createVectorText(args[i]),
-                    Collections.singleton(args[i]), 0);
+            rowset.addValueAtRow(MetaFieldFactory.createVectorText(args[i],
+                    CATEGORY_NAME, false), Collections.singleton(args[i]), 0);
         }
         return rowset;
     }

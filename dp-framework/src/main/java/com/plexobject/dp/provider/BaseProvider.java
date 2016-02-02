@@ -9,11 +9,11 @@ import com.plexobject.dp.domain.Metadata;
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public abstract class BaseProvider implements DataProvider {
     private final String name;
-    private transient final Metadata mandatoryRequestFields;
-    private transient final Metadata optionalRequestFields;
-    private transient final Metadata responseFields;
-    private transient TaskGranularity taskGranularity = TaskGranularity.COARSE;
-    private transient int rank;
+    private final Metadata mandatoryRequestFields;
+    private final Metadata optionalRequestFields;
+    private final Metadata responseFields;
+    private TaskGranularity taskGranularity = TaskGranularity.COARSE;
+    private int rank;
 
     public BaseProvider(String name, Metadata mandatoryRequestFields,
             Metadata optionalRequestFields, Metadata responseFields) {

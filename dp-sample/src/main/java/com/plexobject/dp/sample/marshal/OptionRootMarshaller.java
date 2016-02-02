@@ -8,17 +8,18 @@ import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.marshal.DataRowSetMarshaller;
+import com.plexobject.dp.sample.domain.Option;
 import com.plexobject.dp.sample.domain.OptionRoot;
 
 public class OptionRootMarshaller implements DataRowSetMarshaller<OptionRoot> {
-    private static MetaField opraRoot = MetaFieldFactory.create("opraRoot",
+    private static MetaField opraRoot = MetaFieldFactory.create("opraRoot",Option.class.getSimpleName(),
             MetaFieldType.SCALAR_TEXT, true);
     private static MetaField underlyingSymbol = MetaFieldFactory
-            .createText("optionRoot.underlyingSymbol");
+            .createText("optionRoot.underlyingSymbol", Option.class.getSimpleName(), false);
     private static MetaField multiplier = MetaFieldFactory
-            .createDecimal("optionRoot.multiplier");
+            .createDecimal("optionRoot.multiplier", Option.class.getSimpleName(), false);
     private static MetaField excerciseStyle = MetaFieldFactory
-            .createText("optionRoot.excerciseStyle");
+            .createText("optionRoot.excerciseStyle", Option.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(opraRoot,
             underlyingSymbol, excerciseStyle, multiplier);
 

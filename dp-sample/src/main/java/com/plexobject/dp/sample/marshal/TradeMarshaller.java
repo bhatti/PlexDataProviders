@@ -11,13 +11,14 @@ import com.plexobject.dp.sample.domain.SharedMeta;
 import com.plexobject.dp.sample.domain.Trade;
 
 public class TradeMarshaller implements DataRowSetMarshaller<Trade> {
-    private static MetaField tradeId = MetaFieldFactory
-            .createInteger("tradeId");
-    private static MetaField date = MetaFieldFactory.createDate("trade.date");
-    private static MetaField price = MetaFieldFactory
-            .createDecimal("trade.price");
-    private static MetaField quantity = MetaFieldFactory
-            .createDecimal("trade.quantity");
+    private static MetaField tradeId = MetaFieldFactory.createInteger(
+            "tradeId", Trade.class.getSimpleName(), false);
+    private static MetaField date = MetaFieldFactory.createDate("trade.date",
+            Trade.class.getSimpleName(), false);
+    private static MetaField price = MetaFieldFactory.createDecimal(
+            "trade.price", Trade.class.getSimpleName(), false);
+    private static MetaField quantity = MetaFieldFactory.createDecimal(
+            "trade.quantity", Trade.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(tradeId, date,
             SharedMeta.symbol, SharedMeta.exchange, price, quantity);
 
@@ -38,7 +39,8 @@ public class TradeMarshaller implements DataRowSetMarshaller<Trade> {
 
     private void marshal(Trade trade, DataRowSet rowset, int rowNum) {
         rowset.addValueAtRow(tradeId, trade.getId(), rowNum);
-        rowset.addValueAtRow(SharedMeta.symbol, trade.getSecurity().getSymbol(), rowNum);
+        rowset.addValueAtRow(SharedMeta.symbol,
+                trade.getSecurity().getSymbol(), rowNum);
         rowset.addValueAtRow(SharedMeta.exchange, trade.getExchange(), rowNum);
         rowset.addValueAtRow(price, trade.getPrice(), rowNum);
         rowset.addValueAtRow(quantity, trade.getQuantity(), rowNum);

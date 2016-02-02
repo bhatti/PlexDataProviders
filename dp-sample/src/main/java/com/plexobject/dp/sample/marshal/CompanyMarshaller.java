@@ -9,9 +9,9 @@ import com.plexobject.dp.sample.domain.Company;
 import com.plexobject.dp.sample.domain.SharedMeta;
 
 public class CompanyMarshaller implements DataRowSetMarshaller<Company> {
-    private static MetaField name = MetaFieldFactory.createText("company.name");
+    private static MetaField name = MetaFieldFactory.createText("company.name", Company.class.getSimpleName(), false);
     private static MetaField address = MetaFieldFactory
-            .createRowset("company.address");
+            .createRowset("company.address", Company.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(SharedMeta.symbol,
             name, SharedMeta.exchange, address);
     private static AddressMarshaller addressMarshaller = new AddressMarshaller();

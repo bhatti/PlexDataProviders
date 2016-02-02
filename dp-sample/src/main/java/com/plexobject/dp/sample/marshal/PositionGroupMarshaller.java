@@ -6,16 +6,18 @@ import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.marshal.DataRowSetMarshaller;
+import com.plexobject.dp.sample.domain.Position;
 import com.plexobject.dp.sample.domain.PositionGroup;
 
 public class PositionGroupMarshaller implements
         DataRowSetMarshaller<PositionGroup> {
     private static MetaField positionGroupId = MetaFieldFactory.create(
-            "positionGroupId", MetaFieldType.SCALAR_INTEGER, true);
-    private static MetaField name = MetaFieldFactory
-            .createText("positionGroup.name");
-    private static MetaField positions = MetaFieldFactory
-            .createRowset("positionGroup.positions");
+            "positionGroupId", Position.class.getSimpleName(),
+            MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField name = MetaFieldFactory.createText(
+            "positionGroup.name", Position.class.getSimpleName(), false);
+    private static MetaField positions = MetaFieldFactory.createRowset(
+            "positionGroup.positions", Position.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(positionGroupId, name,
             positions);
     private static final PositionMarshaller positionMarshaller = new PositionMarshaller();

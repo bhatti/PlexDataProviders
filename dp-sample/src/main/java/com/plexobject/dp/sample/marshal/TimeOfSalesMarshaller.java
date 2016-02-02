@@ -12,14 +12,15 @@ import com.plexobject.dp.sample.domain.SharedMeta;
 import com.plexobject.dp.sample.domain.TimeOfSales;
 
 public class TimeOfSalesMarshaller implements DataRowSetMarshaller<TimeOfSales> {
-    private static MetaField date = MetaFieldFactory
-            .createDate("timeOfSale.date");
-    private static MetaField price = MetaFieldFactory
-            .createDecimal("timeOfSale.price");
-    private static MetaField volume = MetaFieldFactory
-            .createInteger("timeOfSale.volume");
+    private static MetaField date = MetaFieldFactory.createDate(
+            "timeOfSale.date", TimeOfSales.class.getSimpleName(), false);
+    private static MetaField price = MetaFieldFactory.createDecimal(
+            "timeOfSale.price", TimeOfSales.class.getSimpleName(), false);
+    private static MetaField volume = MetaFieldFactory.createInteger(
+            "timeOfSale.volume", TimeOfSales.class.getSimpleName(), false);
     private static MetaField exchange = MetaFieldFactory.create(
-            "timeOfSale.exchange", MetaFieldType.SCALAR_TEXT, true);
+            "timeOfSale.exchange", TimeOfSales.class.getSimpleName(),
+            MetaFieldType.SCALAR_TEXT, true);
     private static Metadata responseMeta = Metadata.from(volume, exchange,
             date, SharedMeta.symbol, exchange, price);
 

@@ -8,12 +8,12 @@ import com.plexobject.dp.marshal.DataRowSetMarshaller;
 import com.plexobject.dp.sample.domain.Watchlist;
 
 public class WatchlistMarshaller implements DataRowSetMarshaller<Watchlist> {
-    private static MetaField watchlistId = MetaFieldFactory
-            .createInteger("watchlistId");
-    private static MetaField name = MetaFieldFactory
-            .createText("watchlist.name");
-    private static MetaField securities = MetaFieldFactory
-            .createRowset("watchlist.securities");
+    private static MetaField watchlistId = MetaFieldFactory.createInteger(
+            "watchlistId", Watchlist.class.getSimpleName(), false);
+    private static MetaField name = MetaFieldFactory.createText(
+            "watchlist.name", Watchlist.class.getSimpleName(), false);
+    private static MetaField securities = MetaFieldFactory.createRowset(
+            "watchlist.securities", Watchlist.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(watchlistId, name,
             securities);
     private static final SecurityMarshaller securityMarshaller = new SecurityMarshaller();

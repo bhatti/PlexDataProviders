@@ -1,16 +1,15 @@
 package com.plexobject.dp.sample.service;
 
-import java.util.Collection;
-
 import javax.jws.WebService;
+import javax.ws.rs.QueryParam;
 
 import com.plexobject.dp.domain.DataResponse;
-import com.plexobject.dp.provider.DataProvider;
+import com.plexobject.dp.sample.domain.DataInfoResponse;
 import com.plexobject.handler.Request;
 
 @WebService
 public interface DataService {
     DataResponse query(Request request);
 
-    Collection<DataProvider> info();
+    DataInfoResponse info(@QueryParam("category") String category);
 }

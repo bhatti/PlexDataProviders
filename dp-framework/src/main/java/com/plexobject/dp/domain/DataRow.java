@@ -64,8 +64,8 @@ public class DataRow {
         Object value = fields.get(metaField);
         if (value == null || value instanceof NullObject
                 || value instanceof InitialValue) {
-            throw new IllegalStateException("metaField " + metaField
-                    + " doesn't exist");
+            throw new NullPointerException("The value for " + metaField
+                    + " is not found");
         }
         if (value instanceof RuntimeException) {
             throw (RuntimeException) value;

@@ -13,13 +13,13 @@ import com.plexobject.dp.sample.domain.SharedMeta;
 
 public class PositionMarshaller implements DataRowSetMarshaller<Position> {
     private static MetaField positionId = MetaFieldFactory.create("positionId",
-            MetaFieldType.SCALAR_INTEGER, true);
-    private static MetaField price = MetaFieldFactory
-            .createDecimal("position.price");
-    private static MetaField quantity = MetaFieldFactory
-            .createDecimal("position.quantity");
-    private static Metadata responseMeta = Metadata.from(positionId, SharedMeta.accountId,
-            price, quantity, SharedMeta.symbol);
+            Position.class.getSimpleName(), MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField price = MetaFieldFactory.createDecimal(
+            "position.price", Position.class.getSimpleName(), false);
+    private static MetaField quantity = MetaFieldFactory.createDecimal(
+            "position.quantity", Position.class.getSimpleName(), false);
+    private static Metadata responseMeta = Metadata.from(positionId,
+            SharedMeta.accountId, price, quantity, SharedMeta.symbol);
 
     @Override
     public DataRowSet marshal(Position position) {
@@ -38,8 +38,10 @@ public class PositionMarshaller implements DataRowSetMarshaller<Position> {
 
     private void marshal(DataRowSet rowset, Position position, int rowNum) {
         rowset.addValueAtRow(positionId, position.getId(), rowNum);
-        rowset.addValueAtRow(SharedMeta.accountId, position.getAccount().getId(), rowNum);
-        rowset.addValueAtRow(SharedMeta.symbol, position.getSecurity().getSymbol(), rowNum);
+        rowset.addValueAtRow(SharedMeta.accountId, position.getAccount()
+                .getId(), rowNum);
+        rowset.addValueAtRow(SharedMeta.symbol, position.getSecurity()
+                .getSymbol(), rowNum);
         rowset.addValueAtRow(price, position.getPrice(), rowNum);
         rowset.addValueAtRow(quantity, position.getQuantity(), rowNum);
     }

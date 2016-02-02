@@ -11,13 +11,14 @@ import com.plexobject.dp.sample.domain.CompanyEvent;
 public class CompanyEventMarshaller implements
         DataRowSetMarshaller<CompanyEvent> {
     private static MetaField companyEventId = MetaFieldFactory.create(
-            "companyEventId", MetaFieldType.SCALAR_INTEGER, true);
+            "companyEventId", CompanyEvent.class.getSimpleName(),
+            MetaFieldType.SCALAR_INTEGER, true);
     private static MetaField companyEventType = MetaFieldFactory
-            .createText("companyEvent.type");
+            .createText("companyEvent.type", CompanyEvent.class.getSimpleName(), false);
     private static MetaField companyEventName = MetaFieldFactory
-            .createText("companyEvent.name");
+            .createText("companyEvent.name", CompanyEvent.class.getSimpleName(), false);
     private static MetaField companyEventDate = MetaFieldFactory
-            .createDate("companyEvent.date");
+            .createDate("companyEvent.date", CompanyEvent.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(companyEventId,
             companyEventType, companyEventName, companyEventDate);
 

@@ -10,59 +10,59 @@ public class MetaFieldFactory {
         return fieldsCache.get(name);
     }
 
-    public static synchronized MetaField createRowset(final String name) {
-        return create(name, MetaFieldType.ROWSET, false);
+    public static synchronized MetaField createRowset(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.ROWSET, isKeyField);
     }
 
-    public static synchronized MetaField createText(final String name) {
-        return create(name, MetaFieldType.SCALAR_TEXT, false);
+    public static synchronized MetaField createText(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.SCALAR_TEXT, isKeyField);
     }
 
-    public static synchronized MetaField createInteger(final String name) {
-        return create(name, MetaFieldType.SCALAR_INTEGER, false);
+    public static synchronized MetaField createInteger(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.SCALAR_INTEGER, isKeyField);
     }
 
-    public static synchronized MetaField createDecimal(final String name) {
-        return create(name, MetaFieldType.SCALAR_DECIMAL, false);
+    public static synchronized MetaField createDecimal(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.SCALAR_DECIMAL, isKeyField);
     }
 
-    public static synchronized MetaField createDate(final String name) {
-        return create(name, MetaFieldType.SCALAR_DATE, false);
+    public static synchronized MetaField createDate(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.SCALAR_DATE, isKeyField);
     }
 
-    public static synchronized MetaField createBoolean(final String name) {
-        return create(name, MetaFieldType.SCALAR_BOOLEAN, false);
+    public static synchronized MetaField createBoolean(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.SCALAR_BOOLEAN, isKeyField);
     }
 
-    public static synchronized MetaField createBinary(final String name) {
-        return create(name, MetaFieldType.BINARY, false);
+    public static synchronized MetaField createBinary(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.BINARY, isKeyField);
     }
 
-    public static synchronized MetaField createVectorText(final String name) {
-        return create(name, MetaFieldType.VECTOR_TEXT, false);
+    public static synchronized MetaField createVectorText(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.VECTOR_TEXT, isKeyField);
     }
 
-    public static synchronized MetaField createVectorInteger(final String name) {
-        return create(name, MetaFieldType.VECTOR_INTEGER, false);
+    public static synchronized MetaField createVectorInteger(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.VECTOR_INTEGER, isKeyField);
     }
 
-    public static synchronized MetaField createVectorDecimal(final String name) {
-        return create(name, MetaFieldType.VECTOR_DECIMAL, false);
+    public static synchronized MetaField createVectorDecimal(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.VECTOR_DECIMAL, isKeyField);
     }
 
-    public static synchronized MetaField createVectorDate(final String name) {
-        return create(name, MetaFieldType.VECTOR_DATE, false);
+    public static synchronized MetaField createVectorDate(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.VECTOR_DATE, isKeyField);
     }
 
-    public static synchronized MetaField createVectorBoolean(final String name) {
-        return create(name, MetaFieldType.VECTOR_BOOLEAN, false);
+    public static synchronized MetaField createVectorBoolean(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.VECTOR_BOOLEAN, isKeyField);
     }
 
-    public static synchronized MetaField createVectorRowSet(final String name) {
-        return create(name, MetaFieldType.ROWSET, false);
+    public static synchronized MetaField createVectorRowSet(final String name, final String category, boolean isKeyField) {
+        return create(name, category, MetaFieldType.ROWSET, isKeyField);
     }
 
-    public static synchronized MetaField create(final String name,
+    public static synchronized MetaField create(final String name, final String category,
             final MetaFieldType type, final boolean isKeyField) {
         MetaField field = fieldsCache.get(name);
         if (field != null) {
@@ -73,7 +73,7 @@ public class MetaFieldFactory {
                     "Duplicate meta field with different type found " + field
                             + ", new type " + type);
         }
-        field = new MetaField(name, type, isKeyField);
+        field = new MetaField(name, category, type, isKeyField);
         fieldsCache.put(name, field);
         return field;
     }

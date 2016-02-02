@@ -10,34 +10,35 @@ public class MetaFieldTest {
 
     @Test
     public void testCreate() {
-        MetaField field = MetaFieldFactory.createText("name");
+        MetaField field = MetaFieldFactory.createText("name", "Test", false);
         assertEquals("name", field.getName());
         assertEquals(MetaFieldType.SCALAR_TEXT, field.getType());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateWithDifferentType() {
-        MetaFieldFactory.createText("name");
-        MetaFieldFactory.createDate("name");
+        MetaFieldFactory.createText("name", "Test", false);
+        MetaFieldFactory.createDate("name", "Test", false);
     }
 
     @Test
     public void testHashCode() {
-        MetaField field = MetaFieldFactory.createText("name");
+        MetaField field = MetaFieldFactory.createText("name", "Test", false);
         assertTrue(field.hashCode() != 0);
     }
 
     @Test
     public void testToString() {
-        MetaField field = MetaFieldFactory.createText("phone");
+        MetaField field = MetaFieldFactory.createText("phone", "Test", false);
         assertTrue(field.toString().contains("phone"));
     }
 
     @Test
     public void testEquals() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("name");
-        MetaField field3 = MetaFieldFactory.createText("address");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field3 = MetaFieldFactory
+                .createText("address", "Test", false);
 
         assertEquals(field1, field1);
         assertEquals(field1, field2);
@@ -48,8 +49,8 @@ public class MetaFieldTest {
 
     @Test
     public void testCompare() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
 
         assertTrue(field1.compareTo(field2) < 0);
     }

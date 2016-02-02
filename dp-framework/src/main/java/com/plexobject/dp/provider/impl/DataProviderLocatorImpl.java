@@ -81,22 +81,49 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
      * @return collection of data providers
      */
     @Override
-    public Collection<DataProvider> locate(Metadata requestFields,
-            Metadata responseFields) {
+    public Collection<DataProvider> locate(final Metadata requestFields,
+            final Metadata responseFields) {
         final Timer timer = Metric.newTimer("DataProviderLocatorImpl.locate");
         try {
+            final Metadata workspaceRequestFields = new Metadata(
+                    requestFields.getMetaFields());
+            //
             final List<DataProvider> providers = new ArrayList<>();
-            populateDataProviders(new Metadata(requestFields.getMetaFields()),
-                    new Metadata(responseFields.getMetaFields()), providers);
+            // populateDataProviders(new
+            // Metadata(requestFields.getMetaFields()),
+            // new Metadata(responseFields.getMetaFields()), providers);
+            populateDataProviders(requestFields, workspaceRequestFields,
+                    responseFields, providers);
             Collections.sort(providers); // sort by dependency
             if (logger.isDebugEnabled()) {
                 logger.info("locate selected " + providers + " for input "
-                        + requestFields + ", output " + responseFields);
+                        + workspaceRequestFields + ", output " + responseFields);
             }
+
+            checkIfProvidersHaveAllInput(workspaceRequestFields, providers);
+
             return providers;
         } finally {
             timer.stop();
         }
+    }
+
+    @Override
+    public Collection<DataProvider> getAllWithCategories(String[] categories) {
+        Set<DataProvider> providers = new HashSet<DataProvider>();
+        for (Set<DataProvider> set : providersByOutputMetaField.values()) {
+            for (DataProvider provider : set) {
+                if (provider.getMandatoryRequestFields()
+                        .hasMetaFieldsByCategories(categories)
+                        || provider.getOptionalRequestFields()
+                                .hasMetaFieldsByCategories(categories)
+                        || provider.getResponseFields()
+                                .hasMetaFieldsByCategories(categories)) {
+                    providers.add(provider);
+                }
+            }
+        }
+        return providers;
     }
 
     @Override
@@ -114,16 +141,19 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
     }
 
     private void populateDataProviders(final Metadata requestFields,
+            final Metadata workspaceRequestFields,
             final Metadata responseFields,
             final List<DataProvider> existingProviders) {
-        responseFields.removeMetadata(requestFields);
+        responseFields.removeMetadata(workspaceRequestFields);
         //
 
         for (MetaField responseField : responseFields.getMetaFields()) {
             // check if responseField is available from existing providers
             boolean matchedExistingProviders = false;
             for (DataProvider provider : existingProviders) {
-                if (provider.getResponseFields().contains(responseField)) {
+                if (provider.getResponseFields().contains(responseField)
+                        && provider.getMandatoryRequestFields()
+                                .getMissingCount(workspaceRequestFields) == 0) {
                     matchedExistingProviders = true;
                     break;
                 }
@@ -131,6 +161,7 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
             if (matchedExistingProviders) {
                 continue;
             }
+
             // Otherwise find providers that have the field in the response list
             Set<DataProvider> providers = providersByOutputMetaField
                     .get(responseField);
@@ -139,7 +170,7 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
                         + responseField);
             }
             DataProvider provider = getBestDataProvider(providers,
-                    requestFields);
+                    requestFields, workspaceRequestFields);
             if (existingProviders.contains(provider)) {
                 continue;
             }
@@ -147,16 +178,16 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
 
             // find the missing fields from the mandatory request parameters and
             // we will try to find providers for those
-            Metadata missingFields = requestFields.getMissingMetadata(provider
-                    .getMandatoryRequestFields());
+            Metadata missingFields = workspaceRequestFields
+                    .getMissingMetadata(provider.getMandatoryRequestFields());
 
             // add output fields to requests so that we can use it for other
             // providers
-            requestFields.addMetadata(provider.getResponseFields());
+            workspaceRequestFields.merge(provider.getResponseFields());
             //
             if (missingFields.size() > 0) {
-                populateDataProviders(requestFields, missingFields,
-                        existingProviders);
+                populateDataProviders(requestFields, workspaceRequestFields,
+                        missingFields, existingProviders);
             }
         }
     }
@@ -164,32 +195,29 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
     // This method finds data provider that matches or almost matches the
     // request parameters that we have
     private DataProvider getBestDataProvider(
-            Collection<DataProvider> providers, Metadata requestFields) {
+            Collection<DataProvider> providers, final Metadata requestFields,
+            Metadata workspaceRequestFields) {
         DataProvider bestProvider = null;
-        int bestMinCount = Integer.MAX_VALUE;
         int bestMatchingCount = Integer.MIN_VALUE;
         int bestRank = Integer.MIN_VALUE;
-        int bestRequiredFields = Integer.MAX_VALUE;
+        int bestMissingCount = Integer.MAX_VALUE;
 
         for (DataProvider provider : providers) {
-            int missingCount = provider.getMandatoryRequestFields()
-                    .getMissingCount(requestFields);
-            int matchingCount = provider.getMandatoryRequestFields()
-                    .getMatchingCount(requestFields);
-            // The best provider will the provider that has least number of
-            // missing required fields from the request fields provided,
-            // otherwise we would use the rank or the provider with least number
-            // of required fields or most number of matching fields with input
-            if (missingCount < bestMinCount
-                    || (missingCount == bestMinCount && provider.getRank() > bestRank)
-                    || (missingCount == bestMinCount && provider
-                            .getMandatoryRequestFields().size() < bestRequiredFields)
-                    || (missingCount == bestMinCount && matchingCount > bestMatchingCount)
-                    || (missingCount == bestMinCount && provider
-                            .getMandatoryRequestFields().size() < bestRequiredFields)) {
-                bestRequiredFields = provider.getMandatoryRequestFields()
-                        .size();
-                bestMinCount = missingCount;
+            int missingCount = workspaceRequestFields.getMissingCount(provider
+                    .getMandatoryRequestFields())
+                    + requestFields.getMissingCount(provider
+                            .getMandatoryRequestFields());
+            int matchingCount = workspaceRequestFields
+                    .getMatchingCount(provider.getMandatoryRequestFields())
+                    + requestFields.getMatchingCount(provider
+                            .getMandatoryRequestFields());
+            // The best provider will the provider, whose input matches closely
+            // with request fields otherwise we would use the rank
+            if (matchingCount > bestMatchingCount
+                    || (matchingCount == bestMatchingCount && provider
+                            .getRank() > bestRank)
+                    || (matchingCount == bestMatchingCount && missingCount < bestMissingCount)) {
+                bestMissingCount = missingCount;
                 bestMatchingCount = matchingCount;
                 bestRank = provider.getRank();
                 bestProvider = provider;
@@ -198,4 +226,18 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
         return bestProvider;
     }
 
+    private static void checkIfProvidersHaveAllInput(Metadata requestFields,
+            List<DataProvider> providers) {
+        for (DataProvider provider : providers) {
+            if (!requestFields
+                    .containsAll(provider.getMandatoryRequestFields())) {
+                throw new IllegalStateException("Matching providers "
+                        + providers
+                        + " cannot be fulfilled because requests parameters "
+                        + provider.getMandatoryRequestFields()
+                        + " for provider for " + provider
+                        + " are not available in " + requestFields);
+            }
+        }
+    }
 }

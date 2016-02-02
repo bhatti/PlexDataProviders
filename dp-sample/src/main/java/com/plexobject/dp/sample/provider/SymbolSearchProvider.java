@@ -16,7 +16,7 @@ import com.plexobject.dp.sample.marshal.SecurityMarshaller;
 
 public class SymbolSearchProvider extends BaseProvider {
     private static MetaField symbolQuery = MetaFieldFactory.createText(
-            "symbolQuery");
+            "symbolQuery", Security.class.getSimpleName(), false);
     private static Metadata parameterMeta = Metadata.from(symbolQuery);
     private static Metadata optionalMeta = Metadata.from();
     private static SecurityMarshaller marshaller = new SecurityMarshaller();

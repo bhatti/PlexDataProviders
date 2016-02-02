@@ -3,6 +3,7 @@ package com.plexobject.dp.domain;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -18,8 +19,8 @@ public class DataRowTest {
     @Before
     public void setup() {
         MetaFieldFactory.reset();
-        text = MetaFieldFactory.createText("text");
-        integer = MetaFieldFactory.createInteger("integer");
+        text = MetaFieldFactory.createText("text", "Test", false);
+        integer = MetaFieldFactory.createInteger("integer", "Test", false);
     }
 
     @Test
@@ -29,18 +30,18 @@ public class DataRowTest {
         assertEquals(1, row.size());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected=NullPointerException.class)
     public void testGetValueNull() {
         DataRow row = new DataRow();
         row.addField(text, null);
-        row.getValue(text);
+        assertNull(row.getValue(text));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected=NullPointerException.class)
     public void testGetValueInitial() {
         DataRow row = new DataRow();
         row.addField(text, InitialValue.instance);
-        row.getValue(text);
+        assertNull(row.getValue(text));
     }
 
     @Test(expected = RuntimeException.class)
@@ -128,7 +129,8 @@ public class DataRowTest {
     @Test
     public void testGetValueAsLong() {
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createInteger("object");
+        MetaField field = MetaFieldFactory.createInteger("object", "Test",
+                false);
         row.addField(field, 1);
         assertEquals(1L, row.getValueAsLong(field));
     }
@@ -136,7 +138,8 @@ public class DataRowTest {
     @Test
     public void testGetValueAsBoolean() {
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createBoolean("object");
+        MetaField field = MetaFieldFactory.createBoolean("object", "Test",
+                false);
         row.addField(field, 1);
         assertTrue(row.getValueAsBoolean(field));
     }
@@ -144,7 +147,8 @@ public class DataRowTest {
     @Test
     public void testGetValueAsDecimal() {
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createDecimal("object");
+        MetaField field = MetaFieldFactory.createDecimal("object", "Test",
+                false);
         row.addField(field, 1.1);
         assertEquals(1.1, row.getValueAsDecimal(field), 0.0001);
     }
@@ -153,7 +157,8 @@ public class DataRowTest {
     public void testGetValueAsBinary() {
         String hello = "hello";
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createBinary("object");
+        MetaField field = MetaFieldFactory
+                .createBinary("object", "Test", false);
 
         row.addField(field, hello.getBytes());
         assertEquals(hello, new String(row.getValueAsBinary(field)));
@@ -163,7 +168,7 @@ public class DataRowTest {
     public void testGetValueAsDate() {
         Date date = new Date();
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createDate("object");
+        MetaField field = MetaFieldFactory.createDate("object", "Test", false);
 
         row.addField(field, date);
         assertEquals(date, row.getValueAsDate(field));
@@ -173,7 +178,8 @@ public class DataRowTest {
     public void testGetValueAsLongVector() {
         long[] numbers = { 1, 2, 3 };
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createVectorInteger("object");
+        MetaField field = MetaFieldFactory.createVectorInteger("object",
+                "Test", false);
 
         row.addField(field, numbers);
         assertEquals(numbers, row.getValueAsLongVector(field));
@@ -183,7 +189,8 @@ public class DataRowTest {
     public void testGetValueAsBooleanVector() {
         boolean[] values = { true, false };
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createVectorBoolean("object");
+        MetaField field = MetaFieldFactory.createVectorBoolean("object",
+                "Test", false);
 
         row.addField(field, values);
         assertEquals(values, row.getValueAsBooleanVector(field));
@@ -193,7 +200,8 @@ public class DataRowTest {
     public void testGetValueAsDecimalVector() {
         double[] numbers = { 1.1, 2.1, 3.1 };
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createVectorDecimal("object");
+        MetaField field = MetaFieldFactory.createVectorDecimal("object",
+                "Test", false);
 
         row.addField(field, numbers);
         assertEquals(Arrays.toString(numbers),
@@ -204,7 +212,8 @@ public class DataRowTest {
     public void testGetValueAsDateVector() {
         Date[] dates = { new Date(0), new Date(1) };
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createVectorDate("object");
+        MetaField field = MetaFieldFactory.createVectorDate("object", "Test",
+                false);
 
         row.addField(field, dates);
         assertArrayEquals(dates, row.getValueAsDateVector(field));
@@ -214,7 +223,8 @@ public class DataRowTest {
     public void testGetValueAsTextVector() {
         String[] values = { "value1", "value2" };
         DataRow row = new DataRow();
-        MetaField field = MetaFieldFactory.createVectorText("object");
+        MetaField field = MetaFieldFactory.createVectorText("object", "Test",
+                false);
         row.addField(field, values);
         assertArrayEquals(values, row.getValueAsTextVector(field));
     }

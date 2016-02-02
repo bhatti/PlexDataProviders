@@ -10,17 +10,19 @@ import com.plexobject.dp.sample.domain.User;
 
 public class UserMarshaller implements DataRowSetMarshaller<User> {
     private static MetaField userId = MetaFieldFactory.create("userId",
-            MetaFieldType.SCALAR_INTEGER, true);
-    private static MetaField name = MetaFieldFactory.createText("user.name");
-    private static MetaField email = MetaFieldFactory.createText("user.email");
-    private static MetaField address = MetaFieldFactory
-            .createRowset("user.address");
-    private static MetaField dateOfBirth = MetaFieldFactory
-            .createDate("user.dateOfBirth");
-    private static MetaField roles = MetaFieldFactory
-            .createVectorText("user.roles");
-    private static MetaField portfolio = MetaFieldFactory
-            .createRowset("user.portfolio");
+            User.class.getSimpleName(), MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField name = MetaFieldFactory.createText("user.name",
+            User.class.getSimpleName(), false);
+    private static MetaField email = MetaFieldFactory.createText("user.email",
+            User.class.getSimpleName(), false);
+    private static MetaField address = MetaFieldFactory.createRowset(
+            "user.address", User.class.getSimpleName(), false);
+    private static MetaField dateOfBirth = MetaFieldFactory.createDate(
+            "user.dateOfBirth", User.class.getSimpleName(), false);
+    private static MetaField roles = MetaFieldFactory.createVectorText(
+            "user.roles", User.class.getSimpleName(), false);
+    private static MetaField portfolio = MetaFieldFactory.createRowset(
+            "user.portfolio", User.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(userId, name, email,
             address, dateOfBirth, roles, portfolio);
     private static AddressMarshaller addressMarshaller = new AddressMarshaller();

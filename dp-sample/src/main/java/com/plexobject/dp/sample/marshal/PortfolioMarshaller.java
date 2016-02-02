@@ -12,11 +12,11 @@ import com.plexobject.dp.sample.domain.Portfolio;
 
 public class PortfolioMarshaller implements DataRowSetMarshaller<Portfolio> {
     private static MetaField portfolioId = MetaFieldFactory.create(
-            "portfolioId", MetaFieldType.SCALAR_INTEGER, true);
+            "portfolioId", Portfolio.class.getSimpleName(), MetaFieldType.SCALAR_INTEGER, true);
     private static MetaField cash = MetaFieldFactory
-            .createDecimal("portfolio.cash");
+            .createDecimal("portfolio.cash", Portfolio.class.getSimpleName(), false);
     private static MetaField margin = MetaFieldFactory
-            .createDecimal("portfolio.margin");
+            .createDecimal("portfolio.margin", Portfolio.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(portfolioId, cash,
             margin);
 

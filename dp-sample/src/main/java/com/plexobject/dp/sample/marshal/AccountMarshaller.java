@@ -10,10 +10,10 @@ import com.plexobject.dp.sample.domain.AccountType;
 import com.plexobject.dp.sample.domain.SharedMeta;
 
 public class AccountMarshaller implements DataRowSetMarshaller<Account> {
-    private static MetaField accountType = MetaFieldFactory
-            .createText("account.type");
-    private static MetaField accountName = MetaFieldFactory
-            .createText("account.name");
+    private static MetaField accountType = MetaFieldFactory.createText(
+            "account.type", Account.class.getSimpleName(), false);
+    private static MetaField accountName = MetaFieldFactory.createText(
+            "account.name", Account.class.getSimpleName(), false);
     private static Metadata responseMeta = Metadata.from(accountType,
             accountName);
 

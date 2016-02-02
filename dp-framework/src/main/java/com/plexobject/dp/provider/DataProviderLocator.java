@@ -42,6 +42,16 @@ public interface DataProviderLocator {
             Metadata responseFields);
 
     /**
+     * This method returns all providers matching categories
+     * 
+     * @param categories
+     *            - list of categories or empty list for all
+     * 
+     * @return
+     */
+    Collection<DataProvider> getAllWithCategories(String[] categories);
+    
+    /**
      * This method returns all providers
      * 
      * @return

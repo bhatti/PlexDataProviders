@@ -19,8 +19,8 @@ public class MetadataTest {
 
     @Test
     public void testCreateVector() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
         Metadata fields = new Metadata(field1, field2);
         assertEquals(2, fields.size());
         assertTrue(fields.getMetaFields().contains(field1));
@@ -29,8 +29,8 @@ public class MetadataTest {
 
     @Test
     public void testCreateCollection() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
         Metadata fields = new Metadata(Arrays.asList(field1, field2));
         assertEquals(2, fields.size());
         assertTrue(fields.getMetaFields().contains(field1));
@@ -40,8 +40,8 @@ public class MetadataTest {
     @Test
     public void testAddMetaField() {
         Metadata fields = new Metadata();
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
         fields.addMetaField(field1);
         fields.addMetaField(field1);
         fields.addMetaField(field2);
@@ -53,8 +53,8 @@ public class MetadataTest {
     @Test
     public void testRemoveMetaField() {
         Metadata fields = new Metadata();
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
         fields.addMetaField(field1);
         fields.addMetaField(field2);
         assertEquals(2, fields.size());
@@ -69,12 +69,12 @@ public class MetadataTest {
     @Test
     public void testAddMetaFields() {
         Metadata fields1 = new Metadata();
-        MetaField field1a = MetaFieldFactory.createText("name");
-        MetaField field1b = MetaFieldFactory.createText("phone");
+        MetaField field1a = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field1b = MetaFieldFactory.createText("phone", "Test", false);
         fields1.addMetaField(field1a);
         fields1.addMetaField(field1b);
         Metadata fields2 = new Metadata();
-        fields2.addMetadata(fields1);
+        fields2.merge(fields1);
         assertEquals(2, fields2.size());
         fields2.getMetaFields().contains(field1a);
         fields2.getMetaFields().contains(field1b);
@@ -84,12 +84,12 @@ public class MetadataTest {
     @Test
     public void testRemoveMetaFields() {
         Metadata fields1 = new Metadata();
-        MetaField field1a = MetaFieldFactory.createText("name");
-        MetaField field1b = MetaFieldFactory.createText("phone");
+        MetaField field1a = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field1b = MetaFieldFactory.createText("phone", "Test", false);
         fields1.addMetaField(field1a);
         fields1.addMetaField(field1b);
         Metadata fields2 = new Metadata();
-        fields2.addMetadata(fields1);
+        fields2.merge(fields1);
         assertEquals(2, fields2.size());
         fields2.getMetaFields().contains(field1a);
         fields2.getMetaFields().contains(field1b);
@@ -101,12 +101,12 @@ public class MetadataTest {
     @Test
     public void testContains() {
         Metadata fields1 = new Metadata();
-        MetaField field1a = MetaFieldFactory.createText("name");
-        MetaField field1b = MetaFieldFactory.createText("phone");
+        MetaField field1a = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field1b = MetaFieldFactory.createText("phone", "Test", false);
         fields1.addMetaField(field1a);
         fields1.addMetaField(field1b);
         Metadata fields2 = new Metadata();
-        fields2.addMetadata(fields1);
+        fields2.merge(fields1);
         assertTrue(fields1.containsAll(fields2));
         fields1.removeMetaField(field1a);
         assertFalse(fields1.containsAll(fields2));
@@ -117,9 +117,10 @@ public class MetadataTest {
 
     @Test
     public void testGetMissingCount() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
-        MetaField field3 = MetaFieldFactory.createText("address");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
+        MetaField field3 = MetaFieldFactory
+                .createText("address", "Test", false);
 
         Metadata fields1 = Metadata.from(field1, field2);
         Metadata fields2 = Metadata.from(field1, field2, field3);
@@ -131,9 +132,10 @@ public class MetadataTest {
 
     @Test
     public void testGetMatchingCount() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
-        MetaField field3 = MetaFieldFactory.createText("address");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
+        MetaField field3 = MetaFieldFactory
+                .createText("address", "Test", false);
 
         Metadata fields1 = Metadata.from(field1, field2);
         Metadata fields2 = Metadata.from(field1, field2, field3);
@@ -143,8 +145,8 @@ public class MetadataTest {
 
     @Test
     public void testOf() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
         Metadata fields = Metadata.from(field1, field2);
         assertEquals(2, fields.size());
         assertTrue(fields.getMetaFields().contains(field1));
@@ -153,25 +155,26 @@ public class MetadataTest {
 
     @Test
     public void testOfString() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
         Metadata fields = Metadata.from(field1, field2);
         assertEquals(2, fields.size());
     }
 
     @Test
     public void testHashcode() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
         Metadata fields = Metadata.from(field1, field2);
         assertTrue(fields.hashCode() != 0);
     }
 
     @Test
     public void testEquals() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
-        MetaField field3 = MetaFieldFactory.createText("address");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
+        MetaField field3 = MetaFieldFactory
+                .createText("address", "Test", false);
 
         Metadata fields1 = Metadata.from(field1, field2);
         Metadata fields2 = Metadata.from(field1, field2);
@@ -188,8 +191,8 @@ public class MetadataTest {
 
     @Test
     public void testToString() {
-        MetaField field1 = MetaFieldFactory.createText("name");
-        MetaField field2 = MetaFieldFactory.createText("phone");
+        MetaField field1 = MetaFieldFactory.createText("name", "Test", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Test", false);
         Metadata fields = Metadata.from(field1, field2);
         assertTrue(fields.toString().contains("name"));
     }

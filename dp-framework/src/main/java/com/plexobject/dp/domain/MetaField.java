@@ -1,12 +1,19 @@
 package com.plexobject.dp.domain;
 
+import java.util.Objects;
+
 public class MetaField implements Comparable<MetaField> {
     private final String name;
+    private final String category;
     private final MetaFieldType type;
     private final boolean isKeyField;
 
-    MetaField(String name, MetaFieldType type, boolean isKeyField) {
+    MetaField(String name, String category, MetaFieldType type,
+            boolean isKeyField) {
+        Objects.requireNonNull(name, "name is required");
+        Objects.requireNonNull(category, "category is required");
         this.name = name;
+        this.category = category;
         this.type = type;
         this.isKeyField = isKeyField;
     }
@@ -33,20 +40,28 @@ public class MetaField implements Comparable<MetaField> {
         if (getClass() != obj.getClass())
             return false;
         MetaField other = (MetaField) obj;
-        return name.equals(other.name);
+        return category.equals(other.category) && name.equals(other.name);
     }
 
     @Override
     public String toString() {
-        return name + "/" + type + "/" + isKeyField;
+        return category + ":" + name;
     }
 
     @Override
     public int compareTo(MetaField other) {
-        return name.compareTo(other.name);
+        int cmp = category.compareTo(other.category);
+        if (cmp == 0) {
+            cmp = name.compareTo(other.name);
+        }
+        return cmp;
     }
 
     public boolean isKeyField() {
         return isKeyField;
+    }
+
+    public String getCategory() {
+        return category;
     }
 }

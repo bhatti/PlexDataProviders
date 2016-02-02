@@ -24,8 +24,9 @@ public class MetadataDeserializer extends JsonDeserializer<Metadata> {
             JsonNode next = it.next();
             String name = next.get("name").asText();
             String type = next.get("type").asText();
+            String category = next.get("category").asText();
             boolean keyField = next.get("keyField").asBoolean();
-            MetaField field = MetaFieldFactory.create(name,
+            MetaField field = MetaFieldFactory.create(name, category,
                     MetaFieldType.valueOf(type), keyField);
             metadata.addMetaField(field);
         }

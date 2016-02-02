@@ -15,28 +15,29 @@ import com.plexobject.dp.sample.domain.SharedMeta;
 
 public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
     private static MetaField securityId = MetaFieldFactory.create("securityId",
-            MetaFieldType.SCALAR_INTEGER, true);
-    private static MetaField description = MetaFieldFactory
-            .createText("security.description");
-    private static MetaField type = MetaFieldFactory
-            .createText("security.type");
-    private static MetaField beta = MetaFieldFactory.createRowset("beta");
+            Security.class.getSimpleName(), MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField description = MetaFieldFactory.createText(
+            "security.description", Security.class.getSimpleName(), false);
+    private static MetaField type = MetaFieldFactory.createText(
+            "security.type", Security.class.getSimpleName(), false);
+    private static MetaField beta = MetaFieldFactory.createRowset("beta",
+            Security.class.getSimpleName(), false);
 
-    private static MetaField dividendRate = MetaFieldFactory
-            .createDecimal("security.dividendRate");
-    private static MetaField dividendInterval = MetaFieldFactory
-            .createDecimal("security.dividendInterval");
-    private static MetaField exDividendDate = MetaFieldFactory
-            .createDate("security.exDividendDate");
+    private static MetaField dividendRate = MetaFieldFactory.createDecimal(
+            "security.dividendRate", Security.class.getSimpleName(), false);
+    private static MetaField dividendInterval = MetaFieldFactory.createDecimal(
+            "security.dividendInterval", Security.class.getSimpleName(), false);
+    private static MetaField exDividendDate = MetaFieldFactory.createDate(
+            "security.exDividendDate", Security.class.getSimpleName(), false);
 
-    private static MetaField optionRoot = MetaFieldFactory
-            .createRowset("security.optionRoot");
-    private static MetaField optionType = MetaFieldFactory
-            .createText("security.optionType");
-    private static MetaField strikePrice = MetaFieldFactory
-            .createDecimal("security.strikePrice");
-    private static MetaField expirationDate = MetaFieldFactory
-            .createDate("security.expirationDate");
+    private static MetaField optionRoot = MetaFieldFactory.createRowset(
+            "security.optionRoot", Security.class.getSimpleName(), false);
+    private static MetaField optionType = MetaFieldFactory.createText(
+            "security.optionType", Security.class.getSimpleName(), false);
+    private static MetaField strikePrice = MetaFieldFactory.createDecimal(
+            "security.strikePrice", Security.class.getSimpleName(), false);
+    private static MetaField expirationDate = MetaFieldFactory.createDate(
+            "security.expirationDate", Security.class.getSimpleName(), false);
 
     private static Metadata responseMeta = Metadata.from(securityId,
             SharedMeta.exchange, SharedMeta.symbol,
@@ -63,10 +64,11 @@ public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
 
     private void marshal(DataRowSet rowset, Security security, int rowNum) {
         rowset.addValueAtRow(securityId, security.getId(), rowNum);
-        rowset.addValueAtRow(SharedMeta.exchange, security.getExchange(), rowNum);
-        rowset.addValueAtRow(SharedMeta.symbol, security.getSymbol(), rowNum);
-        rowset.addValueAtRow(SharedMeta.underlyingSymbol, security.getUnderlyingSymbol(),
+        rowset.addValueAtRow(SharedMeta.exchange, security.getExchange(),
                 rowNum);
+        rowset.addValueAtRow(SharedMeta.symbol, security.getSymbol(), rowNum);
+        rowset.addValueAtRow(SharedMeta.underlyingSymbol,
+                security.getUnderlyingSymbol(), rowNum);
         rowset.addValueAtRow(description, security.getDescription(), rowNum);
         rowset.addValueAtRow(type, security.getType().name(), rowNum);
         rowset.addValueAtRow(beta, betaMarshaller.marshal(security.getBeta()),

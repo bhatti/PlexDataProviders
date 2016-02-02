@@ -104,13 +104,12 @@ public class DataRowSet {
     public synchronized DataRow getRowForKeyField(MetaField metaField,
             Object key) {
         assert (metadata.contains(metaField));
-        int rowNumber = getRowNumberByKey(metaField, key);
-        if (rowNumber == -1) {
-            throw new IllegalArgumentException("Row with " + metaField
-                    + " and value " + key + " not found");
-        }
         if (!metaField.isKeyField()) {
             throw new IllegalArgumentException(metaField + " is not key field");
+        }
+        int rowNumber = getRowNumberByKey(metaField, key);
+        if (rowNumber == -1) {
+            return null;
         }
         validateRow(rowNumber);
         return rows.get(rowNumber);

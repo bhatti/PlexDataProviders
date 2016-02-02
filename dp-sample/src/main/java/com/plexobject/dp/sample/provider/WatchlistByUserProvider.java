@@ -17,10 +17,9 @@ import com.plexobject.dp.sample.domain.Watchlist;
 import com.plexobject.dp.sample.marshal.WatchlistMarshaller;
 
 public class WatchlistByUserProvider extends BaseProvider {
-    private static MetaField userId = MetaFieldFactory.createInteger("userId");
-    private static MetaField watchlistName = MetaFieldFactory
-            .createText("watchlistName");
-    private static Metadata parameterMeta = Metadata.from(userId);
+    private static MetaField watchlistName = MetaFieldFactory.createText(
+            "watchlistName", Watchlist.class.getSimpleName(), false);
+    private static Metadata parameterMeta = Metadata.from(SharedMeta.userId);
     private static Metadata optionalMeta = Metadata.from(SharedMeta.symbol,
             watchlistName);
     private static WatchlistMarshaller marshaller = new WatchlistMarshaller();
@@ -35,7 +34,7 @@ public class WatchlistByUserProvider extends BaseProvider {
             DataConfiguration config) throws DataProviderException {
         int nextRow = 0;
         for (int i = 0; i < parameter.size(); i++) {
-            Long id = parameter.getValueAsLong(userId, i);
+            Long id = parameter.getValueAsLong(SharedMeta.userId, i);
             User user = DaoLocator.userDao.getById(id);
             if (user == null) {
                 continue;
@@ -47,8 +46,8 @@ public class WatchlistByUserProvider extends BaseProvider {
                         .getValueAsText(watchlistName, i);
             }
             if (parameter.hasFieldValue(SharedMeta.symbol, i)) {
-                filterSymbols = Arrays.asList(parameter.getValueAsText(SharedMeta.symbol,
-                        i));
+                filterSymbols = Arrays.asList(parameter.getValueAsText(
+                        SharedMeta.symbol, i));
             }
             Collection<Watchlist> watchLists = user.getWatchlists();
             for (Watchlist watchlist : watchLists) {

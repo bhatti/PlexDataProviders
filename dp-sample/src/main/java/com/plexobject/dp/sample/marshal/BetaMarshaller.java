@@ -5,16 +5,15 @@ import java.util.Collection;
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
-import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.marshal.DataRowSetMarshaller;
 import com.plexobject.dp.sample.domain.Beta;
 
 public class BetaMarshaller implements DataRowSetMarshaller<Beta> {
-    private static MetaField betaId = MetaFieldFactory.create("beta.beta",
-            MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField month = MetaFieldFactory.create("beta.month",
-            MetaFieldType.SCALAR_INTEGER);
+    private static MetaField betaId = MetaFieldFactory
+            .createDecimal("beta.beta");
+    private static MetaField month = MetaFieldFactory
+            .createInteger("beta.month");
     private static Metadata responseMeta = Metadata.from(betaId, month);
 
     @Override

@@ -12,8 +12,8 @@ import com.plexobject.dp.sample.domain.Security;
 import com.plexobject.dp.sample.marshal.SecurityMarshaller;
 
 public class SymbolsProvider extends BaseProvider {
-    private static Metadata parameterMeta = Metadata.fromRaw();
-    private static Metadata optionalMeta = Metadata.fromRaw();
+    private static Metadata parameterMeta = Metadata.from();
+    private static Metadata optionalMeta = Metadata.from();
     private static SecurityMarshaller marshaller = new SecurityMarshaller();
 
     public SymbolsProvider() {

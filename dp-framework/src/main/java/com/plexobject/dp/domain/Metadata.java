@@ -97,16 +97,6 @@ public class Metadata {
         return metaFields;
     }
 
-    public static Metadata fromRaw(Object... args) {
-        final Metadata metaFields = new Metadata();
-        for (int i = 0; i < args.length; i += 2) {
-            MetaField field = MetaFieldFactory.create((String) args[i],
-                    MetaFieldType.valueOf(args[i + 1].toString()));
-            metaFields.addMetaField(field);
-        }
-        return metaFields;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;

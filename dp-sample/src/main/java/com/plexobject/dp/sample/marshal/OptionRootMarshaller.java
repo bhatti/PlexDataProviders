@@ -12,16 +12,15 @@ import com.plexobject.dp.sample.domain.OptionRoot;
 
 public class OptionRootMarshaller implements DataRowSetMarshaller<OptionRoot> {
     private static MetaField opraRoot = MetaFieldFactory.create("opraRoot",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField underlyingSymbol = MetaFieldFactory.create(
-            "optionRoot.underlyingSymbol", MetaFieldType.SCALAR_TEXT);
-    private static MetaField multiplier = MetaFieldFactory.create(
-            "optionRoot.multiplier", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField excerciseStyle = MetaFieldFactory.create(
-            "optionRoot.excerciseStyle", MetaFieldType.SCALAR_TEXT);
+            MetaFieldType.SCALAR_TEXT, true);
+    private static MetaField underlyingSymbol = MetaFieldFactory
+            .createText("optionRoot.underlyingSymbol");
+    private static MetaField multiplier = MetaFieldFactory
+            .createDecimal("optionRoot.multiplier");
+    private static MetaField excerciseStyle = MetaFieldFactory
+            .createText("optionRoot.excerciseStyle");
     private static Metadata responseMeta = Metadata.from(opraRoot,
             underlyingSymbol, excerciseStyle, multiplier);
-
 
     @Override
     public DataRowSet marshal(OptionRoot optionRoot) {

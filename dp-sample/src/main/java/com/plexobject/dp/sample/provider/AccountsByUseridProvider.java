@@ -6,7 +6,6 @@ import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
-import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.provider.BaseProvider;
 import com.plexobject.dp.provider.DataProviderException;
@@ -16,8 +15,7 @@ import com.plexobject.dp.sample.domain.User;
 import com.plexobject.dp.sample.marshal.AccountMarshaller;
 
 public class AccountsByUseridProvider extends BaseProvider {
-    private static MetaField userId = MetaFieldFactory.create("userId",
-            MetaFieldType.SCALAR_INTEGER);
+    private static MetaField userId = MetaFieldFactory.createInteger("userId");
     private static Metadata parameterMeta = Metadata.from(userId);
     private static Metadata optionalMeta = Metadata.from();
     private static AccountMarshaller marshaller = new AccountMarshaller();

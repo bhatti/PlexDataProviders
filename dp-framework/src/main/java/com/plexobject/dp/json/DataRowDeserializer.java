@@ -33,6 +33,7 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
             JsonNode node) throws IOException, JsonProcessingException {
         DataRow row = new DataRow();
         //
+        
         Iterator<JsonNode> it = node.elements();
         while (it.hasNext()) {
             JsonNode next = it.next();

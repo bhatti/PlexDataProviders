@@ -11,41 +11,36 @@ import com.plexobject.dp.marshal.DataRowSetMarshaller;
 import com.plexobject.dp.sample.domain.Equity;
 import com.plexobject.dp.sample.domain.Option;
 import com.plexobject.dp.sample.domain.Security;
+import com.plexobject.dp.sample.domain.SharedMeta;
 
 public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
     private static MetaField securityId = MetaFieldFactory.create("securityId",
-            MetaFieldType.SCALAR_INTEGER);
-    private static MetaField exchange = MetaFieldFactory.create("exchange",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField symbol = MetaFieldFactory.create("symbol",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField underlyingSymbol = MetaFieldFactory.create(
-            "underlyingSymbol", MetaFieldType.SCALAR_TEXT);
-    private static MetaField description = MetaFieldFactory.create(
-            "security.description", MetaFieldType.SCALAR_TEXT);
-    private static MetaField type = MetaFieldFactory.create("security.type",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField beta = MetaFieldFactory.create("beta",
-            MetaFieldType.ROWSET);
+            MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField description = MetaFieldFactory
+            .createText("security.description");
+    private static MetaField type = MetaFieldFactory
+            .createText("security.type");
+    private static MetaField beta = MetaFieldFactory.createRowset("beta");
 
-    private static MetaField dividendRate = MetaFieldFactory.create(
-            "security.dividendRate", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField dividendInterval = MetaFieldFactory.create(
-            "security.dividendInterval", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField exDividendDate = MetaFieldFactory.create(
-            "security.exDividendDate", MetaFieldType.SCALAR_DATE);
+    private static MetaField dividendRate = MetaFieldFactory
+            .createDecimal("security.dividendRate");
+    private static MetaField dividendInterval = MetaFieldFactory
+            .createDecimal("security.dividendInterval");
+    private static MetaField exDividendDate = MetaFieldFactory
+            .createDate("security.exDividendDate");
 
-    private static MetaField optionRoot = MetaFieldFactory.create(
-            "security.optionRoot", MetaFieldType.ROWSET);
-    private static MetaField optionType = MetaFieldFactory.create(
-            "security.optionType", MetaFieldType.SCALAR_TEXT);
-    private static MetaField strikePrice = MetaFieldFactory.create(
-            "security.strikePrice", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField expirationDate = MetaFieldFactory.create(
-            "security.expirationDate", MetaFieldType.SCALAR_DATE);
+    private static MetaField optionRoot = MetaFieldFactory
+            .createRowset("security.optionRoot");
+    private static MetaField optionType = MetaFieldFactory
+            .createText("security.optionType");
+    private static MetaField strikePrice = MetaFieldFactory
+            .createDecimal("security.strikePrice");
+    private static MetaField expirationDate = MetaFieldFactory
+            .createDate("security.expirationDate");
 
-    private static Metadata responseMeta = Metadata.from(securityId, exchange,
-            symbol, underlyingSymbol, description, type, beta, dividendRate,
+    private static Metadata responseMeta = Metadata.from(securityId,
+            SharedMeta.exchange, SharedMeta.symbol,
+            SharedMeta.underlyingSymbol, description, type, beta, dividendRate,
             dividendInterval, exDividendDate, optionRoot, optionType,
             strikePrice, expirationDate);
     private static final BetaMarshaller betaMarshaller = new BetaMarshaller();
@@ -68,9 +63,9 @@ public class SecurityMarshaller implements DataRowSetMarshaller<Security> {
 
     private void marshal(DataRowSet rowset, Security security, int rowNum) {
         rowset.addValueAtRow(securityId, security.getId(), rowNum);
-        rowset.addValueAtRow(exchange, security.getExchange(), rowNum);
-        rowset.addValueAtRow(symbol, security.getSymbol(), rowNum);
-        rowset.addValueAtRow(underlyingSymbol, security.getUnderlyingSymbol(),
+        rowset.addValueAtRow(SharedMeta.exchange, security.getExchange(), rowNum);
+        rowset.addValueAtRow(SharedMeta.symbol, security.getSymbol(), rowNum);
+        rowset.addValueAtRow(SharedMeta.underlyingSymbol, security.getUnderlyingSymbol(),
                 rowNum);
         rowset.addValueAtRow(description, security.getDescription(), rowNum);
         rowset.addValueAtRow(type, security.getType().name(), rowNum);

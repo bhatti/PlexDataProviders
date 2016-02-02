@@ -34,6 +34,7 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
         for (Map.Entry<MetaField, Object> e : row.getFields().entrySet()) {
             jgen.writeStartObject();
             jgen.writeStringField("name", e.getKey().getName());
+            // jgen.writeBooleanField("keyField", e.getKey().isKeyField());
             switch (e.getKey().getType()) {
             case SCALAR_TEXT:
                 jgen.writeStringField("value", row.getValueAsText(e.getKey()));

@@ -10,19 +10,17 @@ import com.plexobject.dp.sample.domain.User;
 
 public class UserMarshaller implements DataRowSetMarshaller<User> {
     private static MetaField userId = MetaFieldFactory.create("userId",
-            MetaFieldType.SCALAR_INTEGER);
-    private static MetaField name = MetaFieldFactory.create("user.name",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField email = MetaFieldFactory.create("user.email",
-            MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField address = MetaFieldFactory.create("user.address",
-            MetaFieldType.ROWSET);
-    private static MetaField dateOfBirth = MetaFieldFactory.create(
-            "user.dateOfBirth", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField roles = MetaFieldFactory.create("user.roles",
-            MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField portfolio = MetaFieldFactory.create(
-            "user.portfolio", MetaFieldType.ROWSET);
+            MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField name = MetaFieldFactory.createText("user.name");
+    private static MetaField email = MetaFieldFactory.createText("user.email");
+    private static MetaField address = MetaFieldFactory
+            .createRowset("user.address");
+    private static MetaField dateOfBirth = MetaFieldFactory
+            .createDate("user.dateOfBirth");
+    private static MetaField roles = MetaFieldFactory
+            .createVectorText("user.roles");
+    private static MetaField portfolio = MetaFieldFactory
+            .createRowset("user.portfolio");
     private static Metadata responseMeta = Metadata.from(userId, name, email,
             address, dateOfBirth, roles, portfolio);
     private static AddressMarshaller addressMarshaller = new AddressMarshaller();

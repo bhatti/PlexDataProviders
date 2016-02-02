@@ -22,6 +22,7 @@ public class MetadataSerializer extends StdSerializer<Metadata> {
             jgen.writeStartObject();
             jgen.writeStringField("name", field.getName());
             jgen.writeStringField("type", field.getType().name());
+            jgen.writeBooleanField("keyField", field.isKeyField());
             jgen.writeEndObject();
         }
         jgen.writeEndArray();

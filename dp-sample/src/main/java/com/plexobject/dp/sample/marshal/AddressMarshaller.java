@@ -10,17 +10,15 @@ import com.plexobject.dp.sample.domain.Address;
 
 public class AddressMarshaller implements DataRowSetMarshaller<Address> {
     private static MetaField addressId = MetaFieldFactory.create("addressId",
-            MetaFieldType.SCALAR_INTEGER);
-    private static MetaField street = MetaFieldFactory.create("address.street",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField city = MetaFieldFactory.create("address.city",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField state = MetaFieldFactory.create("address.state",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField zip = MetaFieldFactory.create("address.zip",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField country = MetaFieldFactory.create(
-            "address.country", MetaFieldType.SCALAR_TEXT);
+            MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField street = MetaFieldFactory
+            .createText("address.street");
+    private static MetaField city = MetaFieldFactory.createText("address.city");
+    private static MetaField state = MetaFieldFactory
+            .createText("address.state");
+    private static MetaField zip = MetaFieldFactory.createText("address.zip");
+    private static MetaField country = MetaFieldFactory
+            .createText("address.country");
     private static Metadata responseMeta = Metadata.from(addressId, street,
             city, state, zip, country);
 

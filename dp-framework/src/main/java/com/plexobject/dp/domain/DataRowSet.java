@@ -4,19 +4,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
+/**
+ * This class abstracts set of rows that would represent collection of objects.
+ * Note that you can have rowset within a row to create nested structures
+ * 
+ * @author shahzad bhatti
+ *
+ */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataRowSet {
     private final transient Metadata metadata;
+    private final transient Map<String, MetaField> metaFieldsByName = new ConcurrentHashMap<>();
+    private transient Map<Object, Integer> rowsByKey;
     private final List<DataRow> rows = new ArrayList<>();
-    private final transient Map<String, MetaField> metaFieldsByName = new HashMap<>();
 
     DataRowSet() {
         metadata = Metadata.from(); // For serialization
@@ -46,6 +54,9 @@ public class DataRowSet {
             Object value, int rowNumber) {
         DataRow row = getOrCreateRow(rowNumber);
         addMetaField(metaField);
+        if (metaField.isKeyField()) {
+            addKeyToMap(value, rowNumber);
+        }
         return row.addField(metaField, value);
     }
 
@@ -86,6 +97,25 @@ public class DataRowSet {
         return rows;
     }
 
+    public int getRowNumberByKey(MetaField metaField, Object key) {
+        return getKeyToMap(key);
+    }
+
+    public synchronized DataRow getRowForKeyField(MetaField metaField,
+            Object key) {
+        assert (metadata.contains(metaField));
+        int rowNumber = getRowNumberByKey(metaField, key);
+        if (rowNumber == -1) {
+            throw new IllegalArgumentException("Row with " + metaField
+                    + " and value " + key + " not found");
+        }
+        if (!metaField.isKeyField()) {
+            throw new IllegalArgumentException(metaField + " is not key field");
+        }
+        validateRow(rowNumber);
+        return rows.get(rowNumber);
+    }
+
     public synchronized boolean hasFieldValue(MetaField metaField, int row) {
         assert (metadata.contains(metaField));
         if (row >= rows.size()) {
@@ -106,6 +136,13 @@ public class DataRowSet {
             throw new IllegalArgumentException("row " + row
                     + " is higher than internal rows " + rows.size());
         }
+    }
+
+    public DataRowSet getValueAsRowSet(MetaField metaField, int row) {
+        Objects.requireNonNull(metaField, "metaField cannot be null");
+        assert (metadata.contains(metaField));
+        validateRow(row);
+        return rows.get(row).getValueAsRowSet(metaField);
     }
 
     public String getValueAsText(MetaField metaField, int row) {
@@ -201,4 +238,22 @@ public class DataRowSet {
         }
     }
 
+    private synchronized Map<Object, Integer> getKeyMap() {
+        if (rowsByKey == null) {
+            rowsByKey = new ConcurrentHashMap<Object, Integer>();
+        }
+        return rowsByKey;
+    }
+
+    private synchronized void addKeyToMap(Object key, int rowNumber) {
+        getKeyMap().put(key, rowNumber);
+    }
+
+    private synchronized int getKeyToMap(Object key) {
+        Integer row = getKeyMap().get(key);
+        if (row == null) {
+            return -1;
+        }
+        return row;
+    }
 }

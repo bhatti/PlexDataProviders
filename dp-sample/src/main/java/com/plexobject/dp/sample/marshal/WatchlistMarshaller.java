@@ -3,18 +3,17 @@ package com.plexobject.dp.sample.marshal;
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
-import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.marshal.DataRowSetMarshaller;
 import com.plexobject.dp.sample.domain.Watchlist;
 
 public class WatchlistMarshaller implements DataRowSetMarshaller<Watchlist> {
-    private static MetaField watchlistId = MetaFieldFactory.create(
-            "watchlistId", MetaFieldType.SCALAR_INTEGER);
-    private static MetaField name = MetaFieldFactory.create("watchlist.name",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField securities = MetaFieldFactory.create(
-            "watchlist.securities", MetaFieldType.ROWSET);
+    private static MetaField watchlistId = MetaFieldFactory
+            .createInteger("watchlistId");
+    private static MetaField name = MetaFieldFactory
+            .createText("watchlist.name");
+    private static MetaField securities = MetaFieldFactory
+            .createRowset("watchlist.securities");
     private static Metadata responseMeta = Metadata.from(watchlistId, name,
             securities);
     private static final SecurityMarshaller securityMarshaller = new SecurityMarshaller();

@@ -76,6 +76,15 @@ public class DataRow {
         return value;
     }
 
+    public DataRowSet getValueAsRowSet(MetaField metaField) {
+        if (metaField.getType() != MetaFieldType.ROWSET) {
+            throw new IllegalStateException("metaField " + metaField
+                    + " is not rowset typet");
+        }
+        Object value = getValue(metaField);
+        return (DataRowSet) value;
+    }
+
     public String getValueAsText(MetaField field) {
         Object value = getValue(field);
         return ObjectConversionUtils.getAsText(value);

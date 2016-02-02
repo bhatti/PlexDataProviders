@@ -3,10 +3,12 @@ package com.plexobject.dp.domain;
 public class MetaField implements Comparable<MetaField> {
     private final String name;
     private final MetaFieldType type;
+    private final boolean isKeyField;
 
-    MetaField(String name, MetaFieldType type) {
+    MetaField(String name, MetaFieldType type, boolean isKeyField) {
         this.name = name;
         this.type = type;
+        this.isKeyField = isKeyField;
     }
 
     public String getName() {
@@ -36,11 +38,15 @@ public class MetaField implements Comparable<MetaField> {
 
     @Override
     public String toString() {
-        return name + "/" + type;
+        return name + "/" + type + "/" + isKeyField;
     }
 
     @Override
     public int compareTo(MetaField other) {
         return name.compareTo(other.name);
+    }
+
+    public boolean isKeyField() {
+        return isKeyField;
     }
 }

@@ -11,11 +11,11 @@ import com.plexobject.dp.sample.domain.PositionGroup;
 public class PositionGroupMarshaller implements
         DataRowSetMarshaller<PositionGroup> {
     private static MetaField positionGroupId = MetaFieldFactory.create(
-            "positionGroupId", MetaFieldType.SCALAR_INTEGER);
-    private static MetaField name = MetaFieldFactory.create(
-            "positionGroup.name", MetaFieldType.SCALAR_TEXT);
-    private static MetaField positions = MetaFieldFactory.create(
-            "positionGroup.positions", MetaFieldType.ROWSET);
+            "positionGroupId", MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField name = MetaFieldFactory
+            .createText("positionGroup.name");
+    private static MetaField positions = MetaFieldFactory
+            .createRowset("positionGroup.positions");
     private static Metadata responseMeta = Metadata.from(positionGroupId, name,
             positions);
     private static final PositionMarshaller positionMarshaller = new PositionMarshaller();

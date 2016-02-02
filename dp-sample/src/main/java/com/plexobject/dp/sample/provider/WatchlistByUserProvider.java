@@ -7,24 +7,22 @@ import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
-import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.provider.BaseProvider;
 import com.plexobject.dp.provider.DataProviderException;
 import com.plexobject.dp.sample.dao.DaoLocator;
+import com.plexobject.dp.sample.domain.SharedMeta;
 import com.plexobject.dp.sample.domain.User;
 import com.plexobject.dp.sample.domain.Watchlist;
 import com.plexobject.dp.sample.marshal.WatchlistMarshaller;
 
 public class WatchlistByUserProvider extends BaseProvider {
-    private static MetaField userId = MetaFieldFactory.create("userId",
-            MetaFieldType.SCALAR_INTEGER);
-    private static MetaField symbol = MetaFieldFactory.create("symbol",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField watchlistName = MetaFieldFactory.create(
-            "watchlistName", MetaFieldType.SCALAR_TEXT);
+    private static MetaField userId = MetaFieldFactory.createInteger("userId");
+    private static MetaField watchlistName = MetaFieldFactory
+            .createText("watchlistName");
     private static Metadata parameterMeta = Metadata.from(userId);
-    private static Metadata optionalMeta = Metadata.from(symbol, watchlistName);
+    private static Metadata optionalMeta = Metadata.from(SharedMeta.symbol,
+            watchlistName);
     private static WatchlistMarshaller marshaller = new WatchlistMarshaller();
 
     public WatchlistByUserProvider() {
@@ -48,8 +46,8 @@ public class WatchlistByUserProvider extends BaseProvider {
                 filterWatchlistName = parameter
                         .getValueAsText(watchlistName, i);
             }
-            if (parameter.hasFieldValue(symbol, i)) {
-                filterSymbols = Arrays.asList(parameter.getValueAsText(symbol,
+            if (parameter.hasFieldValue(SharedMeta.symbol, i)) {
+                filterSymbols = Arrays.asList(parameter.getValueAsText(SharedMeta.symbol,
                         i));
             }
             Collection<Watchlist> watchLists = user.getWatchlists();

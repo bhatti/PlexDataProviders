@@ -6,7 +6,6 @@ import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
-import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.provider.BaseProvider;
 import com.plexobject.dp.provider.DataProviderException;
@@ -16,8 +15,8 @@ import com.plexobject.dp.sample.domain.Security;
 import com.plexobject.dp.sample.marshal.SecurityMarshaller;
 
 public class SymbolSearchProvider extends BaseProvider {
-    private static MetaField symbolQuery = MetaFieldFactory.create(
-            "symbolQuery", MetaFieldType.SCALAR_TEXT);
+    private static MetaField symbolQuery = MetaFieldFactory.createText(
+            "symbolQuery");
     private static Metadata parameterMeta = Metadata.from(symbolQuery);
     private static Metadata optionalMeta = Metadata.from();
     private static SecurityMarshaller marshaller = new SecurityMarshaller();

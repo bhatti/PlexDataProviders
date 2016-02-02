@@ -66,10 +66,9 @@ public class MarshallerFactoryTest {
     }
 
     static class UserMarshaller implements DataRowSetMarshaller<User> {
-        private MetaField name = MetaFieldFactory.create("name",
-                MetaFieldType.SCALAR_TEXT);
+        private MetaField name = MetaFieldFactory.createText("name");
         private MetaField username = MetaFieldFactory.create("username",
-                MetaFieldType.SCALAR_TEXT);
+                MetaFieldType.SCALAR_TEXT, true);
 
         @Override
         public DataRowSet marshal(User user) {

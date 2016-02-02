@@ -12,8 +12,8 @@ import com.plexobject.dp.sample.domain.User;
 import com.plexobject.dp.sample.marshal.UserMarshaller;
 
 public class UsersProvider extends BaseProvider {
-    private static Metadata parameterMeta = Metadata.fromRaw();
-    private static Metadata optionalMeta = Metadata.fromRaw();
+    private static Metadata parameterMeta = Metadata.from();
+    private static Metadata optionalMeta = Metadata.from();
     private static UserMarshaller marshaller = new UserMarshaller();
 
     public UsersProvider() {

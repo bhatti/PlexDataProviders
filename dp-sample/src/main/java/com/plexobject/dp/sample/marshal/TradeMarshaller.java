@@ -5,26 +5,21 @@ import java.util.Collection;
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
-import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.marshal.DataRowSetMarshaller;
+import com.plexobject.dp.sample.domain.SharedMeta;
 import com.plexobject.dp.sample.domain.Trade;
 
 public class TradeMarshaller implements DataRowSetMarshaller<Trade> {
-    private static MetaField tradeId = MetaFieldFactory.create("tradeId",
-            MetaFieldType.SCALAR_INTEGER);
-    private static MetaField exchange = MetaFieldFactory.create(
-            "trade.exchange", MetaFieldType.SCALAR_TEXT);
-    private static MetaField date = MetaFieldFactory.create("trade.date",
-            MetaFieldType.SCALAR_DATE);
-    private static MetaField price = MetaFieldFactory.create("trade.price",
-            MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField quantity = MetaFieldFactory.create(
-            "trade.quantity", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField symbol = MetaFieldFactory.create("trade.symbol",
-            MetaFieldType.SCALAR_TEXT);
-    private static Metadata responseMeta = Metadata.from(tradeId, exchange,
-            date, symbol, exchange, price, quantity);
+    private static MetaField tradeId = MetaFieldFactory
+            .createInteger("tradeId");
+    private static MetaField date = MetaFieldFactory.createDate("trade.date");
+    private static MetaField price = MetaFieldFactory
+            .createDecimal("trade.price");
+    private static MetaField quantity = MetaFieldFactory
+            .createDecimal("trade.quantity");
+    private static Metadata responseMeta = Metadata.from(tradeId, date,
+            SharedMeta.symbol, SharedMeta.exchange, price, quantity);
 
     @Override
     public DataRowSet marshal(Trade trade) {
@@ -43,8 +38,8 @@ public class TradeMarshaller implements DataRowSetMarshaller<Trade> {
 
     private void marshal(Trade trade, DataRowSet rowset, int rowNum) {
         rowset.addValueAtRow(tradeId, trade.getId(), rowNum);
-        rowset.addValueAtRow(symbol, trade.getSecurity().getSymbol(), rowNum);
-        rowset.addValueAtRow(exchange, trade.getExchange(), rowNum);
+        rowset.addValueAtRow(SharedMeta.symbol, trade.getSecurity().getSymbol(), rowNum);
+        rowset.addValueAtRow(SharedMeta.exchange, trade.getExchange(), rowNum);
         rowset.addValueAtRow(price, trade.getPrice(), rowNum);
         rowset.addValueAtRow(quantity, trade.getQuantity(), rowNum);
         rowset.addValueAtRow(date, trade.getDate(), rowNum);

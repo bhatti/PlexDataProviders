@@ -12,21 +12,21 @@ import com.plexobject.dp.sample.domain.OrderLeg;
 
 public class OrderLegMarshaller implements DataRowSetMarshaller<OrderLeg> {
     private static MetaField orderLegId = MetaFieldFactory.create("orderLegId",
-            MetaFieldType.SCALAR_INTEGER);
-    private static MetaField positionType = MetaFieldFactory.create(
-            "orderLeg.positionType", MetaFieldType.SCALAR_TEXT);
-    private static MetaField side = MetaFieldFactory.create("orderLeg.side",
-            MetaFieldType.SCALAR_TEXT);
-    private static MetaField price = MetaFieldFactory.create("orderLeg.price",
-            MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField quantity = MetaFieldFactory.create(
-            "orderLeg.quantity", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField fillPrice = MetaFieldFactory.create(
-            "orderLeg.fillPrice", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField fillQuantity = MetaFieldFactory.create(
-            "orderLeg.fillQuantity", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField trades = MetaFieldFactory.create(
-            "orderLeg.trades", MetaFieldType.ROWSET);
+            MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField positionType = MetaFieldFactory
+            .createText("orderLeg.positionType");
+    private static MetaField side = MetaFieldFactory
+            .createText("orderLeg.side");
+    private static MetaField price = MetaFieldFactory
+            .createDecimal("orderLeg.price");
+    private static MetaField quantity = MetaFieldFactory
+            .createDecimal("orderLeg.quantity");
+    private static MetaField fillPrice = MetaFieldFactory
+            .createDecimal("orderLeg.fillPrice");
+    private static MetaField fillQuantity = MetaFieldFactory
+            .createDecimal("orderLeg.fillQuantity");
+    private static MetaField trades = MetaFieldFactory
+            .createRowset("orderLeg.trades");
     private static Metadata responseMeta = Metadata.from(orderLegId,
             positionType, side, price, quantity, fillPrice, fillQuantity,
             trades);

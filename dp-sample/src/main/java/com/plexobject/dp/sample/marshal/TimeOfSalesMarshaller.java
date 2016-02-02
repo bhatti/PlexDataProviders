@@ -8,21 +8,20 @@ import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.marshal.DataRowSetMarshaller;
+import com.plexobject.dp.sample.domain.SharedMeta;
 import com.plexobject.dp.sample.domain.TimeOfSales;
 
 public class TimeOfSalesMarshaller implements DataRowSetMarshaller<TimeOfSales> {
-    private static MetaField date = MetaFieldFactory.create("timeOfSale.date",
-            MetaFieldType.SCALAR_DATE);
-    private static MetaField price = MetaFieldFactory.create(
-            "timeOfSale.price", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField symbol = MetaFieldFactory.create(
-            "timeOfSale.symbol", MetaFieldType.SCALAR_TEXT);
-    private static MetaField volume = MetaFieldFactory.create("volume",
-            MetaFieldType.SCALAR_INTEGER);
+    private static MetaField date = MetaFieldFactory
+            .createDate("timeOfSale.date");
+    private static MetaField price = MetaFieldFactory
+            .createDecimal("timeOfSale.price");
+    private static MetaField volume = MetaFieldFactory
+            .createInteger("timeOfSale.volume");
     private static MetaField exchange = MetaFieldFactory.create(
-            "timeOfSale.exchange", MetaFieldType.SCALAR_TEXT);
+            "timeOfSale.exchange", MetaFieldType.SCALAR_TEXT, true);
     private static Metadata responseMeta = Metadata.from(volume, exchange,
-            date, symbol, exchange, price);
+            date, SharedMeta.symbol, exchange, price);
 
     @Override
     public DataRowSet marshal(TimeOfSales sale) {
@@ -40,7 +39,7 @@ public class TimeOfSalesMarshaller implements DataRowSetMarshaller<TimeOfSales> 
     }
 
     private void marshal(TimeOfSales sale, DataRowSet rowset, int rowNum) {
-        rowset.addValueAtRow(symbol, sale.getSymbol(), rowNum);
+        rowset.addValueAtRow(SharedMeta.symbol, sale.getSymbol(), rowNum);
         rowset.addValueAtRow(exchange, sale.getExchange(), rowNum);
         rowset.addValueAtRow(price, sale.getPrice(), rowNum);
         rowset.addValueAtRow(volume, sale.getVolume(), rowNum);

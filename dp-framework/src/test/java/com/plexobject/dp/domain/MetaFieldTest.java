@@ -1,6 +1,8 @@
 package com.plexobject.dp.domain;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -8,35 +10,35 @@ public class MetaFieldTest {
 
     @Test
     public void testCreate() {
-        MetaField field = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
+        MetaField field = MetaFieldFactory.createText("name");
         assertEquals("name", field.getName());
         assertEquals(MetaFieldType.SCALAR_TEXT, field.getType());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCreateWithDifferentType() {
-        MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaFieldFactory.create("name", MetaFieldType.SCALAR_DATE);
+        MetaFieldFactory.createText("name");
+        MetaFieldFactory.createDate("name");
     }
 
     @Test
     public void testHashCode() {
-        MetaField field = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
+        MetaField field = MetaFieldFactory.createText("name");
         assertTrue(field.hashCode() != 0);
     }
 
     @Test
     public void testToString() {
-        MetaField field = MetaFieldFactory.create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field = MetaFieldFactory.createText("phone");
         assertTrue(field.toString().contains("phone"));
     }
 
     @Test
     public void testEquals() {
-        MetaField field1 = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field2 = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field3 = MetaFieldFactory.create("address",
-                MetaFieldType.SCALAR_TEXT);
+        MetaField field1 = MetaFieldFactory.createText("name");
+        MetaField field2 = MetaFieldFactory.createText("name");
+        MetaField field3 = MetaFieldFactory.createText("address");
+
         assertEquals(field1, field1);
         assertEquals(field1, field2);
         assertNotEquals(field1, field3);
@@ -46,8 +48,9 @@ public class MetaFieldTest {
 
     @Test
     public void testCompare() {
-        MetaField field1 = MetaFieldFactory.create("name", MetaFieldType.SCALAR_TEXT);
-        MetaField field2 = MetaFieldFactory.create("phone", MetaFieldType.SCALAR_TEXT);
+        MetaField field1 = MetaFieldFactory.createText("name");
+        MetaField field2 = MetaFieldFactory.createText("phone");
+
         assertTrue(field1.compareTo(field2) < 0);
     }
 

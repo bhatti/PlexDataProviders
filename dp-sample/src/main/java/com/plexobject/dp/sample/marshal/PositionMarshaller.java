@@ -9,20 +9,17 @@ import com.plexobject.dp.domain.MetaFieldType;
 import com.plexobject.dp.domain.Metadata;
 import com.plexobject.dp.marshal.DataRowSetMarshaller;
 import com.plexobject.dp.sample.domain.Position;
+import com.plexobject.dp.sample.domain.SharedMeta;
 
 public class PositionMarshaller implements DataRowSetMarshaller<Position> {
     private static MetaField positionId = MetaFieldFactory.create("positionId",
-            MetaFieldType.SCALAR_INTEGER);
-    private static MetaField accountId = MetaFieldFactory.create(
-            "position.accountId", MetaFieldType.SCALAR_INTEGER);
-    private static MetaField price = MetaFieldFactory.create("position.price",
-            MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField quantity = MetaFieldFactory.create(
-            "position.quantity", MetaFieldType.SCALAR_DECIMAL);
-    private static MetaField symbol = MetaFieldFactory.create("symbol",
-            MetaFieldType.SCALAR_TEXT);
-    private static Metadata responseMeta = Metadata.from(positionId, accountId,
-            price, quantity, symbol);
+            MetaFieldType.SCALAR_INTEGER, true);
+    private static MetaField price = MetaFieldFactory
+            .createDecimal("position.price");
+    private static MetaField quantity = MetaFieldFactory
+            .createDecimal("position.quantity");
+    private static Metadata responseMeta = Metadata.from(positionId, SharedMeta.accountId,
+            price, quantity, SharedMeta.symbol);
 
     @Override
     public DataRowSet marshal(Position position) {
@@ -41,8 +38,8 @@ public class PositionMarshaller implements DataRowSetMarshaller<Position> {
 
     private void marshal(DataRowSet rowset, Position position, int rowNum) {
         rowset.addValueAtRow(positionId, position.getId(), rowNum);
-        rowset.addValueAtRow(accountId, position.getAccount().getId(), rowNum);
-        rowset.addValueAtRow(symbol, position.getSecurity().getSymbol(), rowNum);
+        rowset.addValueAtRow(SharedMeta.accountId, position.getAccount().getId(), rowNum);
+        rowset.addValueAtRow(SharedMeta.symbol, position.getSecurity().getSymbol(), rowNum);
         rowset.addValueAtRow(price, position.getPrice(), rowNum);
         rowset.addValueAtRow(quantity, position.getQuantity(), rowNum);
     }

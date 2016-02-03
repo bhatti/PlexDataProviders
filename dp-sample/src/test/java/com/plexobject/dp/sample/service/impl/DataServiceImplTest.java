@@ -156,7 +156,7 @@ public class DataServiceImplTest {
         props.setProperty(Constants.HTTP_PORT, String.valueOf(DEFAULT_PORT));
         props.setProperty(Constants.JAXWS_NAMESPACE, "");
         Configuration config = new Configuration(props);
-        if (true || config.getBoolean("log")) {
+        if (config.getBoolean("log")) {
             BasicConfigurator.configure();
             LogManager.getRootLogger().setLevel(Level.WARN);
         }

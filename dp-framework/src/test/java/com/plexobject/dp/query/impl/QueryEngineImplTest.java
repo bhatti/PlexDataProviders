@@ -1,4 +1,4 @@
-package com.plexobject.dp.provider.impl;
+package com.plexobject.dp.query.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -26,13 +26,14 @@ import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.locator.DataProviderLocator;
+import com.plexobject.dp.locator.impl.DataProviderLocatorImpl;
 import com.plexobject.dp.provider.BaseProvider;
 import com.plexobject.dp.provider.DataProvider;
 import com.plexobject.dp.provider.DataProviderException;
-import com.plexobject.dp.provider.DataProviderLocator;
 import com.plexobject.dp.provider.TaskGranularity;
 
-public class DataProvidersImplTest {
+public class QueryEngineImplTest {
     private static final String CATEGORY_NAME = "Test";
 
     static class TimeoutProvider extends BaseProvider {
@@ -181,7 +182,7 @@ public class DataProvidersImplTest {
     }
 
     private final DataProviderLocator dataProviderLocator = new DataProviderLocatorImpl();
-    private final DataProvidersImpl dataProviders = new DataProvidersImpl(
+    private final QueryEngineImpl dataProviders = new QueryEngineImpl(
             dataProviderLocator);
     private final DataConfiguration config = new DataConfiguration();
 
@@ -259,7 +260,7 @@ public class DataProvidersImplTest {
 
         DataRequest request = new DataRequest(rowsetFrom("input1"),
                 metaFrom("output2a"), config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
         assertEquals(1, response.getResponseFields().size());
         assertEquals("output2a-value-0", response.getResponseFields()
@@ -279,7 +280,7 @@ public class DataProvidersImplTest {
 
         DataRequest request = new DataRequest(rowsetFrom("input1"),
                 metaFrom("output2a"), config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
         assertEquals(1, response.getResponseFields().size());
 
@@ -294,7 +295,7 @@ public class DataProvidersImplTest {
         long started = System.currentTimeMillis();
         DataRequest request = new DataRequest(rowsetFrom("A"), metaFrom("E",
                 "F", "H"), config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
         assertEquals(1, response.getResponseFields().size());
 
@@ -331,7 +332,7 @@ public class DataProvidersImplTest {
         long started = System.currentTimeMillis();
         DataRequest request = new DataRequest(rowsetArrayFrom("uid", "search"),
                 metaArrayFrom("uname", "symbol", "positionCount"), config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
         assertEquals(1, response.getResponseFields().size());
 
@@ -375,7 +376,7 @@ public class DataProvidersImplTest {
                 MetaFieldFactory.createInteger("maxOutputRows",
                         DataConfiguration.class.getSimpleName(), false), 10, 0);
 
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
         assertEquals(10, response.getResponseFields().size());
 
@@ -424,7 +425,7 @@ public class DataProvidersImplTest {
 
         DataRequest request = new DataRequest(rowsetFrom("a"), metaFrom("b"),
                 config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
         assertEquals(1, response.getResponseFields().size());
 
@@ -452,7 +453,7 @@ public class DataProvidersImplTest {
 
         DataRequest request = new DataRequest(rowsetFrom("search"), metaFrom(
                 "quotes", "research"), config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
         assertEquals(1, response.getResponseFields().size());
 
@@ -467,7 +468,7 @@ public class DataProvidersImplTest {
         try {
             dataProviderLocator.unregister(provider2);
             dataProviderLocator.unregister(provider3);
-            dataProviders.produce(request);
+            dataProviders.query(request);
             fail("Should have failed");
         } catch (DataProviderException e) {
 
@@ -488,7 +489,7 @@ public class DataProvidersImplTest {
 
         DataRequest request = new DataRequest(rowsetFrom("timeout", "a"),
                 metaFrom("d", "e", "timeout-result"), config);
-        dataProviders.produce(request);
+        dataProviders.query(request);
     }
 
     
@@ -509,7 +510,7 @@ public class DataProvidersImplTest {
 
         DataRequest request = new DataRequest(rowsetFrom("timeout", "a"),
                 metaFrom("d", "e", "timeout-result"), config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
         assertEquals(1, response.getResponseFields().size());
 
@@ -528,7 +529,7 @@ public class DataProvidersImplTest {
 
         DataRequest request = new DataRequest(rowsetFrom("error", "query"),
                 metaFrom("lookupResults", "somedata", "error-result"), config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals(1, response.getErrorsByProviderName().size());
         assertEquals(1, response.getResponseFields().size());
     }
@@ -549,7 +550,7 @@ public class DataProvidersImplTest {
         DataRequest request = new DataRequest(rowsetFrom("error", "query"),
                 metaFrom("lookupResults", "detailsData", "error-result"),
                 config);
-        DataResponse response = dataProviders.produce(request);
+        DataResponse response = dataProviders.query(request);
         assertEquals("Error " + response.getErrorsByProviderName(), 1, response
                 .getErrorsByProviderName().size());
     }

@@ -7,8 +7,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.plexobject.dp.locator.DataProviderLocator;
 import com.plexobject.dp.provider.DataProvider;
-import com.plexobject.dp.provider.DataProviderLocator;
 
 public class DataProviderDeserializer extends JsonDeserializer<DataProvider> {
     private final DataProviderLocator dataProviderLocator;

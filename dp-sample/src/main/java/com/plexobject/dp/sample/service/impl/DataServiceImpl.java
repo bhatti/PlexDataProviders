@@ -23,11 +23,11 @@ import com.plexobject.dp.json.DataRowSetDeserializer;
 import com.plexobject.dp.json.DataRowSetSerializer;
 import com.plexobject.dp.json.MetadataDeserializer;
 import com.plexobject.dp.json.MetadataSerializer;
+import com.plexobject.dp.locator.DataProviderLocator;
+import com.plexobject.dp.locator.impl.DataProviderLocatorImpl;
 import com.plexobject.dp.provider.DataProvider;
-import com.plexobject.dp.provider.DataProviderLocator;
-import com.plexobject.dp.provider.DataProviders;
-import com.plexobject.dp.provider.impl.DataProviderLocatorImpl;
-import com.plexobject.dp.provider.impl.DataProvidersImpl;
+import com.plexobject.dp.query.QueryEngine;
+import com.plexobject.dp.query.impl.QueryEngineImpl;
 import com.plexobject.dp.sample.domain.DataInfoResponse;
 import com.plexobject.dp.sample.provider.AccountsByIdsProvider;
 import com.plexobject.dp.sample.provider.AccountsByUseridProvider;
@@ -52,8 +52,7 @@ import com.plexobject.handler.Request;
 @Path("/data")
 public class DataServiceImpl implements DataService {
     private DataProviderLocator dataProviderLocator = new DataProviderLocatorImpl();
-    private DataProviders dataProviders = new DataProvidersImpl(
-            dataProviderLocator);
+    private QueryEngine queryEngine = new QueryEngineImpl(dataProviderLocator);
 
     public DataServiceImpl() {
         dataProviderLocator.register(new AccountsByIdsProvider());
@@ -78,7 +77,7 @@ public class DataServiceImpl implements DataService {
         final DataRequest dataRequest = DataRequest.from(webRequest
                 .getProperties());
         //
-        return dataProviders.produce(dataRequest);
+        return queryEngine.query(dataRequest);
     }
 
     @Override
@@ -94,7 +93,7 @@ public class DataServiceImpl implements DataService {
         DataInfoResponse response = new DataInfoResponse(Metadata.from(),
                 Metadata.from());
         for (DataProvider provider : providers) {
-            if (categories.length> 0) {
+            if (categories.length > 0) {
                 for (MetaField metaField : provider.getMandatoryRequestFields()
                         .getMetaFieldsByCategories(categories)) {
                     response.getRequestMetadata().addMetaField(metaField);
@@ -108,9 +107,12 @@ public class DataServiceImpl implements DataService {
                     response.getResponseMetadata().addMetaField(metaField);
                 }
             } else {
-                response.getRequestMetadata().merge(provider.getMandatoryRequestFields());
-                response.getRequestMetadata().merge(provider.getOptionalRequestFields());
-                response.getResponseMetadata().merge(provider.getResponseFields());
+                response.getRequestMetadata().merge(
+                        provider.getMandatoryRequestFields());
+                response.getRequestMetadata().merge(
+                        provider.getOptionalRequestFields());
+                response.getResponseMetadata().merge(
+                        provider.getResponseFields());
             }
         }
 

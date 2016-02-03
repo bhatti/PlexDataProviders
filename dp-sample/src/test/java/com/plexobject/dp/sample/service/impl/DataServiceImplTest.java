@@ -383,7 +383,6 @@ public class DataServiceImplTest {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
                 + DEFAULT_PORT
                 + "/data?responseFields=userId,user.accounts,user.portfolio");
-        System.out.println(jsonResp);
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
 
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
@@ -464,8 +463,6 @@ public class DataServiceImplTest {
                         + DEFAULT_PORT
                         + "/data?responseFields=orderId,order.date,order.price,order.quantity,order.status,order.orderLegs&accountId="
                         + accountId);
-        System.out.println(jsonResp);
-
         response = TestWebUtils.decodeQueryResponse(jsonResp);
 
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()

@@ -1,0 +1,10 @@
+com.plexobject.dp.domain
+com.plexobject.dp.json
+com.plexobject.dp.locator
+com.plexobject.dp.locator.impl
+com.plexobject.dp.marshal
+com.plexobject.dp.metrics
+com.plexobject.dp.provider
+com.plexobject.dp.query
+com.plexobject.dp.query.impl
+com.plexobject.dp.util

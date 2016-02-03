@@ -1,4 +1,4 @@
-package com.plexobject.dp.provider.impl;
+package com.plexobject.dp.locator.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,11 +12,11 @@ import org.apache.log4j.Logger;
 
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.locator.DataProviderLocator;
 import com.plexobject.dp.metrics.Metric;
 import com.plexobject.dp.metrics.Timer;
 import com.plexobject.dp.provider.DataProvider;
 import com.plexobject.dp.provider.DataProviderException;
-import com.plexobject.dp.provider.DataProviderLocator;
 
 public class DataProviderLocatorImpl implements DataProviderLocator {
     private static final Logger logger = Logger

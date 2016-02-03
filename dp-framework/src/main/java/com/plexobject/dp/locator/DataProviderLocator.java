@@ -1,8 +1,9 @@
-package com.plexobject.dp.provider;
+package com.plexobject.dp.locator;
 
 import java.util.Collection;
 
 import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.provider.DataProvider;
 
 /**
  * This interface is used to find data providers given request data and response

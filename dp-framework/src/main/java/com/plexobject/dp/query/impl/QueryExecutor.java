@@ -1,4 +1,4 @@
-package com.plexobject.dp.provider.impl;
+package com.plexobject.dp.query.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,9 +20,9 @@ import com.plexobject.dp.provider.DataProvider;
 import com.plexobject.dp.provider.DataProviderException;
 import com.plexobject.dp.provider.TaskGranularity;
 
-public class ProvidersExecutor {
+public class QueryExecutor {
     private static final Logger logger = Logger
-            .getLogger(ProvidersExecutor.class);
+            .getLogger(QueryExecutor.class);
     private final DataRowSet requestFields;
     private final DataRowSet responseFields;
     private final DataConfiguration config;
@@ -32,7 +32,7 @@ public class ProvidersExecutor {
             new Metadata());
     private final Map<String, Throwable> providerErrors = new HashMap<>();
 
-    ProvidersExecutor(final DataRowSet requestFields,
+    public QueryExecutor(final DataRowSet requestFields,
             final DataRowSet responseFields, final DataConfiguration config,
             final Collection<DataProvider> providers,
             final ExecutorService executor) {
@@ -92,11 +92,6 @@ public class ProvidersExecutor {
         final Collection<DataProvider> executedProviders = new ArrayList<>();
         final Map<DataProvider, Future<?>> futures = new HashMap<>();
         for (final DataProvider provider : providers) {
-            System.out.println("Provider "
-                    + provider
-                    + ", missing "
-                    + requestFields.getMetadata().getMissingMetadata(
-                            provider.getMandatoryRequestFields()));
             if (requestFields.getMetadata().getMissingCount(
                     provider.getMandatoryRequestFields()) == 0) {
                 executedProviders.add(provider);

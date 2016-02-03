@@ -1,5 +1,6 @@
 # PlexDataProviders
-Java framework for managing general-purpose data providers
+Java framework for managing general-purpose data providers and data query.
+
 ##Overview
 
 PlexDataProviders is a light-weight Java framework that abstract access to various data providers such as databases, files, web services, etc. It allows aggregation of data from various data providers. 

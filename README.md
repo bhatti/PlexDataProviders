@@ -163,12 +163,16 @@ public class DataServiceImpl implements DataService {
 
 ```
 
-Here is an example client that passes a search query data field and defines
+Here is an example client that passes a search query data field and requests quote data fields with company details
 ```java 
 public void testGetQuoteBySearch() throws Throwable {
     String jsonResp = TestWebUtils.httpGet("http://localhost:" + DEFAULT_PORT
                     + "/data?responseFields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&symbolQuery=AAPL");
 ```
+
+Note that above request will use three data providers, first it uses SymbolSearchProvider provider to search for matching symbols with given query. It then uses the symbol data field to request company and quote data fields from QuotesBySymbolsProvider and CompaniesBySymbolsProvider.
+
+
 Here is an example JSON response from the data service:
 ```javascript
 {

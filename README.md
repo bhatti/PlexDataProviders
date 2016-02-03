@@ -13,6 +13,10 @@ The query engine can determine dependency between providers and it also allow yo
 - data-provider B requires input-b1 and output-a1 and produces output-b1, output-b2
 Then you can pass input-a1, input-a2 to the query engine and request output-a1, output-a2, output-b1, output-b2 output data fields.
 
+
+##Benefits
+PlexDataProviders provides a unified way to search data and abstracts integration to underlying data sources. This also helps simplifying client side logic as they can use a single data service to query all data instead of using multiple data services. As clients can specify the data they need, this helps with payload size and network bandwidth. The clients only need to create a single data parser so it keeps JSON parsing logic simple. As PlexDataProviders supports multi-threading, it also helps with latency of the data fetch requests.
+
 ##Building
 - Download and install <a href="http://www.gradle.org/downloads">Gradle</a>.
 - Download and install <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Java 8</a>.

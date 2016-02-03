@@ -2,6 +2,12 @@ package com.plexobject.dp.domain;
 
 import java.util.Objects;
 
+/**
+ * This class defines meta information for the data fields
+ * 
+ * @author sahzad bhatti
+ *
+ */
 public class MetaField implements Comparable<MetaField> {
     private final String name;
     private final String category;

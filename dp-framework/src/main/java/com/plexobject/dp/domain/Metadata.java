@@ -5,6 +5,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class defines set of meta fields for identifying data fields
+ * 
+ * @author shahzad bhatti
+ *
+ */
 public class Metadata {
     private final Set<MetaField> metaFields = new HashSet<>();
 

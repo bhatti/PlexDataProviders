@@ -18,7 +18,7 @@ import org.apache.log4j.LogManager;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.plexobject.dp.domain.DataConfiguration;
+import com.plexobject.dp.domain.QueryConfiguration;
 import com.plexobject.dp.domain.DataRequest;
 import com.plexobject.dp.domain.DataResponse;
 import com.plexobject.dp.domain.DataRow;
@@ -47,7 +47,7 @@ public class QueryEngineImplTest {
 
         @Override
         public void produce(final DataRowSet requestRowSet,
-                final DataRowSet responseRowSet, final DataConfiguration config) {
+                final DataRowSet responseRowSet, final QueryConfiguration config) {
             try {
                 Thread.sleep(sleepMillis);
             } catch (InterruptedException e) {
@@ -73,7 +73,7 @@ public class QueryEngineImplTest {
 
         @Override
         public void produce(final DataRowSet requestRowSet,
-                final DataRowSet responseRowSet, final DataConfiguration config)
+                final DataRowSet responseRowSet, final QueryConfiguration config)
                 throws DataProviderException {
             throw error;
         }
@@ -94,7 +94,7 @@ public class QueryEngineImplTest {
 
         @Override
         public void produce(final DataRowSet requestRowSet,
-                final DataRowSet responseRowSet, final DataConfiguration config)
+                final DataRowSet responseRowSet, final QueryConfiguration config)
                 throws DataProviderException {
             for (int i = 0; i < requestRowSet.size(); i++) {
                 for (MetaField metaField : getMandatoryRequestFields()
@@ -110,10 +110,10 @@ public class QueryEngineImplTest {
             }
             int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
                     .createInteger("maxOutputRows",
-                            DataConfiguration.class.getSimpleName(), false), 0) ? (int) requestRowSet
+                            QueryConfiguration.class.getSimpleName(), false), 0) ? (int) requestRowSet
                     .getValueAsLong(MetaFieldFactory.createInteger(
                             "maxOutputRows",
-                            DataConfiguration.class.getSimpleName(), false), 0)
+                            QueryConfiguration.class.getSimpleName(), false), 0)
                     : requestRowSet.size();
             for (int i = 0; i < maxOutputRows; i++) {
                 Collection<MetaField> responseFields = new ArrayList<>(
@@ -146,7 +146,7 @@ public class QueryEngineImplTest {
 
         @Override
         public void produce(final DataRowSet requestRowSet,
-                final DataRowSet responseRowSet, final DataConfiguration config)
+                final DataRowSet responseRowSet, final QueryConfiguration config)
                 throws DataProviderException {
             for (int i = 0; i < requestRowSet.size(); i++) {
                 for (MetaField metaField : getMandatoryRequestFields()
@@ -156,10 +156,10 @@ public class QueryEngineImplTest {
             }
             int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
                     .createInteger("maxOutputRows",
-                            DataConfiguration.class.getSimpleName(), false), 0) ? (int) requestRowSet
+                            QueryConfiguration.class.getSimpleName(), false), 0) ? (int) requestRowSet
                     .getValueAsLong(MetaFieldFactory.createInteger(
                             "maxOutputRows",
-                            DataConfiguration.class.getSimpleName(), false), 0)
+                            QueryConfiguration.class.getSimpleName(), false), 0)
                     : requestRowSet.size();
             for (int i = 0; i < maxOutputRows; i++) {
                 Collection<MetaField> responseFields = new ArrayList<>(
@@ -184,7 +184,7 @@ public class QueryEngineImplTest {
     private final DataProviderLocator dataProviderLocator = new DataProviderLocatorImpl();
     private final QueryEngineImpl dataProviders = new QueryEngineImpl(
             dataProviderLocator);
-    private final DataConfiguration config = new DataConfiguration();
+    private final QueryConfiguration config = new QueryConfiguration();
 
     @Before
     public void setUp() throws Exception {
@@ -374,7 +374,7 @@ public class QueryEngineImplTest {
                 "symbol", "bid", "mark"), config);
         request.getParameters().addValueAtRow(
                 MetaFieldFactory.createInteger("maxOutputRows",
-                        DataConfiguration.class.getSimpleName(), false), 10, 0);
+                        QueryConfiguration.class.getSimpleName(), false), 10, 0);
 
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());

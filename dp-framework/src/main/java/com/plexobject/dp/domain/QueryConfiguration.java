@@ -5,12 +5,19 @@ import java.util.Map;
 
 import com.plexobject.dp.util.ObjectConversionUtils;
 
-public class DataConfiguration {
+/**
+ * This class defines configuration parameters for query
+ * 
+ * @author shahzad bhatti
+ *
+ */
+public class QueryConfiguration {
     private static final String PAGE = "page";
     private static final String LIMIT = "limit";
     private static final String QUERY_TIMEOUT = "queryTimeoutMillis";
     private static final String ORDER_BY = "orderBy";
     private static final String GROUP_BY = "groupBy";
+    private static final String ABORT_UPON_FAILURE = "abortUponPartialFailure";
 
     private int page;
     private int limit;
@@ -21,8 +28,8 @@ public class DataConfiguration {
     private boolean abortUponPartialFailure;
     private Map<String, Object> filterCriteria = new HashMap<>();
 
-    public static DataConfiguration from(final Map<String, Object> args) {
-        final DataConfiguration config = new DataConfiguration();
+    public static QueryConfiguration from(final Map<String, Object> args) {
+        final QueryConfiguration config = new QueryConfiguration();
         for (Map.Entry<String, Object> e : args.entrySet()) {
             if (PAGE.equals(e.getKey())) {
                 config.setPage((int) ObjectConversionUtils.getAsLong(e
@@ -37,6 +44,9 @@ public class DataConfiguration {
                 config.setOrderBy(ObjectConversionUtils.getAsText(e.getValue()));
             } else if (GROUP_BY.equals(e.getKey())) {
                 config.setGroupBy(ObjectConversionUtils.getAsText(e.getValue()));
+            } else if (ABORT_UPON_FAILURE.equals(e.getKey())) {
+                config.setAbortUponPartialFailure(ObjectConversionUtils
+                        .getAsBoolean(e.getValue()));
             }
         }
         return config;

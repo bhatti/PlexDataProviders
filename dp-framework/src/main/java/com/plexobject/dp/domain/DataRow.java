@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.plexobject.dp.util.ObjectConversionUtils;
 
 /**
- * This class defines collection of data fields that would be returned or
- * consumed by data provider
+ * This class defines collection of data fields where each data field is
+ * identified by meta-field
  * 
  * @author shahzad bhatti
  *

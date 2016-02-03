@@ -1,6 +1,6 @@
 package com.plexobject.dp.provider;
 
-import com.plexobject.dp.domain.DataConfiguration;
+import com.plexobject.dp.domain.QueryConfiguration;
 import com.plexobject.dp.domain.DataRowSet;
 
 /**
@@ -24,5 +24,5 @@ public interface DataProducer {
      * @throws DataProviderException
      */
     void produce(DataRowSet requestFields, DataRowSet responseFields,
-            DataConfiguration config) throws DataProviderException;
+            QueryConfiguration config) throws DataProviderException;
 }

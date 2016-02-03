@@ -7,6 +7,12 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
+/**
+ * This class defines response for output data fields
+ * 
+ * @author shahzad bhatti
+ *
+ */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataResponse {
     private DataRowSet responseFields;

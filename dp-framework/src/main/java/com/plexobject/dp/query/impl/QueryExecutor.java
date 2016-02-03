@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import com.plexobject.dp.domain.DataConfiguration;
+import com.plexobject.dp.domain.QueryConfiguration;
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.Metadata;
@@ -20,12 +20,17 @@ import com.plexobject.dp.provider.DataProvider;
 import com.plexobject.dp.provider.DataProviderException;
 import com.plexobject.dp.provider.TaskGranularity;
 
+/**
+ * This class queries and aggregates data using multi-threading if needed.
+ * 
+ * @author shahzad bhatti
+ *
+ */
 public class QueryExecutor {
-    private static final Logger logger = Logger
-            .getLogger(QueryExecutor.class);
+    private static final Logger logger = Logger.getLogger(QueryExecutor.class);
     private final DataRowSet requestFields;
     private final DataRowSet responseFields;
-    private final DataConfiguration config;
+    private final QueryConfiguration config;
     private final Collection<DataProvider> providers;
     private final ExecutorService executor;
     private final DataRowSet optionalRequestFields = new DataRowSet(
@@ -33,7 +38,7 @@ public class QueryExecutor {
     private final Map<String, Throwable> providerErrors = new HashMap<>();
 
     public QueryExecutor(final DataRowSet requestFields,
-            final DataRowSet responseFields, final DataConfiguration config,
+            final DataRowSet responseFields, final QueryConfiguration config,
             final Collection<DataProvider> providers,
             final ExecutorService executor) {
         this.requestFields = requestFields;

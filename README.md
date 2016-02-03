@@ -60,7 +60,7 @@ The data provider implements following two interfaces
 ```java 
 public interface DataProducer {
     void produce(DataRowSet requestFields, DataRowSet responseFields,
-            DataConfiguration config) throws DataProviderException;
+            QueryConfiguration config) throws DataProviderException;
 }
 
 ```
@@ -96,7 +96,7 @@ public class SecuritiesBySymbolsProvider extends BaseProvider {
 
     @Override
     public void produce(DataRowSet parameter, DataRowSet response,
-            DataConfiguration config) throws DataProviderException {
+            QueryConfiguration config) throws DataProviderException {
         final String id = parameter.getValueAsText(SharedMeta.symbol, 0);
         Map<String, Object> criteria = new HashMap<>();
         criteria.put("symbol", id.toUpperCase());

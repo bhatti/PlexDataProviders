@@ -4,6 +4,13 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Date;
 
+/**
+ * This class defines methods for converting objects into primitive data types
+ * such as long, text
+ * 
+ * @author shahzad bhatti
+ *
+ */
 public class ObjectConversionUtils {
     public static String getAsText(Object value) {
         if (value instanceof String) {

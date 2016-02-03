@@ -8,7 +8,7 @@ import java.util.HashMap;
 import org.junit.Test;
 
 public class DataConfigurationTest {
-    private DataConfiguration config = new DataConfiguration();
+    private QueryConfiguration config = new QueryConfiguration();
 
     @Test
     public void testGetSetPage() {

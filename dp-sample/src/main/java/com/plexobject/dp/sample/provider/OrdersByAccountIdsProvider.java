@@ -38,8 +38,7 @@ public class OrdersByAccountIdsProvider extends BaseProvider {
                     });
             //
             if (orders.size() > 0) {
-                Order order = orders.iterator().next();
-                DataRowSet rowset = marshaller.marshal(order);
+                DataRowSet rowset = marshaller.marshal(orders);
                 nextRow = addRowSet(response, rowset, nextRow);
             }
         }

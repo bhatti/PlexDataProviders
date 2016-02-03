@@ -110,4 +110,9 @@ public class Quote implements Idable<String> {
         this.marketSession = marketSession;
     }
 
+    @Override
+    public String toString() {
+        return "Quote(" + security.getSymbol() + ")";
+    }
+
 }

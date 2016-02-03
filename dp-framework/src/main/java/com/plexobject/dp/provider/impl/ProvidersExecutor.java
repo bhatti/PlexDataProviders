@@ -92,6 +92,11 @@ public class ProvidersExecutor {
         final Collection<DataProvider> executedProviders = new ArrayList<>();
         final Map<DataProvider, Future<?>> futures = new HashMap<>();
         for (final DataProvider provider : providers) {
+            System.out.println("Provider "
+                    + provider
+                    + ", missing "
+                    + requestFields.getMetadata().getMissingMetadata(
+                            provider.getMandatoryRequestFields()));
             if (requestFields.getMetadata().getMissingCount(
                     provider.getMandatoryRequestFields()) == 0) {
                 executedProviders.add(provider);

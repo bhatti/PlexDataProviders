@@ -1,5 +1,7 @@
 package com.plexobject.dp.sample.marshal;
 
+import java.util.Collection;
+
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
@@ -20,10 +22,23 @@ public class AccountMarshaller implements DataRowSetMarshaller<Account> {
     @Override
     public DataRowSet marshal(Account account) {
         DataRowSet rowset = new DataRowSet(responseMeta);
-        rowset.addValueAtRow(SharedMeta.accountId, account.getId(), 0);
-        rowset.addValueAtRow(accountType, account.getAccountType().name(), 0);
-        rowset.addValueAtRow(accountName, account.getAccountName(), 0);
+        marshal(rowset, account, 0);
         return rowset;
+    }
+
+    public DataRowSet marshal(Collection<Account> accounts) {
+        DataRowSet rowset = new DataRowSet(responseMeta);
+        for (Account account : accounts) {
+            marshal(rowset, account, rowset.size());
+        }
+        return rowset;
+    }
+
+    private void marshal(DataRowSet rowset, Account account, int rowNum) {
+        rowset.addValueAtRow(SharedMeta.accountId, account.getId(), rowNum);
+        rowset.addValueAtRow(accountType, account.getAccountType().name(),
+                rowNum);
+        rowset.addValueAtRow(accountName, account.getAccountName(), rowNum);
     }
 
     @Override

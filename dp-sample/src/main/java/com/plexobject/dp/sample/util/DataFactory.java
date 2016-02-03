@@ -61,6 +61,10 @@ public class DataFactory {
             Company company = createCompany();
             DaoLocator.companyDao.save(company);
         }
+        for (int i = 0; i < 20; i++) {
+            Quote quote = createQuote();
+            DaoLocator.quoteDao.save(quote);
+        }
         for (int i = 0; i < 10; i++) {
             User user = createUser();
             DaoLocator.userDao.save(user);

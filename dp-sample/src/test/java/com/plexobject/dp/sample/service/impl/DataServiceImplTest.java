@@ -200,7 +200,6 @@ public class DataServiceImplTest {
     public void testInfo() throws Throwable {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
                 + DEFAULT_PORT + "/data/info");
-        System.out.println(jsonResp);
         InfoResponse response = TestWebUtils.decodeDataInfoResponse(jsonResp);
         assertTrue(response.getInfoResponse().getRequestMetadata().size() > 0);
         assertTrue(response.getInfoResponse().getResponseMetadata().size() > 0);
@@ -303,8 +302,6 @@ public class DataServiceImplTest {
                         + DEFAULT_PORT
                         + "/data?responseFields=exchange,symbol,underlyingSymbol,security.type,company.name,company.address&symbolQuery=M");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
-        // System.out.println("XX " +
-        // response.queryResponse.getResponseFields());
 
         assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
@@ -342,6 +339,83 @@ public class DataServiceImplTest {
     }
 
     @Test
+    public void testGetQuoteBySearch() throws Throwable {
+        String jsonResp = TestWebUtils
+                .httpGet("http://localhost:"
+                        + DEFAULT_PORT
+                        + "/data?responseFields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&symbolQuery=AAPL");
+        QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
+
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
+        assertEquals(2, response.getQueryResponse().getResponseFields().size());
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("QuotesBySymbolsProvider"));
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("SymbolSearchProvider"));
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("CompaniesBySymbolsProvider"));
+
+        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+                .size(); i++) {
+            assertTrue(response.getQueryResponse().getResponseFields()
+                    .getValueAsText(SharedMeta.symbol, i).contains("AAPL"));
+            assertTrue(response.getQueryResponse().getResponseFields()
+                    .getValueAsText(SharedMeta.exchange, i).length() > 0);
+            DataRowSet sales = response
+                    .getQueryResponse()
+                    .getResponseFields()
+                    .getValueAsRowSet(MetaFieldFactory.lookup("quote.sales"), 0);
+            assertEquals(5, sales.size());
+            for (int j = 0; j < 5; j++) {
+                assertTrue(sales.getValueAsLong(
+                        MetaFieldFactory.lookup("timeOfSale.volume"), j) > 0);
+                assertTrue(sales.getValueAsDecimal(
+                        MetaFieldFactory.lookup("timeOfSale.price"), j) > 0);
+                assertTrue(sales.getValueAsText(
+                        MetaFieldFactory.lookup("symbol"), j).length() > 0);
+            }
+        }
+    }
+
+    @Test
+    public void testGetAccounts() throws Throwable {
+        String jsonResp = TestWebUtils.httpGet("http://localhost:"
+                + DEFAULT_PORT
+                + "/data?responseFields=userId,user.accounts,user.portfolio");
+        System.out.println(jsonResp);
+        QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
+
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
+        assertEquals(10, response.getQueryResponse().getResponseFields().size());
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("UsersProvider"));
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("UsersByIdsProvider"));
+
+        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+                .size(); i++) {
+            assertTrue(response.getQueryResponse().getResponseFields()
+                    .getValueAsLong(SharedMeta.userId, i) > 0);
+            DataRowSet accounts = response
+                    .getQueryResponse()
+                    .getResponseFields()
+                    .getValueAsRowSet(MetaFieldFactory.lookup("user.accounts"),
+                            0);
+            assertEquals(5, accounts.size());
+            for (int j = 0; j < 5; j++) {
+                assertTrue(accounts.getValueAsLong(
+                        MetaFieldFactory.lookup("accountId"), j) > 0);
+                assertTrue(accounts.getValueAsText(
+                        MetaFieldFactory.lookup("account.type"), j).length() > 0);
+                assertTrue(accounts.getValueAsText(
+                        MetaFieldFactory.lookup("account.name"), j).length() > 0);
+            }
+        }
+    }
+
+    @Test
     public void testGetSecuritiesBySymbol() throws Throwable {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
                 + DEFAULT_PORT
@@ -359,4 +433,60 @@ public class DataServiceImplTest {
                 .getValueAsText(SharedMeta.underlyingSymbol, 0));
     }
 
+    @Test
+    public void testGetAccountsOrders() throws Throwable {
+        String jsonResp = TestWebUtils.httpGet("http://localhost:"
+                + DEFAULT_PORT + "/data?responseFields=user.accounts");
+        QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
+
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
+        assertEquals(10, response.getQueryResponse().getResponseFields().size());
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("UsersProvider"));
+        long accountId = 0;
+        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+                .size(); i++) {
+            DataRowSet accounts = response
+                    .getQueryResponse()
+                    .getResponseFields()
+                    .getValueAsRowSet(MetaFieldFactory.lookup("user.accounts"),
+                            0);
+            assertEquals(5, accounts.size());
+            for (int j = 0; j < 5; j++) {
+                accountId = accounts.getValueAsLong(
+                        MetaFieldFactory.lookup("accountId"), j);
+            }
+        }
+
+        jsonResp = TestWebUtils
+                .httpGet("http://localhost:"
+                        + DEFAULT_PORT
+                        + "/data?responseFields=orderId,order.date,order.price,order.quantity,order.status,order.orderLegs&accountId="
+                        + accountId);
+        System.out.println(jsonResp);
+
+        response = TestWebUtils.decodeQueryResponse(jsonResp);
+
+        assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
+                .size());
+        assertEquals(20, response.getQueryResponse().getResponseFields().size());
+        assertTrue(response.getQueryResponse().getProviders()
+                .contains("OrdersByAccountIdsProvider"));
+        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+                .size(); i++) {
+            assertTrue(response
+                    .getQueryResponse()
+                    .getResponseFields()
+                    .getValueAsDecimal(
+                            MetaFieldFactory.lookup("order.quantity"), i) > 0);
+            DataRowSet legs = response
+                    .getQueryResponse()
+                    .getResponseFields()
+                    .getValueAsRowSet(
+                            MetaFieldFactory.lookup("order.orderLegs"), i);
+            assertEquals(5, legs.size());
+        }
+
+    }
 }

@@ -32,6 +32,9 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
             SerializerProvider sp) throws IOException, JsonGenerationException {
         jgen.writeStartArray(row.size());
         for (Map.Entry<MetaField, Object> e : row.getFields().entrySet()) {
+            if (!row.hasFieldValue(e.getKey())) {
+                continue;
+            }
             jgen.writeStartObject();
             jgen.writeStringField("name", e.getKey().getName());
             // jgen.writeBooleanField("keyField", e.getKey().isKeyField());

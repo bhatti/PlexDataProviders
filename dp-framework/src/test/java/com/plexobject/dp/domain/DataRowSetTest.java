@@ -280,7 +280,7 @@ public class DataRowSetTest {
         assertEquals(1L, row.getValueAsLong(MetaFieldFactory.lookup("num")));
     }
 
-    @Test
+    @Test(expected=IllegalArgumentException.class)
     public void testGetValueAsTextKeyFieldNonexistant() {
         DataRowSet rowset = new DataRowSet(metaFields);
         MetaField field1 = MetaFieldFactory.create("text", "Test",

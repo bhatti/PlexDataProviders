@@ -1,5 +1,7 @@
 package com.plexobject.dp.sample.marshal;
 
+import java.util.Collection;
+
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
@@ -40,27 +42,39 @@ public class OrderMarshaller implements DataRowSetMarshaller<Order> {
     @Override
     public DataRowSet marshal(Order order) {
         DataRowSet rowset = new DataRowSet(responseMeta);
-        rowset.addValueAtRow(orderId, order.getId(), 0);
+        marshal(rowset, order, 0);
+        return rowset;
+    }
+
+    public DataRowSet marshal(Collection<Order> orders) {
+        DataRowSet rowset = new DataRowSet(responseMeta);
+        for (Order order : orders) {
+            marshal(rowset, order, rowset.size());
+        }
+        return rowset;
+    }
+
+    public void marshal(DataRowSet rowset, Order order, int rowNum) {
+        rowset.addValueAtRow(orderId, order.getId(), rowNum);
         rowset.addValueAtRow(SharedMeta.accountId, order.getAccount().getId(),
-                0);
+                rowNum);
         rowset.addValueAtRow(SharedMeta.marketSession, order.getMarketSession()
-                .name(), 0);
+                .name(), rowNum);
         rowset.addValueAtRow(SharedMeta.symbol,
-                order.getSecurity().getSymbol(), 0);
-        rowset.addValueAtRow(SharedMeta.exchange, order.getExchange(), 0);
-        rowset.addValueAtRow(status, order.getStatus(), 0);
-        rowset.addValueAtRow(priceType, order.getPriceType().name(), 0);
-        rowset.addValueAtRow(price, order.getPrice(), 0);
-        rowset.addValueAtRow(quantity, order.getQuantity(), 0);
-        rowset.addValueAtRow(date, order.getDate(), 0);
+                order.getSecurity().getSymbol(), rowNum);
+        rowset.addValueAtRow(SharedMeta.exchange, order.getExchange(), rowNum);
+        rowset.addValueAtRow(status, order.getStatus().name(), rowNum);
+        rowset.addValueAtRow(priceType, order.getPriceType().name(), rowNum);
+        rowset.addValueAtRow(price, order.getPrice(), rowNum);
+        rowset.addValueAtRow(quantity, order.getQuantity(), rowNum);
+        rowset.addValueAtRow(date, order.getDate(), rowNum);
         if (order.getStatus() == OrderStatus.FILLED) {
-            rowset.addValueAtRow(fillDate, order.getFillDate(), 0);
-            rowset.addValueAtRow(fillPrice, order.getFillPrice(), 0);
-            rowset.addValueAtRow(fillQuantity, order.getFillQuantity(), 0);
+            rowset.addValueAtRow(fillDate, order.getFillDate(), rowNum);
+            rowset.addValueAtRow(fillPrice, order.getFillPrice(), rowNum);
+            rowset.addValueAtRow(fillQuantity, order.getFillQuantity(), rowNum);
         }
         rowset.addValueAtRow(orderLegs,
-                orderLegMarshaller.marshal(order.getOrderLegs()), 0);
-        return rowset;
+                orderLegMarshaller.marshal(order.getOrderLegs()), rowNum);
     }
 
     @Override

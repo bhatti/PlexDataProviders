@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,8 +24,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 public class DataRowSet {
     private final transient Metadata metadata;
     private final transient Map<String, MetaField> metaFieldsByName = new ConcurrentHashMap<>();
-    private transient Map<Object, Integer> rowsByKey;
+    private transient Map<MetaField, Map<Object, Integer>> rowsByKey;
     private final List<DataRow> rows = new ArrayList<>();
+    private boolean nestedRowSet;
 
     DataRowSet() {
         metadata = Metadata.from(); // For serialization
@@ -55,9 +57,39 @@ public class DataRowSet {
         DataRow row = getOrCreateRow(rowNumber);
         addMetaField(metaField);
         if (metaField.isKeyField()) {
-            addKeyToMap(value, rowNumber);
+            addKeyToMap(metaField, value, rowNumber);
         }
         return row.addField(metaField, value);
+    }
+
+    public synchronized boolean hasFieldValue(MetaField metaField, int row) {
+        assert (metadata.contains(metaField));
+        if (row >= rows.size()) {
+            return false;
+        }
+        return rows.get(row).hasFieldValue(metaField);
+    }
+
+    public synchronized Object getValue(MetaField metaField, int rowNumber) {
+        assert (metadata.contains(metaField));
+        validateRow(rowNumber);
+        DataRow row = rows.get(rowNumber);
+        return row.getValue(metaField);
+    }
+
+    public synchronized DataRow getRowForKeyField(MetaField metaField,
+            Object key) {
+        assert (metadata.contains(metaField));
+        if (!metaField.isKeyField()) {
+            throw new IllegalArgumentException(metaField + " is not key field");
+        }
+        int rowNumber = getRowNumberByKey(metaField, key);
+        if (rowNumber == -1) {
+            throw new IllegalArgumentException("Row with " + metaField
+                    + " and value " + key + " not found");
+        }
+        validateRow(rowNumber);
+        return rows.get(rowNumber);
     }
 
     public synchronized DataRow getOrCreateRow(int row) {
@@ -98,36 +130,7 @@ public class DataRowSet {
     }
 
     public int getRowNumberByKey(MetaField metaField, Object key) {
-        return getKeyToMap(key);
-    }
-
-    public synchronized DataRow getRowForKeyField(MetaField metaField,
-            Object key) {
-        assert (metadata.contains(metaField));
-        if (!metaField.isKeyField()) {
-            throw new IllegalArgumentException(metaField + " is not key field");
-        }
-        int rowNumber = getRowNumberByKey(metaField, key);
-        if (rowNumber == -1) {
-            return null;
-        }
-        validateRow(rowNumber);
-        return rows.get(rowNumber);
-    }
-
-    public synchronized boolean hasFieldValue(MetaField metaField, int row) {
-        assert (metadata.contains(metaField));
-        if (row >= rows.size()) {
-            return false;
-        }
-        return rows.get(row).hasFieldValue(metaField);
-    }
-
-    public synchronized Object getValue(MetaField metaField, int rowNumber) {
-        assert (metadata.contains(metaField));
-        validateRow(rowNumber);
-        DataRow row = rows.get(rowNumber);
-        return row.getValue(metaField);
+        return getKeyToMap(metaField, key);
     }
 
     private void validateRow(int row) {
@@ -221,6 +224,10 @@ public class DataRowSet {
         return rows.get(row).getValueAsTextVector(metaField);
     }
 
+    public boolean isNestedRowSet() {
+        return nestedRowSet;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -234,25 +241,35 @@ public class DataRowSet {
         if (!metaFieldsByName.containsKey(metaField.getName())) {
             metadata.addMetaField(metaField);
             metaFieldsByName.put(metaField.getName(), metaField);
+            if (metaField.getType() == MetaFieldType.ROWSET) {
+                nestedRowSet = true;
+            }
         }
     }
 
-    private synchronized Map<Object, Integer> getKeyMap() {
+    private synchronized Map<Object, Integer> getKeyMap(MetaField field) {
         if (rowsByKey == null) {
-            rowsByKey = new ConcurrentHashMap<Object, Integer>();
+            rowsByKey = new HashMap<MetaField, Map<Object, Integer>>();
         }
-        return rowsByKey;
+        Map<Object, Integer> keyMap = rowsByKey.get(field);
+        if (keyMap == null) {
+            keyMap = new HashMap<Object, Integer>();
+            rowsByKey.put(field, keyMap);
+        }
+        return keyMap;
     }
 
-    private synchronized void addKeyToMap(Object key, int rowNumber) {
-        getKeyMap().put(key, rowNumber);
+    private synchronized void addKeyToMap(MetaField field, Object key,
+            int rowNumber) {
+        getKeyMap(field).put(key, rowNumber);
     }
 
-    private synchronized int getKeyToMap(Object key) {
-        Integer row = getKeyMap().get(key);
+    private synchronized int getKeyToMap(MetaField field, Object key) {
+        Integer row = getKeyMap(field).get(key);
         if (row == null) {
             return -1;
         }
         return row;
     }
+
 }

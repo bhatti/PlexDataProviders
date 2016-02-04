@@ -24,7 +24,8 @@ PlexDataProviders provides offers following benefits:
 - As clients can specify the data they need, this helps with payload size and network bandwidth. 
 - The clients only need to create a single data parser so it keeps JSON parsing logic simple. 
 - As PlexDataProviders supports multi-threading, it also helps with latency of the data fetch requests.
-
+- It partial failure so that a failure in a single data provider doesn't effect other data providers and the data service can still return partial results. User 
+- It supports timeout so that clients can receive available data that completes in given timeout interval.
 
 ##Building
 - Download and install <a href="http://www.gradle.org/downloads">Gradle</a>.
@@ -71,6 +72,15 @@ public interface DataProducer {
 }
 
 ```
+
+Note that QueryConfiguration defines additional parameters such as:
+- pagination parameters
+- ordering/grouping
+- filtering parameters
+- timeout parameters
+
+The timeout parameter can be used to return all available data within defined time, e.g. query engine may invoke underlying data providers in multiple threads and if underlying query takes a long time then it would return available data.
+
 
 ```java 
 public interface DataProvider extends DataProducer, Comparable<DataProvider> {

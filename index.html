@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><title>Untitled Document.md</title><style></style></head><body id="preview">
 <h1><a id="PlexDataProviders_0"></a>PlexDataProviders</h1>
-<p>Java framework for managing general-purpose data providers
-##Overview</p>
+<p>Java framework for managing general-purpose data providers and data query.</p>
+<p>##Overview</p>
 <p>PlexDataProviders is a light-weight Java framework that abstract access to various data providers such as databases, files, web services, etc. It allows aggregation of data from various data providers.</p>
 <p>The PlexDataProviders framework is divided into two components:</p>
 <ul>
@@ -11,8 +11,20 @@
 <p>The query engine can determine dependency between providers and it also allow you to use output of one of the data provider as input to another data provider. For example, let’s assume:</p>
 <ul>
 <li>data-provider A requires input-a1, input-a2 and produces output-a1, output-a2</li>
-<li>data-provider B requires input-b1 and output-a1 and produces output-b1, output-b2
-Then you can pass input-a1, input-a2 to the query engine and request output-a1, output-a2, output-b1, output-b2 output data fields.</li>
+<li>data-provider B requires input-b1 and output-a1 and produces output-b1, output-b2</li>
+</ul>
+<p>Then you can pass input-a1, input-a2 to the query engine and request output-a1, output-a2, output-b1, output-b2 output data fields.</p>
+<p>##Benefits
+PlexDataProviders provides offers following benefits:</p>
+<ul>
+<li>It provides a unified way to search data and abstracts integration to underlying data sources.</li>
+<li>It helps simplifying client side logic as they can use a single data service to query all data instead of using multiple data services.</li>
+<li>This also help with managing end-points as you only a single end-point instead of connecting to multiple web services.</li>
+<li>As clients can specify the data they need, this helps with payload size and network bandwidth.</li>
+<li>The clients only need to create a single data parser so it keeps JSON parsing logic simple.</li>
+<li>As PlexDataProviders supports multi-threading, it also helps with latency of the data fetch requests.</li>
+<li>It partial failure so that a failure in a single data provider doesn’t effect other data providers and the data service can still return partial results. User</li>
+<li>It supports timeout so that clients can receive available data that completes in given timeout interval.</li>
 </ul>
 <p>##Building</p>
 <ul>
@@ -38,7 +50,7 @@ Then you can pass input-a1, input-a2 to the query engine and request output-a1, 
 <ul>
 <li>MIT</li>
 </ul>
-<h2><a id="Data_Structure_40"></a>Data Structure</h2>
+<h2><a id="Data_Structure_54"></a>Data Structure</h2>
 <p>Following are primary data structures:</p>
 <ul>
 <li>MetaField - This class defines meta information for each data field such as name, category, type, etc.</li>
@@ -47,15 +59,23 @@ Then you can pass input-a1, input-a2 to the query engine and request output-a1, 
 <li>DataRow - This class abstracts row of data fields</li>
 <li>DataRowSet - This class abstracts set of rows</li>
 </ul>
-<p>PlexDataProviders also supports nested structures where a data field can be instance of DataRowSet.</p>
-<h3><a id="Adding_a_Data_Provider_51"></a>Adding a Data Provider</h3>
+<p>PlexDataProviders also supports nested structures where a data field in DataRow can be instance of DataRowSet.</p>
+<h3><a id="Adding_a_Data_Provider_65"></a>Adding a Data Provider</h3>
 <p>The data provider implements following two interfaces</p>
 <pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">DataProducer</span> </span>{
     <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">produce</span><span class="hljs-params">(DataRowSet requestFields, DataRowSet responseFields,
-            DataConfiguration config)</span> <span class="hljs-keyword">throws</span> DataProviderException</span>;
+            QueryConfiguration config)</span> <span class="hljs-keyword">throws</span> DataProviderException</span>;
 }
 
 </code></pre>
+<p>Note that QueryConfiguration defines additional parameters such as:</p>
+<ul>
+<li>pagination parameters</li>
+<li>ordering/grouping</li>
+<li>filtering parameters</li>
+<li>timeout parameters</li>
+</ul>
+<p>The timeout parameter can be used to return all available data within defined time, e.g. query engine may invoke underlying data providers in multiple threads and if underlying query takes a long time then it would return available data.</p>
 <pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">DataProvider</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">DataProducer</span>, <span class="hljs-title">Comparable</span>&lt;<span class="hljs-title">DataProvider</span>&gt; </span>{
     <span class="hljs-function">String <span class="hljs-title">getName</span><span class="hljs-params">()</span></span>;
 
@@ -71,7 +91,7 @@ Then you can pass input-a1, input-a2 to the query engine and request output-a1, 
 }
 </code></pre>
 <p>Each provider defines name, rank (or priority when matching for best provider), set of mandatory/optional input and output data fields. The data provider can also define granularity as coarse grain or fine grain and the implementation may execute those providers on different threads.</p>
-<p>PlexDataProviders also provides interfaces for converting data from domain objects to DataRowSet.  Here is an example of implementation:</p>
+<p>PlexDataProviders also provides interfaces for converting data from domain objects to DataRowSet.  Here is an example of provider implementation:</p>
 <pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SecuritiesBySymbolsProvider</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">BaseProvider</span> </span>{
     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Metadata parameterMeta = Metadata.from(SharedMeta.symbol);
     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Metadata optionalMeta = Metadata.from();
@@ -84,7 +104,7 @@ Then you can pass input-a1, input-a2 to the query engine and request output-a1, 
 
     <span class="hljs-annotation">@Override</span>
     <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">produce</span><span class="hljs-params">(DataRowSet parameter, DataRowSet response,
-            DataConfiguration config)</span> <span class="hljs-keyword">throws</span> DataProviderException </span>{
+            QueryConfiguration config)</span> <span class="hljs-keyword">throws</span> DataProviderException </span>{
         <span class="hljs-keyword">final</span> String id = parameter.getValueAsText(SharedMeta.symbol, <span class="hljs-number">0</span>);
         Map&lt;String, Object&gt; criteria = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();
         criteria.put(<span class="hljs-string">"symbol"</span>, id.toUpperCase());
@@ -94,7 +114,8 @@ Then you can pass input-a1, input-a2 to the query engine and request output-a1, 
     }
 }
 </code></pre>
-<p>The SecurityMarshaller will define methods to convert domain objects to DataRowSet such as:</p>
+<p>Typically, you will create data-provider for each different kind of query that you want to support. Each data provider specifies set of required and optional data fields that can be used to generate output data fields.</p>
+<p>Here is an example of marshalling data from Securty domain objects to DataRowSet:</p>
 <pre><code class="language-java"><span class="hljs-function"><span class="hljs-keyword">public</span> DataRowSet <span class="hljs-title">marshal</span><span class="hljs-params">(Security security)</span> </span>{
     DataRowSet rowset = <span class="hljs-keyword">new</span> DataRowSet(responseMeta);
     marshal(rowset, security, <span class="hljs-number">0</span>);
@@ -150,12 +171,14 @@ Then you can pass input-a1, input-a2 to the query engine and request output-a1, 
 }
 
 </code></pre>
+<p>As you can see the data service simply builds DataRequest with input data fields and sends back response back to clients.</p>
 <p>Here is an example client that passes a search query data field and requests quote data fields with company details</p>
 <pre><code class="language-java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testGetQuoteBySearch</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Throwable </span>{
     String jsonResp = TestWebUtils.httpGet(<span class="hljs-string">"http://localhost:"</span> + DEFAULT_PORT
                     + <span class="hljs-string">"/data?responseFields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&amp;symbolQuery=AAPL"</span>);
+    ...
 </code></pre>
-<p>Note that above request will use three data providers, first it uses SymbolSearchProvider provider to search for matching symbols with given query. It then uses the symbol data field to request company and quote data fields from QuotesBySymbolsProvider and CompaniesBySymbolsProvider.</p>
+<p>Note that above request will use three data providers, first it uses SymbolSearchProvider provider to search for matching symbols with given query. It then uses the symbol data field to request company and quote data fields from QuotesBySymbolsProvider and CompaniesBySymbolsProvider. The PlexDataProviders framework will take care of all dependency management for providers.</p>
 <p>Here is an example JSON response from the data service:</p>
 <pre><code class="language-javascript">{
     <span class="hljs-string">"queryResponse"</span>: {
@@ -273,12 +296,13 @@ Then you can pass input-a1, input-a2 to the query engine and request output-a1, 
     }
 }
 </code></pre>
-<h2><a id="API_Doc_294"></a>API Doc</h2>
+<p>You can browse sample application for more examples.</p>
+<h2><a id="API_Doc_327"></a>API Doc</h2>
 <p><a href="http://bhatti.github.io/PlexDataProviders/javadoc/">Java Doc</a></p>
-<h2><a id="Sample_Applications_298"></a>Sample Applications</h2>
+<h2><a id="Sample_Applications_331"></a>Sample Applications</h2>
 <pre><code>  You can view sample applications under dp-sample folder for detailed examples of services and various configurations.
 </code></pre>
-<h2><a id="Support_or_Contact_301"></a>Support or Contact</h2>
+<h2><a id="Support_or_Contact_334"></a>Support or Contact</h2>
 <pre><code>  Email bhatti AT plexobject DOT com for any questions or suggestions.
 </code></pre>
 

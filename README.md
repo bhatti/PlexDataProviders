@@ -17,7 +17,14 @@ Then you can pass input-a1, input-a2 to the query engine and request output-a1, 
 
 
 ##Benefits
-PlexDataProviders provides a unified way to search data and abstracts integration to underlying data sources. This also helps simplifying client side logic as they can use a single data service to query all data instead of using multiple data services. As clients can specify the data they need, this helps with payload size and network bandwidth. The clients only need to create a single data parser so it keeps JSON parsing logic simple. As PlexDataProviders supports multi-threading, it also helps with latency of the data fetch requests.
+PlexDataProviders provides offers following benefits:
+- It provides a unified way to search data and abstracts integration to underlying data sources. 
+- It helps simplifying client side logic as they can use a single data service to query all data instead of using multiple data services. 
+- This also help with managing end-points as you only a single end-point instead of connecting to multiple web services.
+- As clients can specify the data they need, this helps with payload size and network bandwidth. 
+- The clients only need to create a single data parser so it keeps JSON parsing logic simple. 
+- As PlexDataProviders supports multi-threading, it also helps with latency of the data fetch requests.
+
 
 ##Building
 - Download and install <a href="http://www.gradle.org/downloads">Gradle</a>.

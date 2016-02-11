@@ -323,6 +323,14 @@ Here is an example JSON response from the data service:
 ```
 
 You can also retrieve nested relationships, e.g. following example returns all users along with their account and portfolio information:
+```java 
+public void testGetAccounts() throws Throwable {
+            String jsonResp = TestWebUtils.httpGet("http://localhost:" + DEFAULT_PORT + 
+            "/data?responseFields=userId,user.accounts,user.portfolio");
+    ...
+``` 
+Following is a sample response from above request:
+
 ```javascript 
 {
     "queryResponse": {

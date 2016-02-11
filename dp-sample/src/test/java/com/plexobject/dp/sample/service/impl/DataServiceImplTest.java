@@ -383,7 +383,6 @@ public class DataServiceImplTest {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
                 + DEFAULT_PORT
                 + "/data?responseFields=userId,user.accounts,user.portfolio");
-        System.out.println(jsonResp);
 
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
 

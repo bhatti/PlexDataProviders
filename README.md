@@ -500,6 +500,8 @@ Following is a sample response from above request:
     }
 }
 ```
+Note that requesting composite data fields such as user.accounts and user.portfolio would return all nested data fields as well.
+
 You can browse sample application for more examples.
 
 

@@ -322,6 +322,536 @@ Here is an example JSON response from the data service:
 }
 ```
 
+You can also retrieve nested relationships, e.g. following example returns all users along with their account and portfolio information:
+```javascript 
+{
+    "queryResponse": {
+        "responseFields": [
+            [{
+                "name": "user.portfolio",
+                "value": [
+                    [{
+                        "name": "portfolioId",
+                        "value": 448
+                    }, {
+                        "name": "portfolio.margin",
+                        "value": 4011.3076536930116
+                    }, {
+                        "name": "portfolio.cash",
+                        "value": 2263.377648137971
+                    }]
+                ]
+            }, {
+                "name": "userId",
+                "value": 311
+            }, {
+                "name": "user.accounts",
+                "value": [
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 313
+                    }, {
+                        "name": "account.name",
+                        "value": "account 313"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 314
+                    }, {
+                        "name": "account.name",
+                        "value": "account 314"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 315
+                    }, {
+                        "name": "account.name",
+                        "value": "account 315"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 316
+                    }, {
+                        "name": "account.name",
+                        "value": "account 316"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 317
+                    }, {
+                        "name": "account.name",
+                        "value": "account 317"
+                    }]
+                ]
+            }],
+            [{
+                "name": "user.portfolio",
+                "value": [
+                    [{
+                        "name": "portfolioId",
+                        "value": 3824
+                    }, {
+                        "name": "portfolio.margin",
+                        "value": 3938.312926009776
+                    }, {
+                        "name": "portfolio.cash",
+                        "value": 2391.6500166112105
+                    }]
+                ]
+            }, {
+                "name": "userId",
+                "value": 3687
+            }, {
+                "name": "user.accounts",
+                "value": [
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 3689
+                    }, {
+                        "name": "account.name",
+                        "value": "account 3689"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 3690
+                    }, {
+                        "name": "account.name",
+                        "value": "account 3690"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 3691
+                    }, {
+                        "name": "account.name",
+                        "value": "account 3691"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 3692
+                    }, {
+                        "name": "account.name",
+                        "value": "account 3692"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 3693
+                    }, {
+                        "name": "account.name",
+                        "value": "account 3693"
+                    }]
+                ]
+            }],
+            [{
+                "name": "user.portfolio",
+                "value": [
+                    [{
+                        "name": "portfolioId",
+                        "value": 7200
+                    }, {
+                        "name": "portfolio.margin",
+                        "value": 4200.746372767295
+                    }, {
+                        "name": "portfolio.cash",
+                        "value": 2699.5871566602073
+                    }]
+                ]
+            }, {
+                "name": "userId",
+                "value": 7063
+            }, {
+                "name": "user.accounts",
+                "value": [
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 7065
+                    }, {
+                        "name": "account.name",
+                        "value": "account 7065"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 7066
+                    }, {
+                        "name": "account.name",
+                        "value": "account 7066"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 7067
+                    }, {
+                        "name": "account.name",
+                        "value": "account 7067"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 7068
+                    }, {
+                        "name": "account.name",
+                        "value": "account 7068"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 7069
+                    }, {
+                        "name": "account.name",
+                        "value": "account 7069"
+                    }]
+                ]
+            }],
+            [{
+                "name": "user.portfolio",
+                "value": [
+                    [{
+                        "name": "portfolioId",
+                        "value": 10578
+                    }, {
+                        "name": "portfolio.margin",
+                        "value": 2697.317469455863
+                    }, {
+                        "name": "portfolio.cash",
+                        "value": 2372.6887187894654
+                    }]
+                ]
+            }, {
+                "name": "userId",
+                "value": 10441
+            }, {
+                "name": "user.accounts",
+                "value": [
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 10443
+                    }, {
+                        "name": "account.name",
+                        "value": "account 10443"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 10444
+                    }, {
+                        "name": "account.name",
+                        "value": "account 10444"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 10445
+                    }, {
+                        "name": "account.name",
+                        "value": "account 10445"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 10446
+                    }, {
+                        "name": "account.name",
+                        "value": "account 10446"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 10447
+                    }, {
+                        "name": "account.name",
+                        "value": "account 10447"
+                    }]
+                ]
+            }],
+            [{
+                "name": "user.portfolio",
+                "value": [
+                    [{
+                        "name": "portfolioId",
+                        "value": 13954
+                    }, {
+                        "name": "portfolio.margin",
+                        "value": 1237.869662572689
+                    }, {
+                        "name": "portfolio.cash",
+                        "value": 2100.736728008631
+                    }]
+                ]
+            }, {
+                "name": "userId",
+                "value": 13817
+            }, {
+                "name": "user.accounts",
+                "value": [
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 13819
+                    }, {
+                        "name": "account.name",
+                        "value": "account 13819"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 13820
+                    }, {
+                        "name": "account.name",
+                        "value": "account 13820"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 13821
+                    }, {
+                        "name": "account.name",
+                        "value": "account 13821"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 13822
+                    }, {
+                        "name": "account.name",
+                        "value": "account 13822"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 13823
+                    }, {
+                        "name": "account.name",
+                        "value": "account 13823"
+                    }]
+                ]
+            }],
+            [{
+                "name": "user.portfolio",
+                "value": [
+                    [{
+                        "name": "portfolioId",
+                        "value": 17330
+                    }, {
+                        "name": "portfolio.margin",
+                        "value": 1542.3800715241673
+                    }, {
+                        "name": "portfolio.cash",
+                        "value": 4077.7952857347655
+                    }]
+                ]
+            }, {
+                "name": "userId",
+                "value": 17193
+            }, {
+                "name": "user.accounts",
+                "value": [
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 17195
+                    }, {
+                        "name": "account.name",
+                        "value": "account 17195"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 17196
+                    }, {
+                        "name": "account.name",
+                        "value": "account 17196"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 17197
+                    }, {
+                        "name": "account.name",
+                        "value": "account 17197"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 17198
+                    }, {
+                        "name": "account.name",
+                        "value": "account 17198"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 17199
+                    }, {
+                        "name": "account.name",
+                        "value": "account 17199"
+                    }]
+                ]
+            }],
+            [{
+                "name": "user.portfolio",
+                "value": [
+                    [{
+                        "name": "portfolioId",
+                        "value": 20708
+                    }, {
+                        "name": "portfolio.margin",
+                        "value": 1239.9597867236084
+                    }, {
+                        "name": "portfolio.cash",
+                        "value": 4000.2106890314326
+                    }]
+                ]
+            }, {
+                "name": "userId",
+                "value": 20571
+            }, {
+                "name": "user.accounts",
+                "value": [
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 20573
+                    }, {
+                        "name": "account.name",
+                        "value": "account 20573"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 20574
+                    }, {
+                        "name": "account.name",
+                        "value": "account 20574"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 20575
+                    }, {
+                        "name": "account.name",
+                        "value": "account 20575"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "CASH"
+                    }, {
+                        "name": "accountId",
+                        "value": 20576
+                    }, {
+                        "name": "account.name",
+                        "value": "account 20576"
+                    }],
+                    [{
+                        "name": "account.type",
+                        "value": "MARGIN"
+                    }, {
+                        "name": "accountId",
+                        "value": 20577
+                    }, {
+                        "name": "account.name",
+                        "value": "account 20577"
+                    }]
+                ]
+            }],
+            [{
+                "name": "user.portfolio",
+                "value": [
+                    [{
+                        "name": "portfolioId",
+                        "value": 24084
+                    }, {
+                        "name": "portfolio.margin",
+                        "value": 1870.8532733957773
+                    }, {
+                        "name": "portfolio.cash",
+                        "value": 3069.611728706432
+                    }]
+                ]
+            }]
+        ],
+        "errorsByProviderName": {},
+        "providers": ["UsersProvider", "UsersByIdsProvider"]
+    }
+}
+```
 You can browse sample application for more examples.
 
 

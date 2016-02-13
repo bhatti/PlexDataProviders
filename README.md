@@ -56,9 +56,25 @@ gradle jar
 
 Following are primary data structures:
 - MetaField - This class defines meta information for each data field such as name, category, type, etc.
-- MetaFieldType - This enum class supports primitive data types supported 
+
+- MetaFieldType - This enum class supports primitive data types supported, i.e.
+  - SCALAR_TEXT - simple text
+  - SCALAR_INTEGER - integer numbers
+  - SCALAR_DECIMAL - decimal numbers
+  - SCALAR_DATE - dates
+  - SCALAR_BOOLEAN - boolean 
+  - VECTOR_TEXT - array of text
+  - VECTOR_INTEGER - array of integers
+  - VECTOR_DECIMAL - array of decimals
+  - VECTOR_DATE - array of dates
+  - VECTOR_BOOLEAN - array of boolean
+  - BINARY - binary data
+  - ROWSET - nested data rowsets
+
 - Metadata - This class defines a set of MetaFields used in DataRow/DataRowSet 
+
 - DataRow - This class abstracts a row of data fields 
+
 - DataRowSet - This class abstracts a set of rows 
 
 PlexDataProviders also supports nested structures where a data field in DataRow can be instance of DataRowSet.

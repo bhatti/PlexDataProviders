@@ -18,7 +18,6 @@ import org.apache.log4j.LogManager;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.plexobject.dp.domain.QueryConfiguration;
 import com.plexobject.dp.domain.DataRequest;
 import com.plexobject.dp.domain.DataResponse;
 import com.plexobject.dp.domain.DataRow;
@@ -26,6 +25,7 @@ import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.MetaField;
 import com.plexobject.dp.domain.MetaFieldFactory;
 import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.domain.QueryConfiguration;
 import com.plexobject.dp.locator.DataProviderLocator;
 import com.plexobject.dp.locator.impl.DataProviderLocatorImpl;
 import com.plexobject.dp.provider.BaseProvider;
@@ -97,19 +97,20 @@ public class QueryEngineImplTest {
                 final DataRowSet responseRowSet, final QueryConfiguration config)
                 throws DataProviderException {
             for (int i = 0; i < requestRowSet.size(); i++) {
-                for (MetaField metaField : getMandatoryRequestFields()
+                for (MetaField metaField : getMandatoryRequestMetadata()
                         .getMetaFields()) {
                     requestRowSet.getValueAsText(metaField, i);
                 }
-                for (MetaField metaField : getOptionalRequestFields()
+                for (MetaField metaField : getOptionalRequestMetadata()
                         .getMetaFields()) {
                     if (requestRowSet.hasFieldValue(metaField, i)) {
                         requestRowSet.getValueAsText(metaField, i);
                     }
                 }
             }
-            int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
-                    .createInteger("maxOutputRows",
+            int maxOutputRows = requestRowSet
+                    .hasFieldValue(MetaFieldFactory.createInteger(
+                            "maxOutputRows",
                             QueryConfiguration.class.getSimpleName(), false), 0) ? (int) requestRowSet
                     .getValueAsLong(MetaFieldFactory.createInteger(
                             "maxOutputRows",
@@ -119,7 +120,7 @@ public class QueryEngineImplTest {
                 Collection<MetaField> responseFields = new ArrayList<>(
                         (responseRowSet.getMetadata().getMetaFields()));
                 for (MetaField metaField : responseFields) {
-                    if (getResponseFields().contains(metaField)) {
+                    if (getResponseMetadata().contains(metaField)) {
                         responseRowSet.addValueAtRow(metaField,
                                 metaField.getName() + "-value-" + i, i);
                     }
@@ -129,9 +130,9 @@ public class QueryEngineImplTest {
 
         @Override
         public String toString() {
-            return "ScalarProvider(" + getMandatoryRequestFields() + "/"
-                    + getOptionalRequestFields() + ") => "
-                    + getResponseFields();
+            return "ScalarProvider(" + getMandatoryRequestMetadata() + "/"
+                    + getOptionalRequestMetadata() + ") => "
+                    + getResponseMetadata();
         }
 
     }
@@ -149,13 +150,14 @@ public class QueryEngineImplTest {
                 final DataRowSet responseRowSet, final QueryConfiguration config)
                 throws DataProviderException {
             for (int i = 0; i < requestRowSet.size(); i++) {
-                for (MetaField metaField : getMandatoryRequestFields()
+                for (MetaField metaField : getMandatoryRequestMetadata()
                         .getMetaFields()) {
                     requestRowSet.getValueAsTextVector(metaField, i);
                 }
             }
-            int maxOutputRows = requestRowSet.hasFieldValue(MetaFieldFactory
-                    .createInteger("maxOutputRows",
+            int maxOutputRows = requestRowSet
+                    .hasFieldValue(MetaFieldFactory.createInteger(
+                            "maxOutputRows",
                             QueryConfiguration.class.getSimpleName(), false), 0) ? (int) requestRowSet
                     .getValueAsLong(MetaFieldFactory.createInteger(
                             "maxOutputRows",
@@ -165,7 +167,7 @@ public class QueryEngineImplTest {
                 Collection<MetaField> responseFields = new ArrayList<>(
                         (responseRowSet.getMetadata().getMetaFields()));
                 for (MetaField metaField : responseFields) {
-                    if (getResponseFields().contains(metaField)) {
+                    if (getResponseMetadata().contains(metaField)) {
                         responseRowSet
                                 .addValueAtRow(
                                         metaField,
@@ -262,11 +264,15 @@ public class QueryEngineImplTest {
                 metaFrom("output2a"), config);
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
-        assertEquals("output2a-value-0", response.getResponseFields()
-                .getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
-        assertEquals("optional1-value-0", response.getResponseFields()
-                .getValueAsText(MetaFieldFactory.lookup("optional1"), 0));
+        assertEquals(1, response.getFields().size());
+        assertEquals(
+                "output2a-value-0",
+                response.getFields().getValueAsText(
+                        MetaFieldFactory.lookup("output2a"), 0));
+        assertEquals(
+                "optional1-value-0",
+                response.getFields().getValueAsText(
+                        MetaFieldFactory.lookup("optional1"), 0));
     }
 
     @Test
@@ -282,11 +288,13 @@ public class QueryEngineImplTest {
                 metaFrom("output2a"), config);
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
+        assertEquals(1, response.getFields().size());
 
-        assertEquals("output2a-value-0", response.getResponseFields()
-                .getValueAsText(MetaFieldFactory.lookup("output2a"), 0));
-        assertFalse(response.getResponseFields().hasFieldValue(
+        assertEquals(
+                "output2a-value-0",
+                response.getFields().getValueAsText(
+                        MetaFieldFactory.lookup("output2a"), 0));
+        assertFalse(response.getFields().hasFieldValue(
                 MetaFieldFactory.lookup("optional1"), 0));
     }
 
@@ -297,19 +305,19 @@ public class QueryEngineImplTest {
                 "F", "H"), config);
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
+        assertEquals(1, response.getFields().size());
 
         assertEquals(
                 "E-value-0",
-                response.getResponseFields().getValueAsText(
+                response.getFields().getValueAsText(
                         MetaFieldFactory.lookup("E"), 0));
         assertEquals(
                 "F-value-0",
-                response.getResponseFields().getValueAsText(
+                response.getFields().getValueAsText(
                         MetaFieldFactory.lookup("F"), 0));
         assertEquals(
                 "H-value-0",
-                response.getResponseFields().getValueAsText(
+                response.getFields().getValueAsText(
                         MetaFieldFactory.lookup("H"), 0));
         long elapsed = System.currentTimeMillis() - started;
         assertTrue(elapsed < 100);
@@ -334,23 +342,23 @@ public class QueryEngineImplTest {
                 metaArrayFrom("uname", "symbol", "positionCount"), config);
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
+        assertEquals(1, response.getFields().size());
 
-        assertEquals("uname-array-value1", response.getResponseFields()
+        assertEquals("uname-array-value1", response.getFields()
                 .getValueAsTextVector(MetaFieldFactory.lookup("uname"), 0)[0]);
-        assertEquals("uname-array-value2", response.getResponseFields()
+        assertEquals("uname-array-value2", response.getFields()
                 .getValueAsTextVector(MetaFieldFactory.lookup("uname"), 0)[1]);
-        assertEquals("symbol-array-value1", response.getResponseFields()
+        assertEquals("symbol-array-value1", response.getFields()
                 .getValueAsTextVector(MetaFieldFactory.lookup("symbol"), 0)[0]);
-        assertEquals("symbol-array-value2", response.getResponseFields()
+        assertEquals("symbol-array-value2", response.getFields()
                 .getValueAsTextVector(MetaFieldFactory.lookup("symbol"), 0)[1]);
         assertEquals(
                 "positionCount-array-value1",
-                response.getResponseFields().getValueAsTextVector(
+                response.getFields().getValueAsTextVector(
                         MetaFieldFactory.lookup("positionCount"), 0)[0]);
         assertEquals(
                 "positionCount-array-value2",
-                response.getResponseFields().getValueAsTextVector(
+                response.getFields().getValueAsTextVector(
                         MetaFieldFactory.lookup("positionCount"), 0)[1]);
         long elapsed = System.currentTimeMillis() - started;
         assertTrue(elapsed < 100);
@@ -372,20 +380,26 @@ public class QueryEngineImplTest {
         long started = System.currentTimeMillis();
         DataRequest request = new DataRequest(rowsetFrom("q"), metaFrom(
                 "symbol", "bid", "mark"), config);
-        request.getParameters().addValueAtRow(
-                MetaFieldFactory.createInteger("maxOutputRows",
-                        QueryConfiguration.class.getSimpleName(), false), 10, 0);
+        request.getParameters()
+                .addValueAtRow(
+                        MetaFieldFactory
+                                .createInteger("maxOutputRows",
+                                        QueryConfiguration.class
+                                                .getSimpleName(), false),
+                        10, 0);
 
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
-        assertEquals(10, response.getResponseFields().size());
+        assertEquals(10, response.getFields().size());
 
         for (int i = 0; i < 10; i++) {
-            assertEquals("symbol-value-" + i, response.getResponseFields()
+            assertEquals("symbol-value-" + i, response.getFields()
                     .getValueAsText(MetaFieldFactory.lookup("symbol"), i));
-            assertEquals("bid-value-" + i, response.getResponseFields()
-                    .getValueAsText(MetaFieldFactory.lookup("bid"), i));
-            assertEquals("mark-value-" + i, response.getResponseFields()
+            assertEquals(
+                    "bid-value-" + i,
+                    response.getFields().getValueAsText(
+                            MetaFieldFactory.lookup("bid"), i));
+            assertEquals("mark-value-" + i, response.getFields()
                     .getValueAsText(MetaFieldFactory.lookup("mark"), i));
         }
         long elapsed = System.currentTimeMillis() - started;
@@ -427,11 +441,11 @@ public class QueryEngineImplTest {
                 config);
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
+        assertEquals(1, response.getFields().size());
 
         assertEquals(
                 "b-value-0",
-                response.getResponseFields().getValueAsText(
+                response.getFields().getValueAsText(
                         MetaFieldFactory.lookup("b"), 0));
     }
 
@@ -455,12 +469,16 @@ public class QueryEngineImplTest {
                 "quotes", "research"), config);
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
+        assertEquals(1, response.getFields().size());
 
-        assertEquals("quotes-value-0", response.getResponseFields()
-                .getValueAsText(MetaFieldFactory.lookup("quotes"), 0));
-        assertEquals("research-value-0", response.getResponseFields()
-                .getValueAsText(MetaFieldFactory.lookup("research"), 0));
+        assertEquals(
+                "quotes-value-0",
+                response.getFields().getValueAsText(
+                        MetaFieldFactory.lookup("quotes"), 0));
+        assertEquals(
+                "research-value-0",
+                response.getFields().getValueAsText(
+                        MetaFieldFactory.lookup("research"), 0));
 
         request = new DataRequest(rowsetFrom("search"), metaFrom("quotes",
                 "research"), config);
@@ -492,7 +510,6 @@ public class QueryEngineImplTest {
         dataProviders.query(request);
     }
 
-    
     @Test(expected = DataProviderException.class)
     public void testTimeoutCoarse() {
         TimeoutProvider provider = new TimeoutProvider(200, "timeout");
@@ -512,7 +529,7 @@ public class QueryEngineImplTest {
                 metaFrom("d", "e", "timeout-result"), config);
         DataResponse response = dataProviders.query(request);
         assertEquals(0, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
+        assertEquals(1, response.getFields().size());
 
     }
 
@@ -531,7 +548,7 @@ public class QueryEngineImplTest {
                 metaFrom("lookupResults", "somedata", "error-result"), config);
         DataResponse response = dataProviders.query(request);
         assertEquals(1, response.getErrorsByProviderName().size());
-        assertEquals(1, response.getResponseFields().size());
+        assertEquals(1, response.getFields().size());
     }
 
     @Test

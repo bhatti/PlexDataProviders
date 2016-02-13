@@ -9,32 +9,36 @@ import com.plexobject.dp.domain.Metadata;
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public abstract class BaseProvider implements DataProvider {
     private final String name;
-    private final Metadata mandatoryRequestFields;
-    private final Metadata optionalRequestFields;
-    private final Metadata responseFields;
+    private final Metadata mandatoryRequestMetadata;
+    private final Metadata optionalRequestMetadata;
+    private final Metadata responseMetadata;
     private TaskGranularity taskGranularity = TaskGranularity.COARSE;
     private int rank;
 
-    public BaseProvider(String name, Metadata mandatoryRequestFields,
-            Metadata optionalRequestFields, Metadata responseFields) {
+    public BaseProvider(String name, Metadata mandatoryRequestMetadata,
+            Metadata optionalRequestMetadata, Metadata responseMetadata) {
         this.name = name;
-        this.mandatoryRequestFields = mandatoryRequestFields;
-        this.optionalRequestFields = optionalRequestFields;
-        this.responseFields = responseFields;
+        this.mandatoryRequestMetadata = mandatoryRequestMetadata;
+        this.optionalRequestMetadata = optionalRequestMetadata;
+        this.responseMetadata = responseMetadata;
     }
 
-    public Metadata getMandatoryRequestFields() {
-        return mandatoryRequestFields;
+    @Override
+    public Metadata getMandatoryRequestMetadata() {
+        return mandatoryRequestMetadata;
     }
 
-    public Metadata getOptionalRequestFields() {
-        return optionalRequestFields;
+    @Override
+    public Metadata getOptionalRequestMetadata() {
+        return optionalRequestMetadata;
     }
 
-    public Metadata getResponseFields() {
-        return responseFields;
+    @Override
+    public Metadata getResponseMetadata() {
+        return responseMetadata;
     }
 
+    @Override
     public TaskGranularity getTaskGranularity() {
         return taskGranularity;
     }
@@ -43,6 +47,7 @@ public abstract class BaseProvider implements DataProvider {
         this.taskGranularity = taskGranularity;
     }
 
+    @Override
     public int getRank() {
         return rank;
     }
@@ -57,18 +62,18 @@ public abstract class BaseProvider implements DataProvider {
 
     @Override
     public int compareTo(DataProvider other) {
-        for (MetaField requestField : mandatoryRequestFields.getMetaFields()) {
-            if (other.getResponseFields().contains(requestField)) {
+        for (MetaField requestField : mandatoryRequestMetadata.getMetaFields()) {
+            if (other.getResponseMetadata().contains(requestField)) {
                 return +1;
             }
         }
-        for (MetaField responseField : responseFields.getMetaFields()) {
-            if (other.getMandatoryRequestFields().contains(responseField)) {
+        for (MetaField responseField : responseMetadata.getMetaFields()) {
+            if (other.getMandatoryRequestMetadata().contains(responseField)) {
                 return -1;
             }
         }
-        for (MetaField responseField : responseFields.getMetaFields()) {
-            if (other.getOptionalRequestFields().contains(responseField)) {
+        for (MetaField responseField : responseMetadata.getMetaFields()) {
+            if (other.getOptionalRequestMetadata().contains(responseField)) {
                 return -1;
             }
         }
@@ -83,7 +88,7 @@ public abstract class BaseProvider implements DataProvider {
     protected int addRowSet(DataRowSet response, DataRowSet rowset, int rowNum) {
         for (int i = 0; i < rowset.size(); i++) {
             for (MetaField field : response.getMetadata().getMetaFields()) {
-                if (getResponseFields().contains(field)) {
+                if (getResponseMetadata().contains(field)) {
                     response.addValueAtRow(field, rowset.getValue(field, i),
                             rowNum);
                 }

@@ -98,7 +98,7 @@ public class QueryExecutor {
         final Map<DataProvider, Future<?>> futures = new HashMap<>();
         for (final DataProvider provider : providers) {
             if (requestFields.getMetadata().getMissingCount(
-                    provider.getMandatoryRequestFields()) == 0) {
+                    provider.getMandatoryRequestMetadata()) == 0) {
                 executedProviders.add(provider);
                 // execute in background thread if provider will take long time
                 // to execute
@@ -146,7 +146,7 @@ public class QueryExecutor {
     // add optional fields as request parameters as well
     private void addRequestDataForIntermediateFields(final DataProvider provider) {
         for (int i = 0; i < responseFields.size(); i++) {
-            for (MetaField responseField : provider.getResponseFields()
+            for (MetaField responseField : provider.getResponseMetadata()
                     .getMetaFields()) {
                 if ((responseFields.getMetadata().contains(responseField) && responseFields
                         .hasFieldValue(responseField, i))
@@ -163,13 +163,13 @@ public class QueryExecutor {
     // add any intermediate meta data needed to the output
     private void addIntermediateAndOptionalMetaFields() {
         for (final DataProvider provider : providers) {
-            for (MetaField metaField : provider.getMandatoryRequestFields()
+            for (MetaField metaField : provider.getMandatoryRequestMetadata()
                     .getMetaFields()) {
                 if (!responseFields.getMetadata().contains(metaField)) {
                     responseFields.getMetadata().addMetaField(metaField);
                 }
             }
-            for (MetaField metaField : provider.getOptionalRequestFields()
+            for (MetaField metaField : provider.getOptionalRequestMetadata()
                     .getMetaFields()) {
                 optionalRequestFields.getMetadata().addMetaField(metaField);
                 if (!responseFields.getMetadata().contains(metaField)) {

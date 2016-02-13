@@ -35,12 +35,11 @@ public interface DataProviderLocator {
      * This method returns data-providers that produce the required output
      * fields passed as parameter.
      * 
-     * @param requestFields
-     * @param responseFields
+     * @param requestMeta
+     * @param responseMeta
      * @return collection of data providers
      */
-    Collection<DataProvider> locate(Metadata requestFields,
-            Metadata responseFields);
+    Collection<DataProvider> locate(Metadata requestMeta, Metadata responseMeta);
 
     /**
      * This method returns all providers matching categories

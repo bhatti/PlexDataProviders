@@ -48,13 +48,13 @@ public class QueryEngineImpl implements QueryEngine {
     public DataResponse query(DataRequest request) {
         // Get all data providers needed
         Collection<DataProvider> providers = dataProviderLocator.locate(request
-                .getParameters().getMetadata(), request.getResponseFields());
+                .getParameters().getMetadata(), request.getFields());
         if (logger.isDebugEnabled()) {
             logger.debug("Executing requestFields " + request.getParameters()
-                    + ", responseFields " + request.getResponseFields()
+                    + ", responseFields " + request.getFields()
                     + " with " + providers);
         }
-        DataRowSet responseFields = new DataRowSet(request.getResponseFields());
+        DataRowSet responseFields = new DataRowSet(request.getFields());
         //
         // creating parallel thread executor
         final ExecutorService executor = defaultExecutor != null ? defaultExecutor

@@ -88,11 +88,11 @@ public interface DataProvider extends DataProducer, Comparable<DataProvider> {
 
     int getRank();
 
-    Metadata getMandatoryRequestFields();
+    Metadata getMandatoryRequestMetadata();
 
-    Metadata getOptionalRequestFields();
+    Metadata getOptionalRequestMetadata();
 
-    Metadata getResponseFields();
+    Metadata getResponseMetadata();
 
     TaskGranularity getTaskGranularity();
 }
@@ -151,7 +151,7 @@ PlexDataProviders provides DataProviderLocator interface for registering and loo
 public interface DataProviderLocator {
     void register(DataProvider provider);
 
-    Collection<DataProvider> locate(Metadata requestFields, Metadata responseFields);
+    Collection<DataProvider> locate(Metadata requestMetadata, Metadata responseMetadata);
 ...
 }
 ```
@@ -196,7 +196,7 @@ Here is an example client that passes a search query data field and requests quo
 ```java 
 public void testGetQuoteBySearch() throws Throwable {
     String jsonResp = TestWebUtils.httpGet("http://localhost:" + DEFAULT_PORT
-                    + "/data?responseFields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&symbolQuery=AAPL");
+                    + "/data?fields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&symbolQuery=AAPL");
     ...
 ```
 
@@ -207,7 +207,7 @@ Here is an example JSON response from the data service:
 ```javascript
 {
     "queryResponse": {
-        "responseFields": [
+        "fields": [
             [{
                 "name": "symbol",
                 "value": "AAPL_X"
@@ -326,7 +326,7 @@ You can also retrieve nested relationships, e.g. following example returns all u
 ```java 
 public void testGetAccounts() throws Throwable {
             String jsonResp = TestWebUtils.httpGet("http://localhost:" + DEFAULT_PORT + 
-            "/data?responseFields=userId,user.accounts,user.portfolio");
+            "/data?fields=userId,user.accounts,user.portfolio");
     ...
 ``` 
 Following is a sample response from above request:
@@ -334,7 +334,7 @@ Following is a sample response from above request:
 ```javascript 
 {
     "queryResponse": {
-        "responseFields": [
+        "fields": [
             [{
                 "name": "user.portfolio",
                 "value": [

@@ -34,7 +34,7 @@ import com.plexobject.dp.provider.DataProviderException;
 import com.plexobject.dp.provider.TaskGranularity;
 
 public class QueryEngineImplTest {
-    private static final String CATEGORY_NAME = "Test";
+    private static final String KIND_NAME = "Test";
 
     static class TimeoutProvider extends BaseProvider {
         private long sleepMillis;
@@ -425,9 +425,11 @@ public class QueryEngineImplTest {
     public void testRegisterTwice() {
         ScalarProvider provider1 = new ScalarProvider("one",
                 new String[] { "a" }, new String[] {}, "b");
+        ScalarProvider provider2 = new ScalarProvider("one",
+                new String[] { "a" }, new String[] {}, "b");
         provider1.setTaskGranularity(TaskGranularity.FINE);
         dataProviderLocator.register(provider1);
-        dataProviderLocator.register(provider1);
+        dataProviderLocator.register(provider2);
     }
 
     @Test
@@ -576,7 +578,7 @@ public class QueryEngineImplTest {
         Metadata metaFields = new Metadata();
         for (String arg : args) {
             metaFields.addMetaField(MetaFieldFactory.createText(arg,
-                    CATEGORY_NAME, false));
+                    KIND_NAME, false));
         }
         return metaFields;
     }
@@ -585,7 +587,7 @@ public class QueryEngineImplTest {
         Metadata metaFields = new Metadata();
         for (String arg : args) {
             metaFields.addMetaField(MetaFieldFactory.createVectorText(arg,
-                    CATEGORY_NAME, false));
+                    KIND_NAME, false));
         }
         return metaFields;
     }
@@ -596,7 +598,7 @@ public class QueryEngineImplTest {
         DataRow row = new DataRow();
         for (String arg : args) {
             row.addField(
-                    MetaFieldFactory.createText(arg, CATEGORY_NAME, false), arg
+                    MetaFieldFactory.createText(arg, KIND_NAME, false), arg
                             + "-input");
         }
         rowset.addRow(row);
@@ -608,7 +610,7 @@ public class QueryEngineImplTest {
         DataRowSet rowset = new DataRowSet(metaFields);
         for (int i = 0; i < args.length; i++) {
             rowset.addValueAtRow(MetaFieldFactory.createVectorText(args[i],
-                    CATEGORY_NAME, false), Collections.singleton(args[i]), 0);
+                    KIND_NAME, false), Collections.singleton(args[i]), 0);
         }
         return rowset;
     }

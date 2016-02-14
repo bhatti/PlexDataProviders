@@ -214,13 +214,13 @@ public class DataServiceImplTest {
     }
 
     @Test
-    public void testInfoByCategory() throws Throwable {
+    public void testInfoByKind() throws Throwable {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
-                + DEFAULT_PORT + "/data/info?categories=Order");
+                + DEFAULT_PORT + "/data/info?kinds=Order");
         InfoResponse response = TestWebUtils.decodeDataInfoResponse(jsonResp);
         assertTrue(response.getInfoResponse().getResponseMetadata().size() > 0);
         for (MetaField f : OUTPUT_FIELDS) {
-            if (f.getCategory().equals("Order")) {
+            if (f.getKind().equals("Order")) {
                 assertTrue("Expecting " + f, response.getInfoResponse()
                         .getResponseMetadata().contains(f));
             }
@@ -236,8 +236,8 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SymbolsProvider"));
 
-        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
-        for (DataRow row : response.getQueryResponse().getResponseFields()
+        assertTrue(response.getQueryResponse().getFields().size() > 0);
+        for (DataRow row : response.getQueryResponse().getFields()
                 .getRows()) {
             assertTrue(row.getValueAsText(SharedMeta.symbol).length() > 0);
         }
@@ -252,20 +252,20 @@ public class DataServiceImplTest {
                         + DEFAULT_PORT
                         + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
-        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertTrue(response.getQueryResponse().getFields().size() > 0);
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
                 .size());
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SymbolSearchProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getFields()
                 .size(); i++) {
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.symbol, i).contains("G"));
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.underlyingSymbol, i)
                     .contains("G"));
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.exchange, i).length() > 0);
         }
     }
@@ -277,20 +277,20 @@ public class DataServiceImplTest {
                         + DEFAULT_PORT
                         + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
-        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertTrue(response.getQueryResponse().getFields().size() > 0);
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
                 .size());
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SymbolSearchProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getFields()
                 .size(); i++) {
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.symbol, i).contains("G"));
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.underlyingSymbol, i)
                     .contains("G"));
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.exchange, i).length() > 0);
         }
     }
@@ -303,29 +303,29 @@ public class DataServiceImplTest {
                         + "/data?responseFields=exchange,symbol,underlyingSymbol,security.type,company.name,company.address&symbolQuery=M");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
 
-        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertTrue(response.getQueryResponse().getFields().size() > 0);
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
                 .size());
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SymbolSearchProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getFields()
                 .size(); i++) {
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.symbol, i).contains("M"));
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.underlyingSymbol, i)
                     .contains("M"));
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.exchange, i).length() > 0);
             assertTrue(response
                     .getQueryResponse()
-                    .getResponseFields()
+                    .getFields()
                     .getValueAsText(MetaFieldFactory.lookup("security.type"), i)
                     .length() > 0);
             DataRowSet address = response
                     .getQueryResponse()
-                    .getResponseFields()
+                    .getFields()
                     .getValueAsRowSet(
                             MetaFieldFactory.lookup("company.address"), 0);
             assertEquals(1, address.size());
@@ -348,7 +348,7 @@ public class DataServiceImplTest {
 
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
                 .size());
-        assertEquals(2, response.getQueryResponse().getResponseFields().size());
+        assertEquals(2, response.getQueryResponse().getFields().size());
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("QuotesBySymbolsProvider"));
         assertTrue(response.getQueryResponse().getProviders()
@@ -356,15 +356,15 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("CompaniesBySymbolsProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getFields()
                 .size(); i++) {
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.symbol, i).contains("AAPL"));
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.exchange, i).length() > 0);
             DataRowSet sales = response
                     .getQueryResponse()
-                    .getResponseFields()
+                    .getFields()
                     .getValueAsRowSet(MetaFieldFactory.lookup("quote.sales"), 0);
             assertEquals(5, sales.size());
             for (int j = 0; j < 5; j++) {
@@ -388,19 +388,19 @@ public class DataServiceImplTest {
 
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
                 .size());
-        assertEquals(10, response.getQueryResponse().getResponseFields().size());
+        assertEquals(10, response.getQueryResponse().getFields().size());
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("UsersProvider"));
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("UsersByIdsProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getFields()
                 .size(); i++) {
-            assertTrue(response.getQueryResponse().getResponseFields()
+            assertTrue(response.getQueryResponse().getFields()
                     .getValueAsLong(SharedMeta.userId, i) > 0);
             DataRowSet accounts = response
                     .getQueryResponse()
-                    .getResponseFields()
+                    .getFields()
                     .getValueAsRowSet(MetaFieldFactory.lookup("user.accounts"),
                             0);
             assertEquals(5, accounts.size());
@@ -424,12 +424,12 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SecuritiesBySymbolsProvider"));
 
-        assertTrue(response.getQueryResponse().getResponseFields().size() > 0);
+        assertTrue(response.getQueryResponse().getFields().size() > 0);
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
                 .size());
-        assertEquals("F", response.getQueryResponse().getResponseFields()
+        assertEquals("F", response.getQueryResponse().getFields()
                 .getValueAsText(SharedMeta.symbol, 0));
-        assertEquals("F", response.getQueryResponse().getResponseFields()
+        assertEquals("F", response.getQueryResponse().getFields()
                 .getValueAsText(SharedMeta.underlyingSymbol, 0));
     }
 
@@ -441,15 +441,15 @@ public class DataServiceImplTest {
 
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
                 .size());
-        assertEquals(10, response.getQueryResponse().getResponseFields().size());
+        assertEquals(10, response.getQueryResponse().getFields().size());
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("UsersProvider"));
         long accountId = 0;
-        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getFields()
                 .size(); i++) {
             DataRowSet accounts = response
                     .getQueryResponse()
-                    .getResponseFields()
+                    .getFields()
                     .getValueAsRowSet(MetaFieldFactory.lookup("user.accounts"),
                             0);
             assertEquals(5, accounts.size());
@@ -468,19 +468,19 @@ public class DataServiceImplTest {
 
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
                 .size());
-        assertEquals(20, response.getQueryResponse().getResponseFields().size());
+        assertEquals(20, response.getQueryResponse().getFields().size());
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("OrdersByAccountIdsProvider"));
-        for (int i = 0; i < response.getQueryResponse().getResponseFields()
+        for (int i = 0; i < response.getQueryResponse().getFields()
                 .size(); i++) {
             assertTrue(response
                     .getQueryResponse()
-                    .getResponseFields()
+                    .getFields()
                     .getValueAsDecimal(
                             MetaFieldFactory.lookup("order.quantity"), i) > 0);
             DataRowSet legs = response
                     .getQueryResponse()
-                    .getResponseFields()
+                    .getFields()
                     .getValueAsRowSet(
                             MetaFieldFactory.lookup("order.orderLegs"), i);
             assertEquals(5, legs.size());

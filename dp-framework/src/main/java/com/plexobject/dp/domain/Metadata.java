@@ -91,13 +91,12 @@ public class Metadata {
         return metaFields;
     }
 
-    public synchronized Collection<MetaField> getMetaFieldsByCategories(
-            String[] categories) {
+    public synchronized Collection<MetaField> getMetaFieldsByKinds(
+            String... kinds) {
         Set<MetaField> matchingFields = new HashSet<MetaField>();
         for (MetaField field : metaFields) {
-            for (String category : categories) {
-                if (field.getCategory() != null
-                        && field.getCategory().equals(category)) {
+            for (String kind : kinds) {
+                if (field.getKind() != null && field.getKind().equals(kind)) {
                     matchingFields.add(field);
                 }
             }
@@ -105,16 +104,8 @@ public class Metadata {
         return matchingFields;
     }
 
-    public synchronized boolean hasMetaFieldsByCategories(String[] categories) {
-        for (MetaField field : metaFields) {
-            for (String category : categories) {
-                if (field.getCategory() != null
-                        && field.getCategory().equals(category)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    public boolean hasMetaFieldsByAnyKinds(String... kinds) {
+        return getMetaFieldsByKinds(kinds).size() > 0;
     }
 
     public synchronized int size() {

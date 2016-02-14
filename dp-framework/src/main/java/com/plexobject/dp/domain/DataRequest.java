@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
  */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataRequest {
-    private static final String RESPONSE_FIELDS = "fields";
+    public static final String RESPONSE_FIELDS = "fields";
     private DataRowSet parameters;
     private Metadata fields;
     private QueryConfiguration config;
@@ -52,28 +52,28 @@ public class DataRequest {
     }
 
     /**
-     * accessor for request fields 
+     * accessor for request fields
      */
     public DataRowSet getParameters() {
         return parameters;
     }
 
     /**
-     * setter for request fields 
+     * setter for request fields
      */
     public void setParameters(DataRowSet parameters) {
         this.parameters = parameters;
     }
 
     /**
-     * accessor for response fields 
+     * accessor for response fields
      */
     public Metadata getFields() {
         return fields;
     }
 
     /**
-     * setter for response fields 
+     * setter for response fields
      */
     public void setFields(Metadata fields) {
         this.fields = fields;

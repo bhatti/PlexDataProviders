@@ -11,5 +11,5 @@ import com.plexobject.handler.Request;
 public interface DataService {
     DataResponse query(Request request);
 
-    DataInfoResponse info(@QueryParam("category") String category);
+    DataInfoResponse info(@QueryParam("kind") String kind);
 }

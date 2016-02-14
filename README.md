@@ -55,7 +55,7 @@ gradle jar
 ## Data Structure
 
 Following are primary data structures:
-- MetaField - This class defines meta information for each data field such as name, category, type, etc.
+- MetaField - This class defines meta information for each data field such as name, kind, type, etc.
 
 - MetaFieldType - This enum class supports primitive data types supported, i.e.
   - SCALAR_TEXT - simple text

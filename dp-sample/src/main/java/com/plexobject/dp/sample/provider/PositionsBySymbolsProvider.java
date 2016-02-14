@@ -2,9 +2,9 @@ package com.plexobject.dp.sample.provider;
 
 import java.util.Collection;
 
-import com.plexobject.dp.domain.DataConfiguration;
 import com.plexobject.dp.domain.DataRowSet;
 import com.plexobject.dp.domain.Metadata;
+import com.plexobject.dp.domain.QueryConfiguration;
 import com.plexobject.dp.provider.BaseProvider;
 import com.plexobject.dp.provider.DataProviderException;
 import com.plexobject.dp.sample.dao.DaoLocator;
@@ -25,7 +25,7 @@ public class PositionsBySymbolsProvider extends BaseProvider {
 
     @Override
     public void produce(DataRowSet parameter, DataRowSet response,
-            DataConfiguration config) throws DataProviderException {
+            QueryConfiguration config) throws DataProviderException {
         //
         int nextRow = 0;
         for (int i = 0; i < parameter.size(); i++) {

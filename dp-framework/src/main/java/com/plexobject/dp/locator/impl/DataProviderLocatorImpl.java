@@ -28,9 +28,11 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
     @Override
     public void register(DataProvider provider) {
         synchronized (providersByName) {
-            if (providersByName.get(provider.getName()) != null) {
+            DataProvider oldProvider = providersByName.get(provider.getName());
+            if (oldProvider != null && !oldProvider.equals(provider)) {
                 throw new IllegalArgumentException("Provider with name "
-                        + provider.getName() + " is already registered");
+                        + provider.getName() + " is already registered "
+                        + oldProvider);
             }
             providersByName.put(provider.getName(), provider);
         }
@@ -109,16 +111,16 @@ public class DataProviderLocatorImpl implements DataProviderLocator {
     }
 
     @Override
-    public Collection<DataProvider> getAllWithCategories(String[] categories) {
+    public Collection<DataProvider> getAllWithKinds(String... kinds) {
         Set<DataProvider> providers = new HashSet<DataProvider>();
         for (Set<DataProvider> set : providersByOutputMetaField.values()) {
             for (DataProvider provider : set) {
                 if (provider.getMandatoryRequestMetadata()
-                        .hasMetaFieldsByCategories(categories)
+                        .hasMetaFieldsByAnyKinds(kinds)
                         || provider.getOptionalRequestMetadata()
-                                .hasMetaFieldsByCategories(categories)
+                                .hasMetaFieldsByAnyKinds(kinds)
                         || provider.getResponseMetadata()
-                                .hasMetaFieldsByCategories(categories)) {
+                                .hasMetaFieldsByAnyKinds(kinds)) {
                     providers.add(provider);
                 }
             }

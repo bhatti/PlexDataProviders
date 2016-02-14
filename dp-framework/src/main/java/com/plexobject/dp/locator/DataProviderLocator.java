@@ -42,15 +42,15 @@ public interface DataProviderLocator {
     Collection<DataProvider> locate(Metadata requestMeta, Metadata responseMeta);
 
     /**
-     * This method returns all providers matching categories
+     * This method returns all providers matching kinds
      * 
-     * @param categories
-     *            - list of categories or empty list for all
+     * @param kinds
+     *            - list of kinds or empty list for all
      * 
      * @return
      */
-    Collection<DataProvider> getAllWithCategories(String[] categories);
-    
+    Collection<DataProvider> getAllWithKinds(String... kinds);
+
     /**
      * This method returns all providers
      * 

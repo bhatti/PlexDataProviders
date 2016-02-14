@@ -24,6 +24,7 @@ public class DataRowSetDeserializer extends JsonDeserializer<DataRowSet> {
             JsonNode node) throws IOException, JsonProcessingException {
         DataRowSet rowset = new DataRowSet(Metadata.from());
         Iterator<JsonNode> it = node.elements();
+
         while (it.hasNext()) {
             JsonNode next = it.next();
             DataRow row = DataRowDeserializer.doDeserialize(jp, ctxt, next);

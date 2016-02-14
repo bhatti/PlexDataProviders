@@ -33,7 +33,7 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
             JsonNode node) throws IOException, JsonProcessingException {
         DataRow row = new DataRow();
         //
-        
+
         Iterator<JsonNode> it = node.elements();
         while (it.hasNext()) {
             JsonNode next = it.next();
@@ -59,10 +59,9 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
                 case VECTOR_TEXT: {
                     Iterator<JsonNode> iit = next.get("value").elements();
                     List<String> values = new ArrayList<>();
-                    int i = 0;
                     while (iit.hasNext()) {
                         JsonNode inext = iit.next();
-                        values.add(inext.get(i++).asText());
+                        values.add(inext.asText());
                     }
                     row.addField(field,
                             values.toArray(new String[values.size()]));
@@ -71,10 +70,9 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
                 case VECTOR_INTEGER: {
                     Iterator<JsonNode> iit = next.get("value").elements();
                     List<Long> values = new ArrayList<>();
-                    int i = 0;
                     while (iit.hasNext()) {
                         JsonNode inext = iit.next();
-                        values.add(inext.get(i++).asLong());
+                        values.add(inext.asLong());
                     }
                     row.addField(field, values.toArray(new Long[values.size()]));
                 }
@@ -82,10 +80,9 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
                 case VECTOR_DECIMAL: {
                     Iterator<JsonNode> iit = next.get("value").elements();
                     List<Double> values = new ArrayList<>();
-                    int i = 0;
                     while (iit.hasNext()) {
                         JsonNode inext = iit.next();
-                        values.add(inext.get(i++).asDouble());
+                        values.add(inext.asDouble());
                     }
                     row.addField(field,
                             values.toArray(new Double[values.size()]));
@@ -94,10 +91,9 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
                 case VECTOR_DATE: {
                     Iterator<JsonNode> iit = next.get("value").elements();
                     List<Date> values = new ArrayList<>();
-                    int i = 0;
                     while (iit.hasNext()) {
                         JsonNode inext = iit.next();
-                        values.add(new Date(inext.get(i++).asLong()));
+                        values.add(new Date(inext.asLong()));
                     }
                     row.addField(field, values.toArray(new Date[values.size()]));
 
@@ -106,10 +102,9 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
                 case VECTOR_BOOLEAN: {
                     Iterator<JsonNode> iit = next.get("value").elements();
                     List<Boolean> values = new ArrayList<>();
-                    int i = 0;
                     while (iit.hasNext()) {
                         JsonNode inext = iit.next();
-                        values.add(inext.get(i++).asBoolean());
+                        values.add(inext.asBoolean());
                     }
                     row.addField(field,
                             values.toArray(new Boolean[values.size()]));
@@ -130,6 +125,9 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
                     logger.error("Failed to deserialize object " + next);
                     break;
                 }
+            } else {
+                logger.error("Could not find meta field for " + field + ": "
+                        + next);
             }
         }
         return row;

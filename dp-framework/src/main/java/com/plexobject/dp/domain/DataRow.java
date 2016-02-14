@@ -169,5 +169,4 @@ public class DataRow {
     public String toString() {
         return "[fields=" + fields + "]";
     }
-
 }

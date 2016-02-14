@@ -77,7 +77,9 @@ public class DataServiceImpl implements DataService {
         final DataRequest dataRequest = DataRequest.from(webRequest
                 .getProperties());
         //
-        return queryEngine.query(dataRequest);
+        DataResponse response = queryEngine.query(dataRequest);
+        return response;
+
     }
 
     @Override

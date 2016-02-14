@@ -157,13 +157,11 @@ public class DataRowSetJsonTest {
                 DataRowSet.class);
         String deserRowSetJson = mapper.writeValueAsString(deserRowSet);
 
-        // System.out.println(deserRowSetJson);
-
         assertEquals(topRowSetJson, deserRowSetJson);
     }
 
     @SuppressWarnings("unchecked")
-    private void debugPrint(String topRowSetJson) throws IOException,
+    void debugPrint(String topRowSetJson) throws IOException,
             JsonParseException, JsonMappingException {
         List<Object> topList = mapper.readValue(topRowSetJson, List.class);
         assertEquals(3, topList.size());

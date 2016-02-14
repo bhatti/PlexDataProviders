@@ -156,7 +156,7 @@ public class DataServiceImplTest {
         props.setProperty(Constants.HTTP_PORT, String.valueOf(DEFAULT_PORT));
         props.setProperty(Constants.JAXWS_NAMESPACE, "");
         Configuration config = new Configuration(props);
-        if (config.getBoolean("log")) {
+        if (true || config.getBoolean("log")) {
             BasicConfigurator.configure();
             LogManager.getRootLogger().setLevel(Level.WARN);
         }
@@ -230,15 +230,14 @@ public class DataServiceImplTest {
     @Test
     public void testGetSymbols() throws Throwable {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
-                + DEFAULT_PORT + "/data?responseFields="
+                + DEFAULT_PORT + "/data?fields="
                 + SharedMeta.symbol.getName());
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SymbolsProvider"));
 
         assertTrue(response.getQueryResponse().getFields().size() > 0);
-        for (DataRow row : response.getQueryResponse().getFields()
-                .getRows()) {
+        for (DataRow row : response.getQueryResponse().getFields().getRows()) {
             assertTrue(row.getValueAsText(SharedMeta.symbol).length() > 0);
         }
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
@@ -250,7 +249,7 @@ public class DataServiceImplTest {
         String jsonResp = TestWebUtils
                 .httpGet("http://localhost:"
                         + DEFAULT_PORT
-                        + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
+                        + "/data?fields=exchange,symbol,underlyingSymbol&symbolQuery=G");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
         assertTrue(response.getQueryResponse().getFields().size() > 0);
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
@@ -258,8 +257,7 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SymbolSearchProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getFields()
-                .size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getFields().size(); i++) {
             assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.symbol, i).contains("G"));
             assertTrue(response.getQueryResponse().getFields()
@@ -275,7 +273,7 @@ public class DataServiceImplTest {
         String jsonResp = TestWebUtils
                 .httpGet("http://localhost:"
                         + DEFAULT_PORT
-                        + "/data?responseFields=exchange,symbol,underlyingSymbol&symbolQuery=G");
+                        + "/data?fields=exchange,symbol,underlyingSymbol&symbolQuery=G");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
         assertTrue(response.getQueryResponse().getFields().size() > 0);
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
@@ -283,8 +281,7 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SymbolSearchProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getFields()
-                .size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getFields().size(); i++) {
             assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.symbol, i).contains("G"));
             assertTrue(response.getQueryResponse().getFields()
@@ -300,7 +297,7 @@ public class DataServiceImplTest {
         String jsonResp = TestWebUtils
                 .httpGet("http://localhost:"
                         + DEFAULT_PORT
-                        + "/data?responseFields=exchange,symbol,underlyingSymbol,security.type,company.name,company.address&symbolQuery=M");
+                        + "/data?fields=exchange,symbol,underlyingSymbol,security.type,company.name,company.address&symbolQuery=M");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
 
         assertTrue(response.getQueryResponse().getFields().size() > 0);
@@ -309,8 +306,7 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SymbolSearchProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getFields()
-                .size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getFields().size(); i++) {
             assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.symbol, i).contains("M"));
             assertTrue(response.getQueryResponse().getFields()
@@ -343,7 +339,7 @@ public class DataServiceImplTest {
         String jsonResp = TestWebUtils
                 .httpGet("http://localhost:"
                         + DEFAULT_PORT
-                        + "/data?responseFields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&symbolQuery=AAPL");
+                        + "/data?fields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&symbolQuery=AAPL");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
 
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
@@ -356,8 +352,7 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("CompaniesBySymbolsProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getFields()
-                .size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getFields().size(); i++) {
             assertTrue(response.getQueryResponse().getFields()
                     .getValueAsText(SharedMeta.symbol, i).contains("AAPL"));
             assertTrue(response.getQueryResponse().getFields()
@@ -382,7 +377,8 @@ public class DataServiceImplTest {
     public void testGetAccounts() throws Throwable {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
                 + DEFAULT_PORT
-                + "/data?responseFields=userId,user.accounts,user.portfolio");
+                + "/data?fields=userId,user.accounts,user.portfolio");
+        System.out.println(jsonResp);
 
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
 
@@ -394,8 +390,7 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("UsersByIdsProvider"));
 
-        for (int i = 0; i < response.getQueryResponse().getFields()
-                .size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getFields().size(); i++) {
             assertTrue(response.getQueryResponse().getFields()
                     .getValueAsLong(SharedMeta.userId, i) > 0);
             DataRowSet accounts = response
@@ -419,7 +414,7 @@ public class DataServiceImplTest {
     public void testGetSecuritiesBySymbol() throws Throwable {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
                 + DEFAULT_PORT
-                + "/data?responseFields=exchange,underlyingSymbol&symbol=F");
+                + "/data?fields=exchange,underlyingSymbol&symbol=F");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("SecuritiesBySymbolsProvider"));
@@ -436,7 +431,7 @@ public class DataServiceImplTest {
     @Test
     public void testGetAccountsOrders() throws Throwable {
         String jsonResp = TestWebUtils.httpGet("http://localhost:"
-                + DEFAULT_PORT + "/data?responseFields=user.accounts");
+                + DEFAULT_PORT + "/data?fields=user.accounts");
         QueryResponse response = TestWebUtils.decodeQueryResponse(jsonResp);
 
         assertEquals(0, response.getQueryResponse().getErrorsByProviderName()
@@ -445,8 +440,7 @@ public class DataServiceImplTest {
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("UsersProvider"));
         long accountId = 0;
-        for (int i = 0; i < response.getQueryResponse().getFields()
-                .size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getFields().size(); i++) {
             DataRowSet accounts = response
                     .getQueryResponse()
                     .getFields()
@@ -462,7 +456,7 @@ public class DataServiceImplTest {
         jsonResp = TestWebUtils
                 .httpGet("http://localhost:"
                         + DEFAULT_PORT
-                        + "/data?responseFields=orderId,order.date,order.price,order.quantity,order.status,order.orderLegs&accountId="
+                        + "/data?fields=orderId,order.date,order.price,order.quantity,order.status,order.orderLegs&accountId="
                         + accountId);
         response = TestWebUtils.decodeQueryResponse(jsonResp);
 
@@ -471,8 +465,7 @@ public class DataServiceImplTest {
         assertEquals(20, response.getQueryResponse().getFields().size());
         assertTrue(response.getQueryResponse().getProviders()
                 .contains("OrdersByAccountIdsProvider"));
-        for (int i = 0; i < response.getQueryResponse().getFields()
-                .size(); i++) {
+        for (int i = 0; i < response.getQueryResponse().getFields().size(); i++) {
             assertTrue(response
                     .getQueryResponse()
                     .getFields()

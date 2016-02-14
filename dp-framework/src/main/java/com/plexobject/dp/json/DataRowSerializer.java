@@ -36,30 +36,31 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
                 continue;
             }
             jgen.writeStartObject();
-            jgen.writeStringField("name", e.getKey().getName());
             // jgen.writeBooleanField("keyField", e.getKey().isKeyField());
             switch (e.getKey().getType()) {
             case SCALAR_TEXT:
-                jgen.writeStringField("value", row.getValueAsText(e.getKey()));
+                jgen.writeStringField(e.getKey().getName(),
+                        row.getValueAsText(e.getKey()));
                 break;
             case SCALAR_INTEGER:
-                jgen.writeNumberField("value", row.getValueAsLong(e.getKey()));
+                jgen.writeNumberField(e.getKey().getName(),
+                        row.getValueAsLong(e.getKey()));
                 break;
             case SCALAR_DECIMAL:
-                jgen.writeNumberField("value",
+                jgen.writeNumberField(e.getKey().getName(),
                         row.getValueAsDecimal(e.getKey()));
                 break;
             case SCALAR_DATE:
-                jgen.writeNumberField("value", row.getValueAsDate(e.getKey())
-                        .getTime());
+                jgen.writeNumberField(e.getKey().getName(),
+                        row.getValueAsDate(e.getKey()).getTime());
                 break;
             case SCALAR_BOOLEAN:
-                jgen.writeBooleanField("value",
+                jgen.writeBooleanField(e.getKey().getName(),
                         row.getValueAsBoolean(e.getKey()));
                 break;
             case VECTOR_TEXT: {
                 String[] values = row.getValueAsTextVector(e.getKey());
-                jgen.writeArrayFieldStart("value");
+                jgen.writeArrayFieldStart(e.getKey().getName());
                 for (int i = 0; i < values.length; i++) {
                     jgen.writeString(values[i]);
                 }
@@ -68,7 +69,7 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
                 break;
             case VECTOR_INTEGER: {
                 long[] values = row.getValueAsLongVector(e.getKey());
-                jgen.writeArrayFieldStart("value");
+                jgen.writeArrayFieldStart(e.getKey().getName());
                 for (int i = 0; i < values.length; i++) {
                     jgen.writeNumber(values[i]);
                 }
@@ -77,7 +78,7 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
                 break;
             case VECTOR_DECIMAL: {
                 double[] values = row.getValueAsDecimalVector(e.getKey());
-                jgen.writeArrayFieldStart("value");
+                jgen.writeArrayFieldStart(e.getKey().getName());
                 for (int i = 0; i < values.length; i++) {
                     jgen.writeNumber(values[i]);
                 }
@@ -86,7 +87,7 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
                 break;
             case VECTOR_DATE: {
                 Date[] values = row.getValueAsDateVector(e.getKey());
-                jgen.writeArrayFieldStart("value");
+                jgen.writeArrayFieldStart(e.getKey().getName());
                 for (int i = 0; i < values.length; i++) {
                     jgen.writeNumber(values[i].getTime());
                 }
@@ -96,7 +97,7 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
                 break;
             case VECTOR_BOOLEAN: {
                 boolean[] values = row.getValueAsBooleanVector(e.getKey());
-                jgen.writeArrayFieldStart("value");
+                jgen.writeArrayFieldStart(e.getKey().getName());
                 for (int i = 0; i < values.length; i++) {
                     jgen.writeBoolean(values[i]);
                 }
@@ -104,11 +105,11 @@ public class DataRowSerializer extends StdSerializer<DataRow> {
             }
                 break;
             case BINARY:
-                jgen.writeStringField("value",
+                jgen.writeStringField(e.getKey().getName(),
                         new String(row.getValueAsBinary(e.getKey()), "UTF-8"));
                 break;
             case ROWSET:
-                jgen.writeArrayFieldStart("value");
+                jgen.writeArrayFieldStart(e.getKey().getName());
                 DataRowSetSerializer.doSerialize((DataRowSet) e.getValue(),
                         jgen, sp);
                 jgen.writeEndArray();

@@ -13,24 +13,24 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
  */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataRequest {
-    private static final String RESPONSE_FIELDS = "responseFields";
+    public static final String RESPONSE_FIELDS = "fields";
     private DataRowSet parameters;
-    private Metadata responseFields;
+    private Metadata fields;
     private QueryConfiguration config;
 
     public DataRequest() {
     }
 
-    public DataRequest(DataRowSet parameters, Metadata responseFields,
+    public DataRequest(DataRowSet parameters, Metadata fields,
             QueryConfiguration config) {
         this.parameters = parameters;
-        this.responseFields = responseFields;
+        this.fields = fields;
         this.config = config;
     }
 
     public static DataRequest from(final Map<String, Object> args) {
         final DataRowSet parameters = new DataRowSet(Metadata.from());
-        final Metadata responseFields = Metadata.from();
+        final Metadata fields = Metadata.from();
         final QueryConfiguration config = QueryConfiguration.from(args);
         for (Map.Entry<String, Object> e : args.entrySet()) {
             if (RESPONSE_FIELDS.equals(e.getKey())) {
@@ -38,7 +38,7 @@ public class DataRequest {
                 for (String fieldName : fieldNames) {
                     MetaField field = MetaFieldFactory.lookup(fieldName);
                     if (field != null) {
-                        responseFields.addMetaField(field);
+                        fields.addMetaField(field);
                     }
                 }
             } else {
@@ -48,23 +48,35 @@ public class DataRequest {
                 }
             }
         }
-        return new DataRequest(parameters, responseFields, config);
+        return new DataRequest(parameters, fields, config);
     }
 
+    /**
+     * accessor for request fields
+     */
     public DataRowSet getParameters() {
         return parameters;
     }
 
+    /**
+     * setter for request fields
+     */
     public void setParameters(DataRowSet parameters) {
         this.parameters = parameters;
     }
 
-    public Metadata getResponseFields() {
-        return responseFields;
+    /**
+     * accessor for response fields
+     */
+    public Metadata getFields() {
+        return fields;
     }
 
-    public void setResponseFields(Metadata responseFields) {
-        this.responseFields = responseFields;
+    /**
+     * setter for response fields
+     */
+    public void setFields(Metadata fields) {
+        this.fields = fields;
     }
 
     public QueryConfiguration getConfig() {

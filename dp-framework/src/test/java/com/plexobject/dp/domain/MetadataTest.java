@@ -7,14 +7,32 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class MetadataTest {
 
+    @Before
+    public void setup() {
+        MetaFieldFactory.reset();
+    }
+
     @Test
     public void testCreateEmpty() {
+
         Metadata fields = new Metadata();
         assertEquals(0, fields.size());
+    }
+
+    @Test
+    public void testGetMetaFieldsByKinds() {
+        MetaField field1 = MetaFieldFactory.createText("name", "Kind1", false);
+        MetaField field2 = MetaFieldFactory.createText("phone", "Kind2", false);
+        Metadata fields = new Metadata(field1, field2);
+        assertTrue(fields.hasMetaFieldsByAnyKinds("Kind1", "Kind2"));
+        assertEquals(1, fields.getMetaFieldsByKinds("Kind1").size());
+        assertEquals(1, fields.getMetaFieldsByKinds("Kind2").size());
+        assertEquals(2, fields.getMetaFieldsByKinds("Kind1", "Kind2").size());
     }
 
     @Test

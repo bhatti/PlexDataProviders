@@ -55,11 +55,27 @@ gradle jar
 ## Data Structure
 
 Following are primary data structures:
-- MetaField - This class defines meta information for each data field such as name, category, type, etc.
-- MetaFieldType - This enum class supports primitive data types supported 
-- Metadata - This class defines set of MetaField 
-- DataRow - This class abstracts row of data fields 
-- DataRowSet - This class abstracts set of rows 
+- MetaField - This class defines meta information for each data field such as name, kind, type, etc.
+
+- MetaFieldType - This enum class supports primitive data types supported, i.e.
+  - SCALAR_TEXT - simple text
+  - SCALAR_INTEGER - integer numbers
+  - SCALAR_DECIMAL - decimal numbers
+  - SCALAR_DATE - dates
+  - SCALAR_BOOLEAN - boolean 
+  - VECTOR_TEXT - array of text
+  - VECTOR_INTEGER - array of integers
+  - VECTOR_DECIMAL - array of decimals
+  - VECTOR_DATE - array of dates
+  - VECTOR_BOOLEAN - array of boolean
+  - BINARY - binary data
+  - ROWSET - nested data rowsets
+
+- Metadata - This class defines a set of MetaFields used in DataRow/DataRowSet 
+
+- DataRow - This class abstracts a row of data fields 
+
+- DataRowSet - This class abstracts a set of rows 
 
 PlexDataProviders also supports nested structures where a data field in DataRow can be instance of DataRowSet.
 
@@ -88,11 +104,11 @@ public interface DataProvider extends DataProducer, Comparable<DataProvider> {
 
     int getRank();
 
-    Metadata getMandatoryRequestFields();
+    Metadata getMandatoryRequestMetadata();
 
-    Metadata getOptionalRequestFields();
+    Metadata getOptionalRequestMetadata();
 
-    Metadata getResponseFields();
+    Metadata getResponseMetadata();
 
     TaskGranularity getTaskGranularity();
 }
@@ -151,7 +167,7 @@ PlexDataProviders provides DataProviderLocator interface for registering and loo
 public interface DataProviderLocator {
     void register(DataProvider provider);
 
-    Collection<DataProvider> locate(Metadata requestFields, Metadata responseFields);
+    Collection<DataProvider> locate(Metadata requestMetadata, Metadata responseMetadata);
 ...
 }
 ```
@@ -196,7 +212,7 @@ Here is an example client that passes a search query data field and requests quo
 ```java 
 public void testGetQuoteBySearch() throws Throwable {
     String jsonResp = TestWebUtils.httpGet("http://localhost:" + DEFAULT_PORT
-                    + "/data?responseFields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&symbolQuery=AAPL");
+                    + "/data?fields=exchange,symbol,quote.bidPrice,quote.askPrice,quote.sales,company.name&symbolQuery=AAPL");
     ...
 ```
 
@@ -204,116 +220,83 @@ Note that above request will use three data providers, first it uses SymbolSearc
 
 
 Here is an example JSON response from the data service:
-```javascript
+```javascript 
 {
     "queryResponse": {
-        "responseFields": [
+        "fields": [
             [{
-                "name": "symbol",
-                "value": "AAPL_X"
+                "symbol": "AAPL_X"
             }, {
-                "name": "quote.sales",
-                "value": [
+                "quote.sales": [
                     [{
-                        "name": "symbol",
-                        "value": "AAPL_X"
+                        "symbol": "AAPL_X"
                     }, {
-                        "name": "timeOfSale.volume",
-                        "value": 23
+                        "timeOfSale.volume": 56
                     }, {
-                        "name": "timeOfSale.exchange",
-                        "value": "DOW"
+                        "timeOfSale.exchange": "DOW"
                     }, {
-                        "name": "timeOfSale.date",
-                        "value": 1454472544364
+                        "timeOfSale.date": 1455426008762
                     }, {
-                        "name": "timeOfSale.price",
-                        "value": 65.34189108481885
+                        "timeOfSale.price": 69.49132317180353
                     }],
                     [{
-                        "name": "symbol",
-                        "value": "AAPL_X"
+                        "symbol": "AAPL_X"
                     }, {
-                        "name": "timeOfSale.volume",
-                        "value": 21
+                        "timeOfSale.volume": 54
                     }, {
-                        "name": "timeOfSale.exchange",
-                        "value": "NYSE"
+                        "timeOfSale.exchange": "NYSE"
                     }, {
-                        "name": "timeOfSale.date",
-                        "value": 1454472544364
+                        "timeOfSale.date": 1455426008762
                     }, {
-                        "name": "timeOfSale.price",
-                        "value": 60.5340513295224
+                        "timeOfSale.price": 16.677774132458076
                     }],
                     [{
-                        "name": "symbol",
-                        "value": "AAPL_X"
+                        "symbol": "AAPL_X"
                     }, {
-                        "name": "timeOfSale.volume",
-                        "value": 12
+                        "timeOfSale.volume": 99
                     }, {
-                        "name": "timeOfSale.exchange",
-                        "value": "NASDAQ"
+                        "timeOfSale.exchange": "NASDAQ"
                     }, {
-                        "name": "timeOfSale.date",
-                        "value": 1454472544364
+                        "timeOfSale.date": 1455426008762
                     }, {
-                        "name": "timeOfSale.price",
-                        "value": 45.527847983593546
+                        "timeOfSale.price": 42.17891320885568
                     }],
                     [{
-                        "name": "symbol",
-                        "value": "AAPL_X"
+                        "symbol": "AAPL_X"
                     }, {
-                        "name": "timeOfSale.volume",
-                        "value": 55
+                        "timeOfSale.volume": 49
                     }, {
-                        "name": "timeOfSale.exchange",
-                        "value": "DOW"
+                        "timeOfSale.exchange": "DOW"
                     }, {
-                        "name": "timeOfSale.date",
-                        "value": 1454472544364
+                        "timeOfSale.date": 1455426008762
                     }, {
-                        "name": "timeOfSale.price",
-                        "value": 81.2969270317429
+                        "timeOfSale.price": 69.61680149649729
                     }],
                     [{
-                        "name": "symbol",
-                        "value": "AAPL_X"
+                        "symbol": "AAPL_X"
                     }, {
-                        "name": "timeOfSale.volume",
-                        "value": 47
+                        "timeOfSale.volume": 69
                     }, {
-                        "name": "timeOfSale.exchange",
-                        "value": "NYSE"
+                        "timeOfSale.exchange": "NYSE"
                     }, {
-                        "name": "timeOfSale.date",
-                        "value": 1454472544364
+                        "timeOfSale.date": 1455426008762
                     }, {
-                        "name": "timeOfSale.price",
-                        "value": 45.74518654599762
+                        "timeOfSale.price": 25.353316897552833
                     }]
                 ]
             }, {
-                "name": "quote.askPrice",
-                "value": 42.291074086023166
+                "quote.askPrice": 54.99300665695502
             }, {
-                "name": "quote.bidPrice",
-                "value": 29.06251067028489
+                "quote.bidPrice": 26.935682182171643
             }, {
-                "name": "exchange",
-                "value": "DOW"
+                "exchange": "DOW"
             }, {
-                "name": "company.name",
-                "value": "AAPL - name"
+                "company.name": "AAPL - name"
             }],
             [{
-                "name": "symbol",
-                "value": "AAPL"
+                "symbol": "AAPL"
             }, {
-                "name": "exchange",
-                "value": "NASDAQ"
+                "exchange": "NASDAQ"
             }]
         ],
         "errorsByProviderName": {},
@@ -321,6 +304,140 @@ Here is an example JSON response from the data service:
     }
 }
 ```
+
+You can also retrieve nested relationships, e.g. following example returns all users along with their account and portfolio information:
+```java 
+public void testGetAccounts() throws Throwable {
+            String jsonResp = TestWebUtils.httpGet("http://localhost:" + DEFAULT_PORT + 
+            "/data?fields=userId,user.accounts,user.portfolio");
+    ...
+``` 
+Following is a sample response from above request:
+
+```javascript 
+{
+    "queryResponse": {
+        "fields": [
+            [{
+                "user.portfolio": [
+                    [{
+                        "portfolioId": 448
+                    }, {
+                        "portfolio.margin": 2199.343269236506
+                    }, {
+                        "portfolio.cash": 2488.5370398814766
+                    }]
+                ]
+            }, {
+                "userId": 311
+            }, {
+                "user.accounts": [
+                    [{
+                        "account.type": "MARGIN"
+                    }, {
+                        "accountId": 313
+                    }, {
+                        "account.name": "account 313"
+                    }],
+                    [{
+                        "account.type": "CASH"
+                    }, {
+                        "accountId": 314
+                    }, {
+                        "account.name": "account 314"
+                    }],
+                    [{
+                        "account.type": "MARGIN"
+                    }, {
+                        "accountId": 315
+                    }, {
+                        "account.name": "account 315"
+                    }],
+                    [{
+                        "account.type": "CASH"
+                    }, {
+                        "accountId": 316
+                    }, {
+                        "account.name": "account 316"
+                    }],
+                    [{
+                        "account.type": "MARGIN"
+                    }, {
+                        "accountId": 317
+                    }, {
+                        "account.name": "account 317"
+                    }]
+                ]
+            }],
+            [{
+                "user.portfolio": [
+                    [{
+                        "portfolioId": 3824
+                    }, {
+                        "portfolio.margin": 2172.6109918377097
+                    }, {
+                        "portfolio.cash": 1282.9727530033433
+                    }]
+                ]
+            }, {
+                "userId": 3687
+            }, {
+                "user.accounts": [
+                    [{
+                        "account.type": "MARGIN"
+                    }, {
+                        "accountId": 3689
+                    }, {
+                        "account.name": "account 3689"
+                    }],
+                    [{
+                        "account.type": "CASH"
+                    }, {
+                        "accountId": 3690
+                    }, {
+                        "account.name": "account 3690"
+                    }],
+                    [{
+                        "account.type": "MARGIN"
+                    }, {
+                        "accountId": 3691
+                    }, {
+                        "account.name": "account 3691"
+                    }],
+                    [{
+                        "account.type": "CASH"
+                    }, {
+                        "accountId": 3692
+                    }, {
+                        "account.name": "account 3692"
+                    }],
+                    [{
+                        "account.type": "MARGIN"
+                    }, {
+                        "accountId": 3693
+                    }, {
+                        "account.name": "account 3693"
+                    }]
+                ]
+            }],
+            [{
+                "user.portfolio": [
+                    [{
+                        "portfolioId": 7200
+                    }, {
+                        "portfolio.margin": 2706.1256621272414
+                    }, {
+                        "portfolio.cash": 1764.2884398117876
+                    }]
+                ]
+            }]
+        ],
+        "errorsByProviderName": {},
+        "providers": ["UsersProvider", "UsersByIdsProvider"]
+    }
+}
+```
+Note that requesting composite data fields such as user.accounts and user.portfolio would return all nested data fields as well.
 
 You can browse sample application for more examples.
 

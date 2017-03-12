@@ -77,42 +77,44 @@ public class DataServiceImpl implements DataService {
         final DataRequest dataRequest = DataRequest.from(webRequest
                 .getProperties());
         //
-        return queryEngine.query(dataRequest);
+        DataResponse response = queryEngine.query(dataRequest);
+        return response;
+
     }
 
     @Override
     @GET
     @Path("/info")
-    public DataInfoResponse info(
-            @QueryParam("categories") String categoriesParam) {
-        String[] categories = categoriesParam != null ? categoriesParam
-                .split(",") : new String[0];
-        Collection<DataProvider> providers = categories.length > 0 ? dataProviderLocator
-                .getAllWithCategories(categories) : dataProviderLocator
-                .getAll();
+    public DataInfoResponse info(@QueryParam("kinds") String kindsParam) {
+        String[] kinds = kindsParam != null ? kindsParam.split(",")
+                : new String[0];
+        Collection<DataProvider> providers = kinds.length > 0 ? dataProviderLocator
+                .getAllWithKinds(kinds) : dataProviderLocator.getAll();
         DataInfoResponse response = new DataInfoResponse(Metadata.from(),
                 Metadata.from());
         for (DataProvider provider : providers) {
-            if (categories.length > 0) {
-                for (MetaField metaField : provider.getMandatoryRequestFields()
-                        .getMetaFieldsByCategories(categories)) {
+            if (kinds.length > 0) {
+                for (MetaField metaField : provider
+                        .getMandatoryRequestMetadata().getMetaFieldsByKinds(
+                                kinds)) {
                     response.getRequestMetadata().addMetaField(metaField);
                 }
-                for (MetaField metaField : provider.getOptionalRequestFields()
-                        .getMetaFieldsByCategories(categories)) {
+                for (MetaField metaField : provider
+                        .getOptionalRequestMetadata().getMetaFieldsByKinds(
+                                kinds)) {
                     response.getRequestMetadata().addMetaField(metaField);
                 }
-                for (MetaField metaField : provider.getResponseFields()
-                        .getMetaFieldsByCategories(categories)) {
+                for (MetaField metaField : provider.getResponseMetadata()
+                        .getMetaFieldsByKinds(kinds)) {
                     response.getResponseMetadata().addMetaField(metaField);
                 }
             } else {
                 response.getRequestMetadata().merge(
-                        provider.getMandatoryRequestFields());
+                        provider.getMandatoryRequestMetadata());
                 response.getRequestMetadata().merge(
-                        provider.getOptionalRequestFields());
+                        provider.getOptionalRequestMetadata());
                 response.getResponseMetadata().merge(
-                        provider.getResponseFields());
+                        provider.getResponseMetadata());
             }
         }
 

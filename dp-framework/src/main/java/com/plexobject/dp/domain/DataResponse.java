@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
  */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class DataResponse {
-    private DataRowSet responseFields;
+    private DataRowSet fields;
     private Map<String, Throwable> errorsByProviderName;
     private Set<String> providers = new HashSet<>();
 
@@ -23,19 +23,19 @@ public class DataResponse {
 
     }
 
-    public DataResponse(DataRowSet responseFields, Set<String> providers,
+    public DataResponse(DataRowSet fields, Set<String> providers,
             Map<String, Throwable> errors) {
-        this.responseFields = responseFields;
+        this.fields = fields;
         this.providers = providers;
         this.errorsByProviderName = errors;
     }
 
-    public DataRowSet getResponseFields() {
-        return responseFields;
+    public DataRowSet getFields() {
+        return fields;
     }
 
-    public void setResponseFields(DataRowSet responseFields) {
-        this.responseFields = responseFields;
+    public void setFields(DataRowSet fields) {
+        this.fields = fields;
     }
 
     public Map<String, Throwable> getErrorsByProviderName() {

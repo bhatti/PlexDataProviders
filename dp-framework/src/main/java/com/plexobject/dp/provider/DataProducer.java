@@ -14,15 +14,15 @@ public interface DataProducer {
     /**
      * This method will produce set of data fields given input
      * 
-     * @param requestFields
+     * @param requestMetadata
      *            - input parameter fields
-     * @param responseFields
+     * @param responseMetadata
      *            - output fields
      * @param config
      *            - configuration parameters
      * @return
      * @throws DataProviderException
      */
-    void produce(DataRowSet requestFields, DataRowSet responseFields,
+    void produce(DataRowSet requestMetadata, DataRowSet responseMetadata,
             QueryConfiguration config) throws DataProviderException;
 }

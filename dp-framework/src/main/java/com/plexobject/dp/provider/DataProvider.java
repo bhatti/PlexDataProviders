@@ -24,25 +24,25 @@ public interface DataProvider extends DataProducer, Comparable<DataProvider> {
     int getRank();
 
     /**
-     * This method returns required request fields
+     * This method returns required request meta data
      * 
      * @return
      */
-    Metadata getMandatoryRequestFields();
+    Metadata getMandatoryRequestMetadata();
 
     /**
-     * This method returns optional request fields
+     * This method returns optional request meta data
      * 
      * @return
      */
-    Metadata getOptionalRequestFields();
+    Metadata getOptionalRequestMetadata();
 
     /**
-     * This method returns response fields information
+     * This method returns response meta data information
      * 
      * @return
      */
-    Metadata getResponseFields();
+    Metadata getResponseMetadata();
 
     /**
      * This method returns granularity of task so that a separate thread can be

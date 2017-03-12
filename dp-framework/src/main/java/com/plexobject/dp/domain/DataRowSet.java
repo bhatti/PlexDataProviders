@@ -265,11 +265,11 @@ public class DataRowSet {
     }
 
     private synchronized int getKeyToMap(MetaField field, Object key) {
-        Integer row = getKeyMap(field).get(key);
-        if (row == null) {
+        Integer rowNumber = getKeyMap(field).get(key);
+        if (rowNumber == null) {
             return -1;
         }
-        return row;
+        return rowNumber;
     }
 
 }

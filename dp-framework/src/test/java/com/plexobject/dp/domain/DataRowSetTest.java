@@ -14,17 +14,17 @@ import org.junit.Test;
 
 public class DataRowSetTest {
     private Metadata metaFields;
-    private MetaField textMeta;
+    private MetaField keyMeta;
     private MetaField nameMeta;
 
     @Before
     public void setup() {
         MetaFieldFactory.reset();
-        textMeta = MetaFieldFactory.create("text", "Test",
+        keyMeta = MetaFieldFactory.create("key", "Test",
                 MetaFieldType.SCALAR_TEXT, true);
         nameMeta = MetaFieldFactory.create("name", "Test",
                 MetaFieldType.SCALAR_TEXT, false);
-        metaFields = Metadata.from(textMeta, nameMeta);
+        metaFields = Metadata.from(keyMeta, nameMeta);
     }
 
     @Test
@@ -34,8 +34,14 @@ public class DataRowSetTest {
     }
 
     @Test
+    public void testDefaultCreate() {
+        DataRowSet rowset = new DataRowSet();
+        assertEquals(0, rowset.size());
+    }
+
+    @Test
     public void testCreateRowSets() {
-        DataRow row = DataRow.from(textMeta, "hello there", nameMeta, "Jake");
+        DataRow row = DataRow.from(keyMeta, "hello there", nameMeta, "Jake");
         DataRowSet rowset = new DataRowSet(metaFields, row);
         assertEquals(1, rowset.size());
         assertTrue(rowset.toString().contains("Jake"));
@@ -43,7 +49,7 @@ public class DataRowSetTest {
 
     @Test
     public void testCreateRowSetsCollection() {
-        DataRow row = DataRow.from(textMeta, "hello there", nameMeta, "Jake");
+        DataRow row = DataRow.from(keyMeta, "hello there", nameMeta, "Jake");
         DataRowSet rowset = new DataRowSet(metaFields, Arrays.asList(row));
         assertEquals(1, rowset.size());
         assertEquals(metaFields, rowset.getMetadata());
@@ -65,7 +71,7 @@ public class DataRowSetTest {
         rowset.addValueAtRow(MetaFieldFactory.lookup("name"), "jake2", 1);
         assertTrue(rowset.hasFieldValue(MetaFieldFactory.lookup("name"), 0));
         assertFalse(rowset.hasFieldValue(MetaFieldFactory.lookup("name"), 2));
-        assertFalse(rowset.hasFieldValue(MetaFieldFactory.lookup("text"), 0));
+        assertFalse(rowset.hasFieldValue(MetaFieldFactory.lookup("key"), 0));
     }
 
     @Test
@@ -266,40 +272,74 @@ public class DataRowSetTest {
     @Test
     public void testGetValueAsTextKeyField() {
         DataRowSet rowset = new DataRowSet(metaFields);
-        MetaField field1 = MetaFieldFactory.create("text", "Test",
+        MetaField field1 = MetaFieldFactory.create("key", "Test",
                 MetaFieldType.SCALAR_TEXT, false);
         MetaField field2 = MetaFieldFactory.create("num", "Test",
                 MetaFieldType.SCALAR_INTEGER, false);
 
         rowset.addValueAtRow(field1, "jake1", 0);
         rowset.addValueAtRow(field2, 1L, 0);
-        DataRow row = rowset.getRowForKeyField(MetaFieldFactory.lookup("text"),
+        DataRow row = rowset.getRowForKeyField(MetaFieldFactory.lookup("key"),
                 "jake1");
         assertEquals("jake1",
-                row.getValueAsText(MetaFieldFactory.lookup("text")));
+                row.getValueAsText(MetaFieldFactory.lookup("key")));
         assertEquals(1L, row.getValueAsLong(MetaFieldFactory.lookup("num")));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testGetValueAsTextKeyFieldNonexistant() {
         DataRowSet rowset = new DataRowSet(metaFields);
-        MetaField field1 = MetaFieldFactory.create("text", "Test",
+        MetaField field1 = MetaFieldFactory.create("key", "Test",
                 MetaFieldType.SCALAR_TEXT, false);
         MetaField field2 = MetaFieldFactory.create("num", "Test",
                 MetaFieldType.SCALAR_INTEGER, false);
 
         rowset.addValueAtRow(field1, "jake1", 0);
         rowset.addValueAtRow(field2, 1L, 0);
-        assertNull(rowset.getRowForKeyField(MetaFieldFactory.lookup("text"), "jake2"));
+        assertNull(rowset.getRowForKeyField(MetaFieldFactory.lookup("key"),
+                "jake2"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetRowForKeyFieldWithNonkey() {
+        DataRowSet rowset = new DataRowSet(metaFields);
+        MetaField field1 = MetaFieldFactory.create("key", "Test",
+                MetaFieldType.SCALAR_TEXT, true);
+        MetaField field2 = MetaFieldFactory.create("num", "Test",
+                MetaFieldType.SCALAR_INTEGER, false);
+
+        for (int i = 0; i < 10; i++) {
+            rowset.addValueAtRow(field1, "key" + i, i);
+            rowset.addValueAtRow(field2, i, i);
+        }
+        rowset.getRowForKeyField(field2, "key3");
+    }
+
+    @Test
+    public void testGetRowForKeyField() {
+        DataRowSet rowset = new DataRowSet(metaFields);
+        MetaField field1 = MetaFieldFactory.create("key", "Test",
+                MetaFieldType.SCALAR_TEXT, true);
+        MetaField field2 = MetaFieldFactory.create("num", "Test",
+                MetaFieldType.SCALAR_INTEGER, false);
+
+        for (int i = 0; i < 10; i++) {
+            rowset.addValueAtRow(field1, "key" + i, i);
+            rowset.addValueAtRow(field2, i, i);
+        }
+        DataRow row = rowset.getRowForKeyField(field1, "key3"); // 4th row
+        assertEquals("key3", row.getValueAsText(field1));
+        assertEquals(3L, row.getValueAsLong(field2));
+        assertFalse(rowset.isNestedRowSet());
     }
 
     @Test
     public void testMerge() {
-        Metadata metadata1 = Metadata.from(textMeta);
+        Metadata metadata1 = Metadata.from(keyMeta);
         Metadata metadata2 = Metadata.from(nameMeta);
         DataRowSet rowset1 = new DataRowSet(metadata1);
         DataRowSet rowset2 = new DataRowSet(metadata2);
-        rowset1.addValueAtRow(textMeta, "text1", 0);
+        rowset1.addValueAtRow(keyMeta, "text1", 0);
         rowset2.addValueAtRow(nameMeta, "name1", 0);
         assertEquals(1, rowset1.getRows().size());
         assertEquals(1, rowset2.getRows().size());

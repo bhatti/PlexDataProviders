@@ -33,102 +33,106 @@ public class DataRowDeserializer extends JsonDeserializer<DataRow> {
             JsonNode node) throws IOException, JsonProcessingException {
         DataRow row = new DataRow();
         //
-        
+
         Iterator<JsonNode> it = node.elements();
         while (it.hasNext()) {
             JsonNode next = it.next();
-            String name = next.get("name").asText();
-            MetaField field = MetaFieldFactory.lookup(name);
-            if (field != null) {
-                switch (field.getType()) {
-                case SCALAR_TEXT:
-                    row.addField(field, next.get("value").asText());
-                    break;
-                case SCALAR_INTEGER:
-                    row.addField(field, next.get("value").asLong());
-                    break;
-                case SCALAR_DECIMAL:
-                    row.addField(field, next.get("value").asDouble());
-                    break;
-                case SCALAR_DATE:
-                    row.addField(field, new Date(next.get("value").asLong()));
-                    break;
-                case SCALAR_BOOLEAN:
-                    row.addField(field, next.get("value").asBoolean());
-                    break;
-                case VECTOR_TEXT: {
-                    Iterator<JsonNode> iit = next.get("value").elements();
-                    List<String> values = new ArrayList<>();
-                    int i = 0;
-                    while (iit.hasNext()) {
-                        JsonNode inext = iit.next();
-                        values.add(inext.get(i++).asText());
+            Iterator<String> namesIt = next.fieldNames();
+            while (namesIt.hasNext()) {
+                String name = namesIt.next();
+                MetaField field = MetaFieldFactory.lookup(name);
+                if (field != null) {
+                    switch (field.getType()) {
+                    case SCALAR_TEXT:
+                        row.addField(field, next.get(name).asText());
+                        break;
+                    case SCALAR_INTEGER:
+                        row.addField(field, next.get(name).asLong());
+                        break;
+                    case SCALAR_DECIMAL:
+                        row.addField(field, next.get(name).asDouble());
+                        break;
+                    case SCALAR_DATE:
+                        row.addField(field,
+                                new Date(next.get(name).asLong()));
+                        break;
+                    case SCALAR_BOOLEAN:
+                        row.addField(field, next.get(name).asBoolean());
+                        break;
+                    case VECTOR_TEXT: {
+                        Iterator<JsonNode> iit = next.get(name).elements();
+                        List<String> values = new ArrayList<>();
+                        while (iit.hasNext()) {
+                            JsonNode inext = iit.next();
+                            values.add(inext.asText());
+                        }
+                        row.addField(field,
+                                values.toArray(new String[values.size()]));
                     }
-                    row.addField(field,
-                            values.toArray(new String[values.size()]));
-                }
-                    break;
-                case VECTOR_INTEGER: {
-                    Iterator<JsonNode> iit = next.get("value").elements();
-                    List<Long> values = new ArrayList<>();
-                    int i = 0;
-                    while (iit.hasNext()) {
-                        JsonNode inext = iit.next();
-                        values.add(inext.get(i++).asLong());
+                        break;
+                    case VECTOR_INTEGER: {
+                        Iterator<JsonNode> iit = next.get(name).elements();
+                        List<Long> values = new ArrayList<>();
+                        while (iit.hasNext()) {
+                            JsonNode inext = iit.next();
+                            values.add(inext.asLong());
+                        }
+                        row.addField(field,
+                                values.toArray(new Long[values.size()]));
                     }
-                    row.addField(field, values.toArray(new Long[values.size()]));
-                }
-                    break;
-                case VECTOR_DECIMAL: {
-                    Iterator<JsonNode> iit = next.get("value").elements();
-                    List<Double> values = new ArrayList<>();
-                    int i = 0;
-                    while (iit.hasNext()) {
-                        JsonNode inext = iit.next();
-                        values.add(inext.get(i++).asDouble());
+                        break;
+                    case VECTOR_DECIMAL: {
+                        Iterator<JsonNode> iit = next.get(name).elements();
+                        List<Double> values = new ArrayList<>();
+                        while (iit.hasNext()) {
+                            JsonNode inext = iit.next();
+                            values.add(inext.asDouble());
+                        }
+                        row.addField(field,
+                                values.toArray(new Double[values.size()]));
                     }
-                    row.addField(field,
-                            values.toArray(new Double[values.size()]));
-                }
-                    break;
-                case VECTOR_DATE: {
-                    Iterator<JsonNode> iit = next.get("value").elements();
-                    List<Date> values = new ArrayList<>();
-                    int i = 0;
-                    while (iit.hasNext()) {
-                        JsonNode inext = iit.next();
-                        values.add(new Date(inext.get(i++).asLong()));
-                    }
-                    row.addField(field, values.toArray(new Date[values.size()]));
+                        break;
+                    case VECTOR_DATE: {
+                        Iterator<JsonNode> iit = next.get(name).elements();
+                        List<Date> values = new ArrayList<>();
+                        while (iit.hasNext()) {
+                            JsonNode inext = iit.next();
+                            values.add(new Date(inext.asLong()));
+                        }
+                        row.addField(field,
+                                values.toArray(new Date[values.size()]));
 
-                }
-                    break;
-                case VECTOR_BOOLEAN: {
-                    Iterator<JsonNode> iit = next.get("value").elements();
-                    List<Boolean> values = new ArrayList<>();
-                    int i = 0;
-                    while (iit.hasNext()) {
-                        JsonNode inext = iit.next();
-                        values.add(inext.get(i++).asBoolean());
                     }
-                    row.addField(field,
-                            values.toArray(new Boolean[values.size()]));
+                        break;
+                    case VECTOR_BOOLEAN: {
+                        Iterator<JsonNode> iit = next.get(name).elements();
+                        List<Boolean> values = new ArrayList<>();
+                        while (iit.hasNext()) {
+                            JsonNode inext = iit.next();
+                            values.add(inext.asBoolean());
+                        }
+                        row.addField(field,
+                                values.toArray(new Boolean[values.size()]));
 
-                }
-                    break;
-                case BINARY:
-                    row.addField(field,
-                            next.get("value").asText().getBytes("UTF-8"));
-                    break;
-                case ROWSET: {
-                    DataRowSet rowset = DataRowSetDeserializer.doDeserialize(
-                            jp, ctxt, next.get("value"));
-                    row.addField(field, rowset);
-                    break;
-                }
-                default:
-                    logger.error("Failed to deserialize object " + next);
-                    break;
+                    }
+                        break;
+                    case BINARY:
+                        row.addField(field, next.get(name).asText()
+                                .getBytes("UTF-8"));
+                        break;
+                    case ROWSET: {
+                        DataRowSet rowset = DataRowSetDeserializer
+                                .doDeserialize(jp, ctxt, next.get(name));
+                        row.addField(field, rowset);
+                        break;
+                    }
+                    default:
+                        logger.error("Failed to deserialize object " + next);
+                        break;
+                    }
+                } else {
+                    logger.error("Could not find meta field for " + field
+                            + ": " + next);
                 }
             }
         }
